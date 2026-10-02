@@ -5,6 +5,7 @@ CF Fieldbook 是独立的参考资料与离线例子仓库。先读 [README](REA
 ## Canonical paths
 
 - Markdown 拥有正文；`catalog/` 拥有精确跨页数据、来源和内容索引；`examples/` 拥有可执行行为。
+- `practice/` 拥有匿名重构的历史案例，catalog 的 `practice` 条目把它们纳入阅读、搜索与撤下规则。历史观察与编辑时查阅的官方机制分别注明；私人原始证据、项目身份与实际配置留在仓库外，不记为新的云端执行。
 - `tools/content.py sync` 显式更新维护事实块，`check` 检测漂移。历史报告不读入当前事实。
 - `tools/build_site.py` 是唯一阅读站构建入口，只分发显式 allowlist。阅读呈现的注释过滤与单次署名不回写 Markdown；代码中的注释示例和权利声明须保留，不通过开启任意 HTML 来处理维护标记。
 - `docs/glossary.md` 的词条首段拥有短释义；站点从它生成就地解释，冻结出版物嵌入当版所引用的定义。术语链接保留普通 Markdown 锚点。
@@ -20,7 +21,7 @@ CF Fieldbook 是独立的参考资料与离线例子仓库。先读 [README](REA
 
 例子默认离线。新增云端执行、付费调用、外部资源或账户变更需要该任务的明确授权。网站只发布静态阅读文件，不运行例子。未经授权不改变许可、远端或既有部署配置。
 
-公共资料使用合成输入与可公开来源。凭据、私人原始日志、实际账号配置、内部讨论和工作接续不进入仓库或站点；`.gitignore` 不替代分发边界。原创代码与内容的许可划分以 [LICENSE-STATUS.md](LICENSE-STATUS.md) 为准。
+公共例子使用合成输入；正文使用可公开来源与经过匿名重构的历史实践。凭据、私人原始日志、实际账号配置、内部讨论和工作接续不进入仓库或站点；`.gitignore` 不替代分发边界。原创代码与内容的许可划分以 [LICENSE-STATUS.md](LICENSE-STATUS.md) 为准。
 
 ## Verification and docs
 

@@ -646,5 +646,117 @@
     "accessed": "2026-10-02",
     "kind": "official_primary",
     "verification_scope": "revision_3_public_document_consulted; no_live_model_calls"
+  },
+  {
+    "id": "S84",
+    "title": "Workers bindings 官方说明",
+    "url": "https://developers.cloudflare.com/workers/runtime-apis/bindings/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "practice_mechanism_document_consulted; historical_observations_are_separate; no_new_cloud_execution"
+  },
+  {
+    "id": "S85",
+    "title": "R2 public buckets 官方说明",
+    "url": "https://developers.cloudflare.com/r2/buckets/public-buckets/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "practice_mechanism_document_consulted; historical_observations_are_separate; no_new_cloud_execution"
+  },
+  {
+    "id": "S86",
+    "title": "Access JWT 验证文档",
+    "url": "https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/validating-json/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "practice_mechanism_document_consulted; historical_observations_are_separate; no_new_cloud_execution"
+  },
+  {
+    "id": "S87",
+    "title": "Vectorize API 官方说明",
+    "url": "https://developers.cloudflare.com/vectorize/reference/client-api/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "practice_mechanism_document_consulted; historical_observations_are_separate; no_new_cloud_execution"
+  },
+  {
+    "id": "S88",
+    "title": "Workers AI 模型页",
+    "url": "https://developers.cloudflare.com/workers-ai/models/bge-m3/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "practice_mechanism_document_consulted; historical_observations_are_separate; no_new_cloud_execution"
+  },
+  {
+    "id": "S89",
+    "title": "Vectorize 查询文档",
+    "url": "https://developers.cloudflare.com/vectorize/best-practices/query-vectors/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "practice_mechanism_document_consulted; historical_observations_are_separate; no_new_cloud_execution"
+  },
+  {
+    "id": "S90",
+    "title": "MCP 2025-11-25 授权规范",
+    "url": "https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "practice_mechanism_document_consulted; historical_observations_are_separate; no_new_cloud_execution"
+  },
+  {
+    "id": "S91",
+    "title": "Access session management 官方说明",
+    "url": "https://developers.cloudflare.com/cloudflare-one/access-controls/access-settings/session-management/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "practice_mechanism_document_consulted; historical_observations_are_separate; no_new_cloud_execution"
+  },
+  {
+    "id": "S92",
+    "title": "MDN：Using Service Workers",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers",
+    "accessed": "2026-10-03",
+    "kind": "platform_documentation",
+    "verification_scope": "practice_mechanism_document_consulted; historical_observations_are_separate; no_new_cloud_execution"
+  },
+  {
+    "id": "S93",
+    "title": "Cloudflare Access policies 官方说明",
+    "url": "https://developers.cloudflare.com/cloudflare-one/access-controls/policies/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "practice_mechanism_document_consulted; historical_observations_are_separate; no_new_cloud_execution"
+  },
+  {
+    "id": "S94",
+    "title": "Cloudflare Tunnel routing",
+    "url": "https://developers.cloudflare.com/tunnel/concepts/routing/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "practice_mechanism_document_consulted; historical_observations_are_separate; no_new_cloud_execution"
+  },
+  {
+    "id": "S95",
+    "title": "连接配置说明",
+    "url": "https://developers.cloudflare.com/tunnel/configuration/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "practice_mechanism_document_consulted; historical_observations_are_separate; no_new_cloud_execution"
+  },
+  {
+    "id": "S96",
+    "title": "保护自托管应用官方说明",
+    "url": "https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/self-hosted-public-app/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "practice_mechanism_document_consulted; historical_observations_are_separate; no_new_cloud_execution"
+  },
+  {
+    "id": "S97",
+    "title": "Cloudflare Tunnel 故障排查文档",
+    "url": "https://developers.cloudflare.com/tunnel/troubleshooting/https-origins/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "practice_mechanism_document_consulted; historical_observations_are_separate; no_new_cloud_execution"
   }
 ]

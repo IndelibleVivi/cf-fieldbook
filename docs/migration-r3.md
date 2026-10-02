@@ -1,6 +1,6 @@
 # 从阅读版 r3 接续
 
-CF Fieldbook 以 architecture-1 包为仓库起点，承接 r3 正文、来源、测试与三个例子。初始来源与核验范围见[来源说明](provenance.md)。
+此页帮助阅读过固定 r3 出版物的读者找到当前正文、代码与构建入口。初始来源与核验范围见[来源说明](provenance.md)。
 
 ## 文件与行为的去向
 
@@ -14,9 +14,9 @@ CF Fieldbook 以 architecture-1 包为仓库起点，承接 r3 正文、来源�
 | 来源与修订 | 读者所需的核验范围集中于 docs/provenance.md，现行维护步骤归 docs/ |
 | tools/render.py | canonical 三册 renderer；只读冻结输入，禁止默认覆盖 dist |
 | tools/content.py、editions.py | 显式同步维护数据，固定版次输入并验证输出身份 |
-| tools/build_site.py | canonical 阅读站；替代 architecture-1 的单独 design-reader 生成路径 |
+| tools/build_site.py | 唯一阅读站构建入口，生成静态 HTML、目录和搜索索引 |
 | dist | 原始三册 MD/HTML/PDF 保留；新本地候选在 .build/editions |
-| assets/motifs | 原生青猫与日出 SVG，用于首页和新候选封面 |
+| assets/motifs | 首页插画、青猫与日出 SVG、云与边缘节点线稿；用途见内容设计 |
 | docs 与 CONTRIBUTING | 当前机制、读者说明和维护操作；私人 handoff 不导入 |
 
 ## 现有边界

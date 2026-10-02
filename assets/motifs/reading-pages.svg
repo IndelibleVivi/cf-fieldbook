@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="title desc">
+<title id="title">书页、云与日出</title><desc id="desc">展开的书页上方是云、橙色日出和细线节点，延续 Fieldbook 的几何视觉；仅为阅读装饰。</desc>
+<rect width="320" height="200" fill="#fff"/>
+<g id="sun" stroke="#BE4B13" stroke-width="1.4" stroke-linecap="round">
+<path d="M211 105a35 35 0 0 1 70 0" fill="#BE4B13" stroke="none"/>
+<path d="M246 57V46m-31 21-6-9m64 9 6-9m-80 33-11-3m104 3 11-3" fill="none"/>
+</g>
+<g id="cloud" stroke="#007F93" stroke-width="1.2" stroke-linejoin="round">
+<path d="M68 87c-12 0-21-9-21-20s8-19 19-20c4-13 15-22 29-22 17 0 30 13 31 28h7c12 0 22 8 22 18s-9 18-21 18z" fill="#EFF9FB"/>
+<path d="M88 103v21m0 0 18-9m-18 9-13-11" fill="none"/>
+</g>
+<g id="book" fill="none" stroke="#007F93" stroke-linecap="round">
+<path d="M24 134c60-10 104-6 137 10 37-15 76-17 137-7M30 145c51-8 97-3 131 11 36-12 81-13 133-6M37 157c49-5 90 0 124 11 38-8 80-8 126-2M161 145v35" stroke-width="1.2"/>
+</g>
+<path d="M174 87c12-27 26-34 42-36" fill="none" stroke="#8FBBC5" stroke-width="1" stroke-dasharray="2 5"/>
+<circle cx="177" cy="80" r="3" fill="#007F93"/>
+<path d="M24 103h12m-6-6v12M284 34h14m-7-7v14" stroke="#D3E4E8" stroke-width="1"/>
+</svg>

@@ -39,17 +39,17 @@ PUBLIC_REPOSITORY_PATHS = {
 REPOSITORY_URL = 'https://github.com/IndelibleVivi/cf-fieldbook/blob/main/'
 PUBLIC_SITE_URL = 'https://indeliblevivi.github.io/cf-fieldbook/'
 SITE_ASSETS = {'styles/site.css', 'styles/site.js', 'styles/search.js', 'assets/motifs/cat-sunrise.svg',
-               'assets/motifs/edge-route.svg', 'assets/motifs/favicon.svg'}
+               'assets/motifs/edge-route.svg', 'assets/motifs/reading-pages.svg', 'assets/motifs/field-notes.svg', 'assets/motifs/favicon.svg'}
 LINK_LABELS = {'internal': '站内阅读', 'term': '词义，可就地展开或打开词表', 'repository': '本项目公开源码，前往 GitHub',
                'source': '外部来源，离开本站', 'attachment': '附件；下载或打开文件'}
-READER_PREFIXES = {'services', 'comparisons', 'use-cases', 'guides', 'reference', 'reports', 'examples'}
+READER_PREFIXES = {'services', 'comparisons', 'use-cases', 'guides', 'reference', 'reports', 'examples', 'practice'}
 EXAMPLE_FILES = {
     'decision-routing': ('payloads.py', 'example.meta.json'),
     'health-worker': ('index.mjs', 'worker.test.mjs', 'wrangler.example.json', 'example.meta.json'),
     'job-state': ('model.py', 'demo.py', 'example.meta.json'),
 }
 KIND_LABELS = {'use-case': '用途', 'guide': '手册', 'service': '服务', 'comparison': '比较',
-               'example': '例子', 'reference': '实施参考', 'report': '带日期报告', 'doc': '资料维护'}
+               'example': '例子', 'reference': '实施参考', 'report': '带日期报告', 'practice': '实践', 'doc': '资料维护'}
 STATUS_LABELS = {'current': '当前资料', 'superseded': '已有替代', 'archived': '历史归档',
                  'withdrawn': '已撤下', 'draft': '草稿'}
 FIGCAP = {
@@ -275,7 +275,7 @@ class Site:
 
     def nav(self, page: str) -> str:
         items = [(self.starting_path(), '从用途开始'), ('products.html', '认识服务'),
-                 (self.reading_url('reports/2026-10-02.html'), '本期变化'), ('directory.html', '目录 / 搜索')]
+                 (self.reading_url('practice/README.html'), '实践记录'), ('directory.html', '目录 / 搜索')]
         return '<nav class="global-nav" aria-label="全站导航">' + ''.join(
             f'<a href="{escape(self.url(page, href))}">{label}</a>' for href, label in items) + '</nav>'
 
@@ -488,7 +488,7 @@ class Site:
         status = STATUS_LABELS[entry['status']]
         if entry.get('track') == 'edition':
             status = '历史报告 · ' + Path(path).stem + ' 资料快照'
-        text = f"{status} · 记录核验日期 {review.get('checked_on', '未登记')}"
+        text = f"{status} · 查阅于 {review.get('checked_on', '未登记')}"
         scope = review.get('scope', '未登记核验范围')
         return f'<details class="evidence-note"><summary>{escape(text)} · 核验范围</summary><p>{escape(scope)}。来源记录的日期与范围适用于本文；来源核对不等于账户或云端实测。</p></details>'
 
@@ -502,6 +502,9 @@ class Site:
         title = escape(self.titles[path])
         if title.startswith('Cloudflare '):
             title = '<span class="title-prefix">Cloudflare </span>' + title[len('Cloudflare '):]
+        if entry.get('kind') == 'practice' and '：' in title:
+            title, subtitle = title.split('：', 1)
+            presentation = {**presentation, 'subtitle': html.unescape(subtitle)}
         deck = f'<p class="article-deck">{escape(presentation["subtitle"])}</p>' if presentation.get('subtitle') else ''
         edition = f'<p class="edition-line">{escape(presentation["edition"])}</p>' if presentation.get('edition') else ''
         download = '' if entry.get('status') == 'withdrawn' else f'<a download href="{escape(self.url(page, path))}">下载 Markdown ↓</a>'
@@ -514,8 +517,10 @@ class Site:
         status = entry.get('status', 'current')
         self.directory_items.append({'title': self.titles[path], 'url': page, 'kind': kind, 'status': status})
         self.index_content(BeautifulSoup(content, 'html.parser'), page, self.titles[path], kind, status)
-        body = f'''<main id="main" class="reader-layout"><aside class="contents"><a class="contents-home" href="{escape(self.url(page, 'directory.html'))}">← 全部资料</a><details open><summary>本页目录</summary><ol>{toc}</ol></details><div class="reader-tools">{download}<a href="{escape(self.url(page, 'sources.html'))}">查阅来源索引 ↗</a></div></aside>
-<article class="article"><header class="article-header"><p class="eyebrow">{escape(kind)}</p><h1>{title}</h1>{deck}{edition}{self.notice(path)}</header><div class="prose">{content}{files}</div><div class="reading-end"><a href="{escape(self.url(page, 'directory.html'))}">继续阅读：全部资料 →</a></div></article></main>'''
+        motif = 'field-notes' if entry.get('kind') == 'practice' else 'reading-pages'
+        body = f'''<main id="main" class="reader-main"><header class="article-header"><div class="article-heading"><p class="eyebrow"><a href="{escape(self.url(page, 'index.html'))}">CF FIELDBOOK</a><span>/</span>{escape(kind)}</p><h1>{title}</h1>{deck}<div class="article-meta">{edition}{self.notice(path)}</div></div><img class="reader-mark" src="{escape(self.url(page, f'assets/motifs/{motif}.svg'))}" width="320" height="200" alt="" aria-hidden="true"></header>
+<div class="reader-layout"><aside class="contents"><a class="contents-home" href="{escape(self.url(page, 'directory.html'))}">← 全部资料</a><details open><summary>本页目录</summary><ol>{toc}</ol></details><div class="reader-tools">{download}<a href="{escape(self.url(page, 'sources.html'))}">查阅来源索引 ↗</a></div></aside>
+<article class="article"><div class="prose">{content}{files}</div><div class="reading-end"><a href="{escape(self.url(page, 'practice/README.html') if entry.get('kind') == 'practice' else self.url(page, 'directory.html'))}">继续阅读：{'实践记录' if entry.get('kind') == 'practice' else '全部资料'} →</a></div></article></div></main>'''
         return self.frame(page, self.titles[path], body, 'reader-page')
 
     def product_links(self, *, compact: bool = False) -> str:
@@ -536,11 +541,15 @@ class Site:
         return ''.join(rows)
 
     def home(self) -> str:
-        body = f'''<main id="main" class="home"><section class="home-cover"><div class="cover-copy"><p class="eyebrow">AN INDEPENDENT FIELD GUIDE</p><h1>从手边的问题，<br>读到可检查的实践。</h1><p class="cover-deck">Cloudflare® 服务的用途、选择与实践。<br>认识一项服务，也理解它应当放在哪里。</p><p class="cover-credit">持续参考</p></div><figure class="cover-art"><img src="assets/motifs/cat-sunrise.svg" alt="青色猫坐在书页般的地平线上，望向橙色日出" width="600" height="400"><figcaption>先看清问题，再决定下一步。</figcaption></figure></section>
-<section class="entry-paths" aria-labelledby="entry-heading"><div class="section-intro"><p class="eyebrow">THREE WAYS IN</p><h2 id="entry-heading">从这里翻开</h2><p>不必先读完所有服务。<br>选一个与你现在有关的入口。</p></div><div class="path-list">
-<a class="path" href="{escape(self.starting_path())}"><span class="path-number">01</span><div><h3>从用途开始 <span>→</span></h3><p>发布网页、安全访问、保存内容、恢复任务。<br>从一件正在做的事情认识基础设施。</p></div></a>
-<a class="path" href="products.html"><span class="path-number">02</span><div><h3>认识服务 <span>→</span></h3><p>从 Workers 到 R2，从 Tunnel 到 AI Gateway。<br>按正在解决的问题，找到相关章节。</p></div></a>
-<a class="path" href="{escape(self.reading_url('reports/2026-10-02.html'))}"><span class="path-number">03</span><div><h3>本期变化 <span>→</span></h3><p>2026-10-02 新发布观察。<br>回看当时的开放状态、时间与来源。</p></div></a></div></section>
+        practices = (
+            ('private-reader', '01', 'Workers · D1 · R2 · Vectorize', '电脑关机以后，<br>读者仍能阅读。', '一次私有资料站的发布、检索与授权实践。看内容怎样完整交付，又怎样在中断后继续。'),
+            ('access-pwa', '02', 'Access · PWA', '页面还在，<br>为什么连接已断？', '缓存外壳与登录会话有不同的寿命。从一次手机端故障，找到真正走网络的重连路径。'),
+            ('protected-status', '03', 'Tunnel · Access · Monitoring', '门禁正常，<br>服务就正常了吗？', '把入口、源站与登录后的页面分开检查，读懂状态页给出的每一条线索。'),
+        )
+        practice_cards = ''.join(f'<a class="practice-card" href="practice/{slug}.html"><div class="practice-card-top"><span>{number}</span><span>实践记录 ↗</span></div><h3>{title}</h3><p>{description}</p><div class="practice-stack">{stack}</div></a>' for slug, number, stack, title, description in practices if f'practice/{slug}.md' in self.paths and self.entries[f'practice/{slug}.md']['status'] == 'current')
+        body = f'''<main id="main" class="home"><section class="home-cover"><div class="cover-copy"><p class="eyebrow">CLOUDFLARE / AN INDEPENDENT FIELD GUIDE</p><h1>让手边的想法，<br><em>有地方运行。</em></h1><p class="cover-deck">从一个网页、一份资料，到可以恢复的任务。<br>一起读懂 Cloudflare® 服务，也看看它们真正用起来的样子。</p><a class="cover-start" href="{escape(self.starting_path())}"><span>翻开实践手册</span><span aria-hidden="true">→</span></a><a class="cover-secondary" href="{escape(self.reading_url('practice/README.html'))}">或从三篇真实实践开始 ↗</a></div><figure class="cover-art"><img src="assets/motifs/cat-sunrise.svg" alt="青色猫坐在书页般的地平线上，望向橙色日出" width="600" height="400" fetchpriority="high"></figure></section>
+<section class="entry-paths" aria-label="阅读路径"><a class="path" href="{escape(self.starting_path())}"><span class="path-number">01 / GUIDE</span><h2>先理解用途 <span>→</span></h2><p>发布、访问、数据与恢复。<br>从正在做的事，找到合适的服务。</p></a><a class="path" href="products.html"><span class="path-number">02 / SERVICES</span><h2>按服务查阅 <span>→</span></h2><p>Workers、R2、Tunnel、AI Gateway…<br>认识它负责的部分与边界。</p></a><a class="path" href="{escape(self.reading_url('reports/2026-10-02.html'))}"><span class="path-number">03 / DISPATCH</span><h2>读本期观察 <span>→</span></h2><p>2026-10-02 发布观察。<br>保留当时的开放条件、日期与来源。</p></a></section>
+<section class="practice-section" aria-labelledby="practice-heading"><header class="section-heading"><div><p class="eyebrow">NOTES FROM THE FIELD</p><h2 id="practice-heading">真实问题，实际走过的路。</h2></div><a href="{escape(self.reading_url('practice/README.html'))}">全部实践记录 →</a></header><div class="practice-grid">{practice_cards}</div><p class="practice-caption">来自作者维护过的系统 · 匿名重构 · 各篇保留观察日期与验证范围</p></section>
 <section class="product-spread" aria-labelledby="products-heading"><div class="section-intro"><p class="eyebrow">PRODUCTS / READING PATHS</p><h2 id="products-heading">一个服务，<br>放在什么位置？</h2><p>入口、运行、数据与恢复，各回答不同的问题。沿着一条路径读，不必一次组合所有服务。</p><img class="edge-detail" src="assets/motifs/edge-route.svg" width="360" height="220" alt="" aria-hidden="true"></div><div><ul class="product-links">{self.product_links(compact=True)}</ul><a class="all-products" href="products.html">打开服务阅读索引 →</a></div></section>
 <section class="shelf"><div><p class="eyebrow">READ · INSPECT · TAKE AWAY</p><h2>沿着解释，找到依据。</h2><p>读懂一个做法，再看完整代码与来源。<br>也可以带走 Markdown 和离线例子。</p></div><ul><li><a href="directory.html">全部资料与内容搜索 <span>→</span></a></li><li><a href="examples/README.html">三个离线例子 <span>→</span></a></li><li><a href="{escape(self.reading_url('reference/implementation.html'))}">实施参考：代码与恢复语义 <span>→</span></a></li><li><a href="diagrams/README.html">五张图：架构与资料生命周期 <span>→</span></a></li><li><a href="sources.html">来源与核验范围 <span>→</span></a></li></ul></section>
 <section class="edition-strip"><p class="eyebrow">DATES &amp; SOURCES</p><p>服务解释持续维护；报告保留各自日期。价格、开放条件和接口限制请结合正文的核验范围与来源阅读。</p><a href="sources.html">查阅来源索引 →</a></section></main>'''
@@ -582,19 +591,19 @@ class Site:
 
     def directory(self) -> str:
         groups = []
-        labels = ['用途', '手册', '服务', '比较', '实施参考', '例子', '带日期报告', '资料维护']
+        labels = ['实践', '用途', '手册', '服务', '比较', '实施参考', '例子', '带日期报告', '资料维护']
         for label in labels:
             items = [item for item in self.directory_items if item['kind'] == label]
             if items:
                 groups.append(f'<section class="directory-group"><h2>{label}</h2><ul>' + ''.join(
                     f'<li class="directory-item"><a href="{escape(item["url"])}">{escape(item["title"])}</a><span>{escape(STATUS_LABELS[item["status"]])}</span></li>' for item in items) + '</ul></section>')
         data = json.dumps(self.search, ensure_ascii=False).replace('<', '\\u003c')
-        body = f'''<main id="main" class="directory"><header class="page-title"><p class="eyebrow">THE READING INDEX</p><h1>全部资料</h1><p>从一个词继续找，或按下面的阅读目录翻开。搜索只在你的浏览器内处理。</p></header><section class="search-box"><label for="search-input">搜索正文与标题</label><input id="search-input" type="search" placeholder="例如：任务、费用、Clef、租约" disabled><p id="search-status" role="status">启用 JavaScript 后可搜索；完整目录始终可读。</p><ol id="search-results" hidden></ol></section><div id="reading-directory">{''.join(groups)}</div><script id="search-data" type="application/json">{data}</script></main>'''
+        body = f'''<main id="main" class="directory"><header class="page-title illustrated-title"><div><p class="eyebrow">THE READING INDEX</p><h1>全部资料</h1><p>从一个词继续找，或按下面的阅读目录翻开。搜索只在你的浏览器内处理。</p></div><img src="assets/motifs/field-notes.svg" width="320" height="200" alt="" aria-hidden="true"></header><section class="search-box"><label for="search-input">搜索正文与标题</label><input id="search-input" type="search" placeholder="例如：任务、费用、Clef、租约" disabled><p id="search-status" role="status">启用 JavaScript 后可搜索；完整目录始终可读。</p><ol id="search-results" hidden></ol></section><div id="reading-directory">{''.join(groups)}</div><script id="search-data" type="application/json">{data}</script></main>'''
         return self.frame('directory.html', '全部资料与搜索', body, extra_scripts=('styles/search.js',))
 
     def sources_page(self) -> str:
         rows = ''.join(f'<li id="{escape(s["id"])}"><span class="source-id">{escape(s["id"])}</span><div><a href="{escape(s["url"])}">{escape(s["title"])}</a><p>记录查阅日期 {escape(s.get("accessed", "未登记"))} · <code>{escape(s.get("verification_scope", "未登记"))}</code></p></div></li>' for s in self.sources)
-        body = f'''<main id="main" class="sources-page"><header class="page-title"><p class="eyebrow">SOURCES &amp; SCOPE</p><h1>来源与核验范围</h1><p>来源编号对应正文引用。查阅日期与核验范围保留在各条记录中；来源核对不等于账户权限证明或云端实测。</p><p><a download href="catalog/sources.json">下载来源记录 JSON ↓</a></p></header><ol class="sources-list">{rows}</ol></main>'''
+        body = f'''<main id="main" class="sources-page"><header class="page-title illustrated-title"><div><p class="eyebrow">SOURCES &amp; SCOPE</p><h1>来源与核验范围</h1><p>来源编号对应正文引用。查阅日期与核验范围保留在各条记录中；来源核对不等于账户权限证明或云端实测。</p><p><a download href="catalog/sources.json">下载来源记录 JSON ↓</a></p></div><img src="assets/motifs/reading-pages.svg" width="320" height="200" alt="" aria-hidden="true"></header><ol class="sources-list">{rows}</ol></main>'''
         return self.frame('sources.html', '来源与核验范围', body)
 
     def download_markdown(self, path: str) -> str:

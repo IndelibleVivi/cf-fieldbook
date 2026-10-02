@@ -24,7 +24,7 @@ npm ci --ignore-scripts
 .venv/bin/python tools/render_diagrams.py --check
 ```
 
-依赖和浏览器安装会访问软件源；渲染只读本地模块。已有兼容 Playwright Chromium 时不必重新下载，可通过 `--browser` 指定。原 architecture-1 使用的 Gradio bundle 入口已退役；当前只维护 npm 锁定依赖路径。更换 Mermaid 版本先改 package/lock，再重新渲染、检查配套并看图，不只刷新摘要。
+依赖和浏览器安装会访问软件源；渲染只读本地模块。已有兼容 Playwright Chromium 时不必重新下载，可通过 `--browser` 指定。当前只维护 npm 锁定依赖路径。更换 Mermaid 版本先改 package/lock，再重新渲染、检查配套并看图，不只刷新摘要。
 
 导出做两项统一兼容处理：添加真正的白底矩形；把 Mermaid 生成的同样式词级 tspan 合成单个行级 tspan，避免某些 SVG 打印引擎错误分配词位置。文字、行坐标、节点、边来自 Mermaid；未手改图意或移动节点。
 

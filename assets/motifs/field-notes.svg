@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="title desc">
+<title id="title">记录与连接</title><desc id="desc">错落的几页记录、青色连接线和橙色页签；实践阅读区的原创几何装饰，不表示系统拓扑。</desc>
+<rect width="320" height="200" fill="#fff"/>
+<g id="pages" stroke="#8FBBC5" stroke-width="1.2" stroke-linejoin="round">
+<path d="M53 48h93v115H53z" fill="#EFF9FB"/>
+<path d="M87 31h100v127H87z" fill="#fff"/>
+<path d="M122 57h108v117H122z" fill="#fff" stroke="#007F93"/>
+</g>
+<path d="M199 57v26l9-6 9 6V57" fill="#BE4B13"/>
+<g id="writing" fill="none" stroke="#8FBBC5" stroke-width="1.1" stroke-linecap="round">
+<path d="M139 90h35m-35 13h63m-63 12h53m-53 12h61m-61 22h30M104 49h22M69 67h9"/>
+</g>
+<path d="M236 123c49-17 51-48 7-64" fill="none" stroke="#007F93" stroke-width="1" stroke-dasharray="2 5"/>
+<circle cx="247" cy="58" r="5" fill="#fff" stroke="#007F93" stroke-width="1.2"/>
+<path d="M261 23h14m-7-7v14M38 126h12m-6-6v12" stroke="#D3E4E8" stroke-width="1"/>
+<path d="M65 182c63-11 129-7 196 0" fill="none" stroke="#007F93" stroke-width="1.2"/>
+<path d="M80 190c57-7 108-4 165 0" fill="none" stroke="#8FBBC5" stroke-width="1"/>
+</svg>

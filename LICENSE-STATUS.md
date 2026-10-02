@@ -8,7 +8,7 @@ CF Fieldbook 的项目原创部分由 Faye 按下列条款提供，作品署名�
 |---|---|
 | `tools/`、`tests/`、`examples/` 中的原创 Python / JavaScript / MJS 程序；`styles/` 的 CSS / JavaScript；文档中可独立执行的原创代码片段 | [Sustainable Use License 1.0（SUL-1.0）](LICENSE) |
 | 原创运行、构建与依赖配置：`.github/`、`.gitattributes`、`.gitignore`、`package*.json`、`requirements-*.txt`、`diagrams/mermaid.config.json`、`styles/fieldbook-tokens.json`、`examples/health-worker/wrangler.example.json` | [SUL-1.0](LICENSE)，仅就本项目有权许可的部分 |
-| 原创正文与模板：根目录文档，`docs/`、`guides/`、`services/`、`use-cases/`、`comparisons/`、`reference/`、`reports/`、`templates/`，以及例子和图示目录中的说明 | [CC BY-NC-SA 4.0](LICENSE-DOCUMENTATION.md)，可执行代码片段除外 |
+| 原创正文与模板：根目录文档，`docs/`、`guides/`、`services/`、`use-cases/`、`comparisons/`、`reference/`、`reports/`、`practice/`、`templates/`，以及例子和图示目录中的说明 | [CC BY-NC-SA 4.0](LICENSE-DOCUMENTATION.md)，可执行代码片段除外 |
 | 原创独立图形及其绘图源：`assets/` 中的 SVG、`diagrams/src/` 的 Mermaid | [CC BY-NC-SA 4.0](LICENSE-DOCUMENTATION.md) |
 | `catalog/`、`diagrams/index.json`、图示 manifest、例子元数据中的原创说明、选择与编排 | [CC BY-NC-SA 4.0](LICENSE-DOCUMENTATION.md)，限于本项目拥有的著作权或相关数据库权利；不对事实本身主张独占权 |
 | `dist/` 及后续导出的 Markdown / HTML / PDF | 原创文字和图形沿用 CC BY-NC-SA 4.0；其中可分离的功能代码、脚本与样式沿用 SUL-1.0；第三方材料仍按其本来的权利边界处理 |

@@ -27,7 +27,7 @@ class ReadingSiteTests(unittest.TestCase):
         cls.root.mkdir()
         # Only public build inputs are copied; no working notes or environment.
         for directory in ('catalog', 'services', 'comparisons', 'use-cases', 'guides',
-                          'reference', 'reports', 'examples', 'diagrams', 'assets', 'styles', 'templates'):
+                          'reference', 'reports', 'examples', 'practice', 'diagrams', 'assets', 'styles', 'templates'):
             shutil.copytree(ROOT / directory, cls.root / directory)
         for path in (*build_site.PUBLIC_DOCS, 'LICENSE'):
             if (ROOT / path).is_file():
@@ -62,6 +62,33 @@ class ReadingSiteTests(unittest.TestCase):
             self.assertTrue((self.output / path).is_file(), path)
         diagrams = BeautifulSoup((self.output / 'diagrams/README.html').read_text(), 'html.parser')
         self.assertEqual(len(diagrams.select('img.technical-diagram')), 5)
+
+    def test_real_practice_is_discoverable_without_claiming_a_new_cloud_run(self):
+        home = BeautifulSoup((self.output / 'index.html').read_text(), 'html.parser')
+        directory = BeautifulSoup((self.output / 'directory.html').read_text(), 'html.parser')
+        index = json.loads((self.output / 'search-index.json').read_text())
+        routes = {f'practice/{name}.html' for name in ('private-reader', 'access-pwa', 'protected-status')}
+        self.assertEqual({a['href'] for a in home.select('.practice-card')}, routes)
+        for route in routes:
+            self.assertIsNotNone(directory.find('a', href=route))
+            self.assertTrue(any(item['url'].split('#')[0] == route and item['kind'] == '实践' for item in index))
+            page = BeautifulSoup((self.output / route).read_text(), 'html.parser')
+            self.assertIn('未进行新的云端实验', page.select_one('.evidence-note').get_text())
+            self.assertTrue((self.output / Path(route).with_suffix('.md')).is_file())
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / 'fieldbook'
+            shutil.copytree(self.root, root, ignore=shutil.ignore_patterns('.build'))
+            catalog_path = root / 'catalog/entries.json'
+            catalog = json.loads(catalog_path.read_text())
+            entry = next(e for e in catalog['entries'] if e['id'] == 'practice.access-pwa')
+            entry['status'] = 'withdrawn'
+            catalog_path.write_text(json.dumps(catalog, ensure_ascii=False))
+            (root / entry['path']).write_text('# WITHDRAWN_PRACTICE_SENTINEL')
+            build_site.build_site(root)
+            output = root / '.build/site'
+            self.assertFalse((output / 'practice/access-pwa.md').exists())
+            self.assertNotIn('practice/access-pwa.html', (output / 'index.html').read_text())
+            self.assertNotIn('WITHDRAWN_PRACTICE_SENTINEL', (output / 'search-index.json').read_text())
 
     def test_all_generated_local_links_assets_and_anchors_exist(self):
         for page in self.output.rglob('*.html'):
@@ -221,7 +248,8 @@ cat < input > output
             self.assertEqual(soup.select_one('.site-footer .signature').get_text(), 'made by Faye & Cove')
             self.assertIsNotNone(soup.select_one('.site-footer .link-legend'))
             self.assertFalse(soup.select('body > .reading-legend'))
-            self.assertNotIn('CF FIELDBOOK', soup.select_one('.article-header .eyebrow').get_text())
+            self.assertNotIn('Faye & Cove', soup.select_one('.article-header').get_text())
+            self.assertEqual(len(soup.find_all('h1')), 1)
             self.assertNotIn('Faye & Cove', soup.select_one('.article-deck').get_text())
             self.assertTrue(soup.select_one('.edition-line').get_text().startswith('2026.10'))
             self.assertFalse(soup.select_one('.prose').find('p').strong)

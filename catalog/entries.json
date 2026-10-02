@@ -315,6 +315,94 @@
           "ref": "tests/test_job_recovery.py"
         }
       ]
+    },
+    {
+      "id": "practice.index",
+      "kind": "practice",
+      "path": "practice/README.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [],
+      "related": [
+        "guide.handbook"
+      ],
+      "review": {
+        "state": "checked",
+        "checked_on": "2026-10-03",
+        "scope": "匿名历史实践的编辑复核与文中所链官方机制文档查阅；历史观察日期见正文，未进行新的云端实验"
+      },
+      "evidence": [
+        {
+          "kind": "source-reviewed",
+          "ref": "docs/provenance.md"
+        }
+      ]
+    },
+    {
+      "id": "practice.private-reader",
+      "kind": "practice",
+      "path": "practice/private-reader.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [],
+      "related": [
+        "guide.handbook"
+      ],
+      "review": {
+        "state": "checked",
+        "checked_on": "2026-10-03",
+        "scope": "匿名历史实践的编辑复核与文中所链官方机制文档查阅；历史观察日期见正文，未进行新的云端实验"
+      },
+      "evidence": [
+        {
+          "kind": "source-reviewed",
+          "ref": "docs/provenance.md"
+        }
+      ]
+    },
+    {
+      "id": "practice.access-pwa",
+      "kind": "practice",
+      "path": "practice/access-pwa.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [],
+      "related": [
+        "guide.handbook"
+      ],
+      "review": {
+        "state": "checked",
+        "checked_on": "2026-10-03",
+        "scope": "匿名历史实践的编辑复核与文中所链官方机制文档查阅；历史观察日期见正文，未进行新的云端实验"
+      },
+      "evidence": [
+        {
+          "kind": "source-reviewed",
+          "ref": "docs/provenance.md"
+        }
+      ]
+    },
+    {
+      "id": "practice.protected-status",
+      "kind": "practice",
+      "path": "practice/protected-status.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [],
+      "related": [
+        "guide.handbook"
+      ],
+      "review": {
+        "state": "checked",
+        "checked_on": "2026-10-03",
+        "scope": "匿名历史实践的编辑复核与文中所链官方机制文档查阅；历史观察日期见正文，未进行新的云端实验"
+      },
+      "evidence": [
+        {
+          "kind": "source-reviewed",
+          "ref": "docs/provenance.md"
+        }
+      ]
     }
   ]
 }

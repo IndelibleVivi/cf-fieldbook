@@ -9,7 +9,7 @@ import sys
 from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
-ALLOWED = {'blog.cloudflare.com', 'developers.cloudflare.com', 'www.cloudflare.com', 'docs.typesafe.ai', 'openrouter.ai', 'vercel.com', 'huggingface.co'}
+ALLOWED = {'blog.cloudflare.com', 'developers.cloudflare.com', 'www.cloudflare.com', 'docs.typesafe.ai', 'openrouter.ai', 'vercel.com', 'huggingface.co', 'developer.mozilla.org', 'modelcontextprotocol.io'}
 
 
 def validate(root: Path = ROOT) -> list[str]:
