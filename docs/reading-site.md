@@ -12,10 +12,10 @@
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements-render.txt
 .venv/bin/python tools/build_site.py
-.venv/bin/python -m http.server 8766 --bind 127.0.0.1 --directory .build/site
+.venv/bin/python -m http.server 8767 --bind 127.0.0.1 --directory .build/site
 ```
 
-打开 `http://127.0.0.1:8766/`。构建结果在 `.build/site`；也可直接打开其中的 `index.html`。搜索数据随 HTML 保存，没有搜索服务、外部追踪、登录或后台。JavaScript 关闭时，正文、内链、来源与完整目录仍可阅读；搜索与手机目录自动收起需要 JavaScript。
+打开 `http://127.0.0.1:8767/`。构建结果在 `.build/site`；也可直接打开其中的 `index.html`。搜索数据随 HTML 保存，没有搜索服务、外部追踪、登录或后台。JavaScript 关闭时，正文、内链、来源与完整目录仍可阅读；搜索与手机目录自动收起需要 JavaScript。
 
 重新构建会清空并重建指定的 `.build` 子目录，避免被撤下的附件残留。不要把其他工作文件放进站点产物目录。构建不修改 Markdown、catalog、图示源或核验日期。
 

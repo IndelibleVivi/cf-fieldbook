@@ -35,10 +35,10 @@ Python 环境只负责生成静态文件，阅读页面不需要后端：
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements-render.txt -r requirements-design.txt
 .venv/bin/python tools/build_site.py
-python3 -m http.server 8765 --bind 127.0.0.1 --directory .build/site
+python3 -m http.server 8767 --bind 127.0.0.1 --directory .build/site
 ```
 
-在浏览器打开 `http://127.0.0.1:8765`。依赖安装需要软件源网络；构建与阅读本身不请求云 API，没有追踪、登录或付费执行入口。也可直接阅读仓库 Markdown。网站的生成、附件与撤下规则见[阅读站说明](docs/reading-site.md)。
+在浏览器打开 `http://127.0.0.1:8767`。依赖安装需要软件源网络；构建与阅读本身不请求云 API，没有追踪、登录或付费执行入口。也可直接阅读仓库 Markdown。网站的生成、附件与撤下规则见[阅读站说明](docs/reading-site.md)。
 
 ## 内容如何维护
 
