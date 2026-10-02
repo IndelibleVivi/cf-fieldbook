@@ -368,8 +368,6 @@ class Site:
         if not figures:
             return
         for img in list(soup.find_all('img')):
-            if '/motifs/' in str(img['src']):
-                continue
             if img.parent.name == 'p' and len(img.parent.contents) == 1:
                 img.parent.unwrap()
             figure = soup.new_tag('figure')
@@ -419,6 +417,10 @@ class Site:
         for ident in sorted(missing):
             body += f'\n[{ident}]: {source_by_id[ident]["url"]}\n'
         soup = BeautifulSoup(self.md.render(body, {'source_path': path}), 'html.parser')
+        # The GitHub masthead belongs to the repository; the website has its own header.
+        if path == 'README.md':
+            for banner in soup.select('p > a > img[src="assets/motifs/repository-banner.svg"]'):
+                banner.find_parent('p').decompose()
         # Only the authored question/answer prefix pair is enhanced; arbitrary HTML stays disabled.
         for block in soup.find_all('blockquote'):
             paragraphs = block.find_all('p', recursive=False)
@@ -630,7 +632,7 @@ class Site:
                 if self.entries.get(rel, {}).get('status') == 'withdrawn':
                     return f'{prefix}[{label}]({Path(parsed.path).with_suffix(".html")})'
                 return match[0]
-            if rel in self.attachments:
+            if rel in self.attachments or rel in SITE_ASSETS:
                 return match[0]
             if rel in PUBLIC_REPOSITORY_PATHS:
                 return f'{prefix}[{label}]({REPOSITORY_URL}{quote(rel, safe="/")})'

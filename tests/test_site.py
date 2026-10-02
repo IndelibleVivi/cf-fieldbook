@@ -241,6 +241,16 @@ cat < input > output
         self.assertEqual(len(soup.find_all('img')), 1)
         self.assertEqual(soup.img['src'], 'assets/workspace.svg')
 
+    def test_repository_banner_stays_in_readme_source_not_web_pages(self):
+        banner = 'assets/motifs/repository-banner.svg'
+        self.assertIn(banner, (self.root / 'README.md').read_text())
+        self.assertIn(banner, (self.output / 'README.md').read_text())
+        self.assertTrue((self.output / banner).is_file())
+        download = BeautifulSoup(MarkdownIt().render((self.output / 'README.md').read_text()), 'html.parser')
+        self.assertEqual(download.find('img', src=banner).parent['href'], build_site.PUBLIC_SITE_URL)
+        for path in ('README.html', 'index.html'):
+            self.assertNotIn(banner, (self.output / path).read_text())
+
     def test_shared_footer_owns_signature_and_opening_metadata_is_semantic(self):
         for path in ('guides/handbook.html', 'reports/2026-10-02.html'):
             soup = BeautifulSoup((self.output / path).read_text(), 'html.parser')
