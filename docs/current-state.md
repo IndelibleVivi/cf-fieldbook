@@ -2,7 +2,7 @@
 
 2026-10-02 · [公共源码](https://github.com/IndelibleVivi/cf-fieldbook)，默认分支 `main`。
 
-- 阅读站提供用途、服务与当期观察三条入口，包含产品索引、目录、全文搜索、Markdown 下载和公开例子附件。正式部署地址为 [CF Fieldbook](https://indeliblevivi.github.io/cf-fieldbook/)；首次部署待完成。
+- 阅读站提供用途、服务与当期观察三条入口，包含产品索引、目录、全文搜索、Markdown 下载和公开例子附件。[CF Fieldbook 正式站](https://indeliblevivi.github.io/cf-fieldbook/) 已上线，使用 GitHub Pages 与 HTTPS。
 - `Checks and Pages` 对提交运行离线检查，主分支通过后部署到 GitHub Pages。PR 只检查。构建与回退方法见[阅读站](reading-site.md)。
 - 决策模型的路线、选择器、价格、上下文和成本估算由 catalog 与例子实现共源；其余解释由 Markdown 维护。
 - 三个例子默认离线。任务恢复演示覆盖中断、租约接管、迟到完成与不确定结果；没有云端实测声明。
