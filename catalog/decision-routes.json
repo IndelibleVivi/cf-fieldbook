@@ -1,0 +1,99 @@
+{
+  "schema": "decision-route-catalog/v1",
+  "currency": "USD",
+  "note": "Price only; fees, Worker, logging and retries are separate. Null means not asserted, not zero. Distinct gateways need not mean distinct inference providers.",
+  "routes": [
+    {
+      "id": "cf-jev",
+      "model": "Jev",
+      "model_author": "TypeSafe",
+      "gateway": "Cloudflare",
+      "selector": "typesafe/jev",
+      "input_usd_per_million": "0.042",
+      "output_usd_per_million": "0",
+      "context": "Catalog: 32000",
+      "sources": [
+        "S73"
+      ],
+      "verified_on": "2026-10-02",
+      "evidence": "official_documentation_not_inference_test"
+    },
+    {
+      "id": "cf-clef-flash",
+      "model": "Clef-flash",
+      "model_author": "Cloudflare",
+      "gateway": "Cloudflare",
+      "selector": "@cf/cloudflare/clef-flash",
+      "input_usd_per_million": "0.09",
+      "output_usd_per_million": null,
+      "context": "65536; max64 questions; images extension",
+      "sources": [
+        "S18"
+      ],
+      "verified_on": "2026-10-02",
+      "evidence": "official_documentation_not_inference_test"
+    },
+    {
+      "id": "cf-clef",
+      "model": "Clef",
+      "model_author": "Cloudflare",
+      "gateway": "Cloudflare",
+      "selector": "@cf/cloudflare/clef",
+      "input_usd_per_million": "0.24",
+      "output_usd_per_million": null,
+      "context": "65536; max64 questions; images extension",
+      "sources": [
+        "S17"
+      ],
+      "verified_on": "2026-10-02",
+      "evidence": "official_documentation_not_inference_test"
+    },
+    {
+      "id": "typesafe-direct",
+      "model": "Jev 1.13",
+      "model_author": "TypeSafe",
+      "gateway": null,
+      "selector": "jev-1.13.0",
+      "input_usd_per_million": "0.042",
+      "output_usd_per_million": "0",
+      "context": "Total64000; state+longest-question32000",
+      "sources": [
+        "S74"
+      ],
+      "verified_on": "2026-10-02",
+      "evidence": "official_documentation_not_inference_test"
+    },
+    {
+      "id": "openrouter-jev",
+      "model": "Jev 1.13",
+      "model_author": "TypeSafe",
+      "gateway": "OpenRouter",
+      "selector": "typesafe/jev-1.13",
+      "input_usd_per_million": "0.042",
+      "output_usd_per_million": "0",
+      "context": "Catalog:32000",
+      "sources": [
+        "S75",
+        "S76"
+      ],
+      "verified_on": "2026-10-02",
+      "evidence": "official_documentation_not_inference_test"
+    },
+    {
+      "id": "vercel-jev",
+      "model": "Jev",
+      "model_author": "TypeSafe",
+      "gateway": "Vercel AI Gateway",
+      "selector": "typesafe-ai/jev",
+      "input_usd_per_million": null,
+      "output_usd_per_million": null,
+      "display_price": "$0.04/M",
+      "context": "Not verified",
+      "sources": [
+        "S81"
+      ],
+      "verified_on": "2026-10-02",
+      "evidence": "official_documentation_not_inference_test"
+    }
+  ]
+}

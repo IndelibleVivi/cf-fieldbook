@@ -1,0 +1,650 @@
+[
+  {
+    "id": "S01",
+    "title": "Birthday Week 2026 发布总览",
+    "url": "https://www.cloudflare.com/birthday-week/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S02",
+    "title": "cf CLI 发布",
+    "url": "https://blog.cloudflare.com/cloudflare-cf-cli-launch/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S03",
+    "title": "cf CLI 文档",
+    "url": "https://developers.cloudflare.com/cf/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S04",
+    "title": "Containers 新运行接口与 Sandbox",
+    "url": "https://blog.cloudflare.com/faster-agent-sandboxes/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S05",
+    "title": "Containers 文件系统快照",
+    "url": "https://developers.cloudflare.com/containers/guides/snapshots/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S06",
+    "title": "Containers 价格",
+    "url": "https://developers.cloudflare.com/containers/platform/pricing/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S07",
+    "title": "Artifacts 公开测试发布",
+    "url": "https://blog.cloudflare.com/next-git-platform-on-cloudflare/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S08",
+    "title": "Artifacts 价格",
+    "url": "https://developers.cloudflare.com/artifacts/platform/pricing/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S09",
+    "title": "AI Search GA",
+    "url": "https://blog.cloudflare.com/ai-search-ga/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S10",
+    "title": "AI Search 限制与价格",
+    "url": "https://developers.cloudflare.com/ai-search/platform/limits-pricing/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S11",
+    "title": "Workers Issues 发布",
+    "url": "https://blog.cloudflare.com/real-time-issue-detection/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S12",
+    "title": "Workers Issues 文档",
+    "url": "https://developers.cloudflare.com/workers/observability/issues/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S13",
+    "title": "AutoRouter 发布",
+    "url": "https://blog.cloudflare.com/auto-router/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S14",
+    "title": "AI Gateway User Insights",
+    "url": "https://developers.cloudflare.com/ai-gateway/observability/user-insights/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S15",
+    "title": "AI Gateway 价格与日志",
+    "url": "https://developers.cloudflare.com/ai-gateway/reference/pricing/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S16",
+    "title": "Clef 与强化学习平台发布",
+    "url": "https://blog.cloudflare.com/clef-decision-models/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "revision_3_public_document_rechecked; no_live_model_calls"
+  },
+  {
+    "id": "S17",
+    "title": "Clef 模型卡",
+    "url": "https://developers.cloudflare.com/workers-ai/models/clef/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "revision_3_public_document_rechecked; no_live_model_calls"
+  },
+  {
+    "id": "S18",
+    "title": "Clef-flash 模型卡",
+    "url": "https://developers.cloudflare.com/workers-ai/models/clef-flash/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "revision_3_public_document_rechecked; no_live_model_calls"
+  },
+  {
+    "id": "S19",
+    "title": "Kitesurf 更新",
+    "url": "https://blog.cloudflare.com/kitesurf-update/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S20",
+    "title": "Cloudflare OS 托管候补",
+    "url": "https://blog.cloudflare.com/managed-cloudflare-os/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S21",
+    "title": "EmDash 1.0 与 EmDash Build",
+    "url": "https://blog.cloudflare.com/emdash-cms-plugin-registry/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S22",
+    "title": "K2 发布",
+    "url": "https://blog.cloudflare.com/cloudflare-k2-streams/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S23",
+    "title": "K2 文档",
+    "url": "https://developers.cloudflare.com/k2/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S24",
+    "title": "Basin GA",
+    "url": "https://blog.cloudflare.com/cloudflare-basin/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S25",
+    "title": "KV Instant 私测与价格",
+    "url": "https://blog.cloudflare.com/workers-kv-instant/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S26",
+    "title": "Rust Emscripten target",
+    "url": "https://blog.cloudflare.com/rust-workers-emscripten-target/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S27",
+    "title": "Forge 生成工具链",
+    "url": "https://blog.cloudflare.com/forge-open-source-generation-pipeline/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S28",
+    "title": "Vinext 1.0",
+    "url": "https://blog.cloudflare.com/vinext-nextjs-on-vite/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S29",
+    "title": "Threat Signals",
+    "url": "https://blog.cloudflare.com/threat-signals/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S30",
+    "title": "Monetization Gateway 封闭测试",
+    "url": "https://blog.cloudflare.com/monetization-gateway-beta/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S31",
+    "title": "The Cold Start",
+    "url": "https://blog.cloudflare.com/introducing-the-cold-start/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S32",
+    "title": "Git 平台比赛正式规则",
+    "url": "https://www.cloudflare.com/documents/build-next-gen-git-platform-competition-terms.pdf",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S33",
+    "title": "开发者平台 Changelog",
+    "url": "https://developers.cloudflare.com/changelog/product-group/developer-platform/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S34",
+    "title": "Workers 价格",
+    "url": "https://developers.cloudflare.com/workers/platform/pricing/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S35",
+    "title": "Workers Builds 限制与价格",
+    "url": "https://developers.cloudflare.com/workers/ci-cd/builds/limits-and-pricing/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S36",
+    "title": "Browser Run 价格",
+    "url": "https://developers.cloudflare.com/browser-run/pricing/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S37",
+    "title": "D1 价格",
+    "url": "https://developers.cloudflare.com/d1/platform/pricing/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S38",
+    "title": "R2 价格",
+    "url": "https://developers.cloudflare.com/r2/pricing/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S39",
+    "title": "Queues 价格",
+    "url": "https://developers.cloudflare.com/queues/platform/pricing/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S40",
+    "title": "Vectorize 价格",
+    "url": "https://developers.cloudflare.com/vectorize/platform/pricing/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S41",
+    "title": "Workers AI 价格",
+    "url": "https://developers.cloudflare.com/workers-ai/platform/pricing/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S42",
+    "title": "KV 价格",
+    "url": "https://developers.cloudflare.com/kv/platform/pricing/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S43",
+    "title": "Durable Objects 价格",
+    "url": "https://developers.cloudflare.com/durable-objects/platform/pricing/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S44",
+    "title": "Workflows 价格",
+    "url": "https://developers.cloudflare.com/workflows/reference/pricing/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S45",
+    "title": "Workers Bindings",
+    "url": "https://developers.cloudflare.com/workers/runtime-apis/bindings/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S46",
+    "title": "Workers Static Assets",
+    "url": "https://developers.cloudflare.com/workers/static-assets/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S47",
+    "title": "Cloudflare Tunnel",
+    "url": "https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S48",
+    "title": "Access JWT 验证",
+    "url": "https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/validating-json/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S49",
+    "title": "Access Service Tokens",
+    "url": "https://developers.cloudflare.com/cloudflare-one/access-controls/service-credentials/service-tokens/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S50",
+    "title": "D1 Time Travel",
+    "url": "https://developers.cloudflare.com/d1/reference/time-travel/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S51",
+    "title": "D1 数据导出",
+    "url": "https://developers.cloudflare.com/d1/best-practices/import-export-data/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S52",
+    "title": "R2 对象生命周期",
+    "url": "https://developers.cloudflare.com/r2/buckets/object-lifecycles/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S53",
+    "title": "Queues 重试与批处理",
+    "url": "https://developers.cloudflare.com/queues/configuration/batching-retries/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S54",
+    "title": "Queues 死信队列",
+    "url": "https://developers.cloudflare.com/queues/configuration/dead-letter-queues/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S55",
+    "title": "Workflows 执行规则",
+    "url": "https://developers.cloudflare.com/workflows/build/rules-of-workflows/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S56",
+    "title": "Cron Triggers",
+    "url": "https://developers.cloudflare.com/workers/configuration/cron-triggers/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S57",
+    "title": "Service Bindings",
+    "url": "https://developers.cloudflare.com/workers/runtime-apis/bindings/service-bindings/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S58",
+    "title": "Agents SDK",
+    "url": "https://developers.cloudflare.com/agents/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S59",
+    "title": "Sandbox SDK",
+    "url": "https://developers.cloudflare.com/sandbox/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S60",
+    "title": "Agent Memory",
+    "url": "https://developers.cloudflare.com/agent-memory/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S61",
+    "title": "Cloudflare Mesh",
+    "url": "https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-mesh/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S62",
+    "title": "Split Tunnels",
+    "url": "https://developers.cloudflare.com/cloudflare-one/team-and-resources/devices/cloudflare-one-client/configure/route-traffic/split-tunnels/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S63",
+    "title": "Workers 预览资源隔离",
+    "url": "https://developers.cloudflare.com/workers/previews/resources/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S64",
+    "title": "Vectorize Client API",
+    "url": "https://developers.cloudflare.com/vectorize/reference/client-api/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S65",
+    "title": "Workers Builds",
+    "url": "https://developers.cloudflare.com/workers/ci-cd/builds/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S66",
+    "title": "Workers 入门",
+    "url": "https://developers.cloudflare.com/workers/get-started/guide/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S67",
+    "title": "Zero Trust 计划",
+    "url": "https://www.cloudflare.com/plans/zero-trust-services/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S70",
+    "title": "Durable Objects pending I/O 保活",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-01-pending-io-keep-alive/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S71",
+    "title": "Workers OAuth Provider v1",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-01-workers-oauth-provider-1x/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S72",
+    "title": "Sandbox SDK 1.0 迁移差异",
+    "url": "https://developers.cloudflare.com/sandbox/sdk/migrate/changes-in-1-0/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S73",
+    "title": "Jev：Cloudflare 第三方模型目录",
+    "url": "https://developers.cloudflare.com/ai/models/typesafe/jev/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "revision_3_public_document_consulted; no_live_model_calls"
+  },
+  {
+    "id": "S74",
+    "title": "TypeSafe：Jev 版本、价格与上下文预算",
+    "url": "https://docs.typesafe.ai/models",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "revision_3_public_document_consulted; no_live_model_calls"
+  },
+  {
+    "id": "S75",
+    "title": "OpenRouter：Jev 1.13 价格与供应商",
+    "url": "https://openrouter.ai/typesafe/jev-1.13/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "revision_3_public_document_consulted; no_live_model_calls"
+  },
+  {
+    "id": "S76",
+    "title": "OpenRouter：Jev 的两种接口",
+    "url": "https://openrouter.ai/docs/guides/community/jev",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "revision_3_public_document_consulted; no_live_model_calls"
+  },
+  {
+    "id": "S77",
+    "title": "TypeSafe：confidence 的含义",
+    "url": "https://docs.typesafe.ai/confidence",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "revision_3_public_document_consulted; no_live_model_calls"
+  },
+  {
+    "id": "S78",
+    "title": "TypeSafe：Jev 1.13 已知能力边界",
+    "url": "https://docs.typesafe.ai/model-jaggedness/jev-1.13",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "revision_3_public_document_consulted; no_live_model_calls"
+  },
+  {
+    "id": "S79",
+    "title": "Cloudflare AI Gateway：统一 REST API",
+    "url": "https://developers.cloudflare.com/ai-gateway/usage/rest-api/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "revision_3_public_document_consulted; no_live_model_calls"
+  },
+  {
+    "id": "S80",
+    "title": "Cloudflare AI Gateway：Unified Billing",
+    "url": "https://developers.cloudflare.com/ai-gateway/features/unified-billing/",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "revision_3_public_document_consulted; no_live_model_calls"
+  },
+  {
+    "id": "S81",
+    "title": "Vercel AI Gateway：Jev 目录显示价与 SDK 示例",
+    "url": "https://vercel.com/ai-gateway/models/jev",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "official_search_excerpt; full_page_fetch_failed; display_precision_only"
+  },
+  {
+    "id": "S82",
+    "title": "Cloudflare Clef：开放模型权重与模型卡",
+    "url": "https://huggingface.co/Cloudflare/clef",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "revision_3_public_document_consulted; no_live_model_calls"
+  },
+  {
+    "id": "S83",
+    "title": "Cloudflare Clef-flash：开放模型权重与模型卡",
+    "url": "https://huggingface.co/Cloudflare/clef-flash",
+    "accessed": "2026-10-02",
+    "kind": "official_primary",
+    "verification_scope": "revision_3_public_document_consulted; no_live_model_calls"
+  }
+]

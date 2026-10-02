@@ -1,0 +1,84 @@
+{
+  "schema": "fieldbook.diagrams/1",
+  "engine": {
+    "name": "mermaid",
+    "version": "11.17.2",
+    "loader": "npm-mermaid",
+    "module_sha256": "462d6f73fc9833044bca6dc08e62e0ee83f5a2b09583f588f95d5fd91b1960ed"
+  },
+  "config": "diagrams/mermaid.config.json",
+  "config_sha256": "d77e33f7f8c798e277406d22603f5b80d6b98c864ab6b51cd8b279b6429007ea",
+  "font_family": "Noto Sans CJK SC, sans-serif",
+  "font_files_distributed": false,
+  "local_module_hashes": {
+    "mermaid.esm.min.mjs": "462d6f73fc9833044bca6dc08e62e0ee83f5a2b09583f588f95d5fd91b1960ed",
+    "chunks/mermaid.esm.min/chunk-IJBDOHL6.mjs": "90fea472974e49e0f757e6ad31836dae671d1587f3b136e52de9d7ca2a74c24e",
+    "chunks/mermaid.esm.min/chunk-WUBWJARI.mjs": "4bcad87eea22a611249efbde3bbe17318f6c4aa4a287b5e45b2ed807d962b90e",
+    "chunks/mermaid.esm.min/chunk-4CAJECRU.mjs": "be13c6cc5a08abbacc854665dd8a16baac552f5de8e2e2261e621d3e22180635",
+    "chunks/mermaid.esm.min/chunk-NUDPKBEF.mjs": "c10f6b350e128803e833adb6ea35b3074a69de13123d378654442ce3d43fc4ec",
+    "chunks/mermaid.esm.min/chunk-YDMLL4PJ.mjs": "6786c76c702e2c7902c8c84e5c054f79e43005108ea1779b45b029c4eb0346b2",
+    "chunks/mermaid.esm.min/chunk-ZQN7UHIL.mjs": "808ed4f224bf4b9cb698526c985f79d2d3bcf904d7016e5ae78cac18fb3119e1",
+    "chunks/mermaid.esm.min/chunk-4OADUZ5Q.mjs": "9bf3697e257ac173a527ce20d473447d909aba338028dcd8b4bfeca7ae42f368",
+    "chunks/mermaid.esm.min/chunk-VRZKL3EH.mjs": "d5f4b9482941721b7e66b11b5f2ad1b4fa429817f066b52e1dbe5a9622ed7948",
+    "chunks/mermaid.esm.min/chunk-Z6V44ARX.mjs": "8a42faac8d625c35b141d5dc8a6b3c23395196ca019c293edf9dd356ba00cf14",
+    "chunks/mermaid.esm.min/chunk-5IMINLNL.mjs": "ed3c40c332ee25f9c86e89507f2a6d18edefda66eadfb38ef3aeb59b95dad2b2",
+    "chunks/mermaid.esm.min/chunk-ZNLK7HRR.mjs": "8c9d1739ef3a4cf127de90b40d6bf3b30b22a25949739315f7830b28a091842d",
+    "chunks/mermaid.esm.min/chunk-DZP67EKU.mjs": "e18a319b2c57124bb847dbc773d2bf01c38b724e20b7236a54849e88278711de",
+    "chunks/mermaid.esm.min/chunk-2NMSUPJH.mjs": "b398a4e9da693d9f308248c6fa278c2567c11a7098c69ade60c60a886fc7ce59",
+    "chunks/mermaid.esm.min/chunk-VY2OSTJR.mjs": "355ab014d80cbf7c4a1b95b918f5f81d57323568e1044d2c3d8a0fb763b122a2",
+    "chunks/mermaid.esm.min/chunk-STOV2HOB.mjs": "b9dcf40a130db7675f59151f77ea069438782074fa847001abcd6bb82b8d9b02",
+    "chunks/mermaid.esm.min/chunk-QJSWEUOL.mjs": "3391f563eeeadc7ea41e174529bedf753a53d762518991e6e147de9e728758aa",
+    "chunks/mermaid.esm.min/chunk-H7VHZCWX.mjs": "4db617f30526ebfe1549ac8e873a922b35f4864d23d584b19bc52e9bda420965",
+    "chunks/mermaid.esm.min/chunk-AQ6EADP3.mjs": "13f83482f9731f6ed320746bf4f69aaaff5e1efdda94f64cd9ea6d9030b868c2",
+    "chunks/mermaid.esm.min/flowDiagram-YHGXBVSY.mjs": "1c0da2132dec1c08b762505be3091d401e2bd9fb43a1ae74f561ad05ac4b8bd9",
+    "chunks/mermaid.esm.min/chunk-CLS4B6BI.mjs": "d9d9807f18794a72e4ff199be084911035412ef28202a4f9499d792e84a70ca4",
+    "chunks/mermaid.esm.min/chunk-AZZRMDJM.mjs": "e5c109a799a86fc58b75bbb2cbdb72a6570c8c29821037d181ebe019db0beab1",
+    "chunks/mermaid.esm.min/chunk-RCXAM2GK.mjs": "6839f1cffe1cf5cc6ef9db8d3622645cca8a93f0046d7889eb160a5f2ea6468e",
+    "chunks/mermaid.esm.min/chunk-VTHDQ7BV.mjs": "20eac5601b2d52ac6964c2bb342ff5d9d54b3d394d83382a43d349cc53194c55",
+    "chunks/mermaid.esm.min/chunk-EICP7K5X.mjs": "589aa7a2687f2e1f2372e320196930bf0810dc8d8f27300cdafb4d11234328f5",
+    "chunks/mermaid.esm.min/dagre-MPVFI544.mjs": "ddebb5e97d88653c8b00abc5250ff9fbffe2dad2b73bdc314444747e55b5f4db",
+    "chunks/mermaid.esm.min/chunk-R7JDMUKV.mjs": "7d6880f7972b8e762f6e9ed6ac5b43eaac710e014d3917f30c6e0e567abb892c"
+  },
+  "diagrams": [
+    {
+      "id": "architecture",
+      "title": "架构：材料、编辑源与阅读出口",
+      "source": "diagrams/src/architecture.mmd",
+      "output": "assets/diagrams/architecture.svg",
+      "source_sha256": "89f772452ec43d81e308556a1e7485a97082a31519c9e6acb60dd551dd675175",
+      "svg_sha256": "bd940819614f279026037ab53dfc869570dde2bc70a052ccde8323313255c4b0"
+    },
+    {
+      "id": "change-impact",
+      "title": "更新影响：相关，不等于依赖",
+      "source": "diagrams/src/change-impact.mmd",
+      "output": "assets/diagrams/change-impact.svg",
+      "source_sha256": "c95ad2bc24ec2a928009827c3cd43da8aa7974fbd8e7485869e9d36aa81ce315",
+      "svg_sha256": "439f269d20fc0ec5d791c329822d43b64300fda69817cd1ef5b31c393539ec99"
+    },
+    {
+      "id": "content-lifecycle",
+      "title": "内容生命周期：修订不抹掉上一版",
+      "source": "diagrams/src/content-lifecycle.mmd",
+      "output": "assets/diagrams/content-lifecycle.svg",
+      "source_sha256": "ba6598119189251aa4ba54cc62c732ee509adbf9d2b8572b66d8cfcad5670c4d",
+      "svg_sha256": "62ce8c15b1683ccccaa83b3137cf512c06c7357331d021b32425d4829fe6fc6c"
+    },
+    {
+      "id": "publication",
+      "title": "出版流程：源码向产物流动",
+      "source": "diagrams/src/publication.mmd",
+      "output": "assets/diagrams/publication.svg",
+      "source_sha256": "bb79c9a992f5b2d1ce0f6602993fa730985cdfd604c20107e2e4587c6456eb21",
+      "svg_sha256": "855a6adbb3e56ff0ca57f4450ac5b71b18a8c423ef4c1b8c38fcee1d0d11eaa9"
+    },
+    {
+      "id": "example-lifecycle",
+      "title": "实验生命周期：运行完还要收得回来",
+      "source": "diagrams/src/example-lifecycle.mmd",
+      "output": "assets/diagrams/example-lifecycle.svg",
+      "source_sha256": "192cd124c29aa79c2b815985eaaa2a836bf91ecd72d0d3459a0effb5c201fa5e",
+      "svg_sha256": "b8964e56d60d4ec89418bae71f2bedb9cfba318c4f041cba63318df19c3a88c3"
+    }
+  ]
+}

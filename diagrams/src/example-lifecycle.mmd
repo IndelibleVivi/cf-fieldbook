@@ -1,0 +1,17 @@
+flowchart TB
+  accTitle: 公共例子的离线与云端执行生命周期
+  accDescr: 例子先用合成输入完成离线检查。不需要云端则发布范围明确的本地证据；需要云端时单独确认目标、预算与授权。运行的成功、失败与取消都进入清理，资源核对失败则保留待清理状态。
+  A[问题与可公开合成输入]:::source --> B[离线实现与失败测试]:::content
+  B --> C{确实需要<br/>云端核实？}:::gate
+  C -->|否| D[保留本地证据<br/>不声称云端实测]:::output
+  C -->|是| E[目标 · 预算 · 资源 · 授权]:::gate
+  E --> F[创建临时资源<br/>私有台账记录具体 ID]:::content
+  F --> G[运行并观察<br/>成功 / 失败 / 超时 / 取消]:::content
+  G --> H[清理与资源读回]:::gate
+  I[进程中断后的独立复核]:::source -.-> H
+  H -->|资源已核对清理| J[筛选可公开结果<br/>注明日期、环境与局限]:::output
+  H -->|未能确认| K[cleanup-required<br/>保留台账与恢复操作]:::gate
+  classDef source fill:#FFFFFF,stroke:#A4BEC6,color:#183544,stroke-width:1px
+  classDef content fill:#EFF9FB,stroke:#007F93,color:#183544,stroke-width:1.3px
+  classDef gate fill:#FFF4EC,stroke:#BE4B13,color:#183544,stroke-width:1.3px
+  classDef output fill:#FFFFFF,stroke:#007F93,color:#183544,stroke-width:1.8px

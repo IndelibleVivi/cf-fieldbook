@@ -1,0 +1,321 @@
+{
+  "schema": "fieldbook.entries/1",
+  "publication_state": "local-candidate",
+  "entries": [
+    {
+      "id": "data.sources",
+      "kind": "data",
+      "path": "catalog/sources.json",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [],
+      "related": [],
+      "review": {
+        "state": "inherited",
+        "checked_on": "2026-10-02",
+        "scope": "继承 r3 的记录；本轮未重新核验服务事实",
+        "next_review_on": "2026-11-01"
+      },
+      "evidence": [
+        {
+          "kind": "prior-edition",
+          "ref": "editorial/qa-r3.md"
+        }
+      ]
+    },
+    {
+      "id": "data.launches",
+      "kind": "data",
+      "path": "catalog/launches.json",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [
+        "data.sources"
+      ],
+      "related": [],
+      "review": {
+        "state": "inherited",
+        "checked_on": "2026-10-02",
+        "scope": "继承 r3 的记录；本轮未重新核验服务事实",
+        "next_review_on": "2026-10-16"
+      },
+      "evidence": [
+        {
+          "kind": "prior-edition",
+          "ref": "editorial/qa-r3.md"
+        }
+      ]
+    },
+    {
+      "id": "data.decision-routes",
+      "kind": "data",
+      "path": "catalog/decision-routes.json",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [
+        "data.sources"
+      ],
+      "related": [],
+      "review": {
+        "state": "inherited",
+        "checked_on": "2026-10-02",
+        "scope": "继承 r3 的记录；本轮未重新核验服务事实",
+        "next_review_on": "2026-10-16"
+      },
+      "evidence": [
+        {
+          "kind": "prior-edition",
+          "ref": "editorial/qa-r3.md"
+        }
+      ]
+    },
+    {
+      "id": "service.decision-models",
+      "kind": "service",
+      "path": "services/decision-models.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [
+        "data.decision-routes"
+      ],
+      "related": [
+        "usecase.bounded-decision",
+        "compare.clef-jev"
+      ],
+      "review": {
+        "state": "inherited",
+        "checked_on": "2026-10-02",
+        "scope": "继承 r3 的记录；本轮未重新核验服务事实",
+        "next_review_on": "2026-10-16"
+      },
+      "evidence": [
+        {
+          "kind": "prior-edition",
+          "ref": "editorial/qa-r3.md"
+        }
+      ]
+    },
+    {
+      "id": "compare.clef-jev",
+      "kind": "comparison",
+      "path": "comparisons/clef-vs-jev.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [
+        "data.decision-routes"
+      ],
+      "related": [
+        "usecase.bounded-decision",
+        "example.decision-routing"
+      ],
+      "review": {
+        "state": "inherited",
+        "checked_on": "2026-10-02",
+        "scope": "继承 r3 的记录；本轮未重新核验服务事实",
+        "next_review_on": "2026-10-16"
+      },
+      "evidence": [
+        {
+          "kind": "prior-edition",
+          "ref": "editorial/qa-r3.md"
+        }
+      ]
+    },
+    {
+      "id": "usecase.bounded-decision",
+      "kind": "use-case",
+      "path": "use-cases/bounded-decision.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [],
+      "related": [
+        "service.decision-models",
+        "compare.clef-jev",
+        "example.decision-routing"
+      ],
+      "review": {
+        "state": "inherited",
+        "checked_on": "2026-10-02",
+        "scope": "继承 r3 的记录；本轮未重新核验服务事实",
+        "next_review_on": "2026-11-01"
+      },
+      "evidence": [
+        {
+          "kind": "prior-edition",
+          "ref": "editorial/qa-r3.md"
+        }
+      ]
+    },
+    {
+      "id": "example.decision-routing",
+      "kind": "example",
+      "path": "examples/decision-routing/README.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [
+        "data.decision-routes"
+      ],
+      "related": [
+        "compare.clef-jev"
+      ],
+      "review": {
+        "state": "inherited",
+        "checked_on": "2026-10-02",
+        "scope": "继承 r3 的记录；本轮未重新核验服务事实",
+        "next_review_on": "2026-11-01"
+      },
+      "evidence": [
+        {
+          "kind": "prior-edition",
+          "ref": "editorial/qa-r3.md"
+        }
+      ]
+    },
+    {
+      "id": "example.job-state",
+      "kind": "example",
+      "path": "examples/job-state/README.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [],
+      "related": [
+        "usecase.recoverable-jobs"
+      ],
+      "review": {
+        "state": "checked",
+        "checked_on": "2026-10-02",
+        "scope": "合成 SQLite demo 与本地跨连接恢复回归；未调用云端服务",
+        "next_review_on": "2026-12-31"
+      },
+      "evidence": [
+        {
+          "kind": "local-executed",
+          "ref": "tests/test_job_recovery.py"
+        }
+      ]
+    },
+    {
+      "id": "example.health-worker",
+      "kind": "example",
+      "path": "examples/health-worker/README.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [],
+      "related": [],
+      "review": {
+        "state": "inherited",
+        "checked_on": "2026-10-02",
+        "scope": "继承 r3 的记录；本轮未重新核验服务事实",
+        "next_review_on": "2026-12-31"
+      },
+      "evidence": [
+        {
+          "kind": "prior-edition",
+          "ref": "editorial/qa-r3.md"
+        }
+      ]
+    },
+    {
+      "id": "guide.handbook",
+      "kind": "guide",
+      "path": "guides/handbook.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [
+        "service.decision-models"
+      ],
+      "related": [
+        "example.job-state",
+        "example.health-worker"
+      ],
+      "review": {
+        "state": "inherited",
+        "checked_on": "2026-10-02",
+        "scope": "继承 r3 的记录；本轮未重新核验服务事实",
+        "next_review_on": "2026-11-01"
+      },
+      "evidence": [
+        {
+          "kind": "prior-edition",
+          "ref": "editorial/qa-r3.md"
+        }
+      ]
+    },
+    {
+      "id": "reference.implementation",
+      "kind": "reference",
+      "path": "reference/implementation.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [
+        "example.health-worker"
+      ],
+      "related": [
+        "example.job-state"
+      ],
+      "review": {
+        "state": "inherited",
+        "checked_on": "2026-10-02",
+        "scope": "继承 r3 的记录；本轮未重新核验服务事实",
+        "next_review_on": "2026-11-01"
+      },
+      "evidence": [
+        {
+          "kind": "prior-edition",
+          "ref": "editorial/qa-r3.md"
+        }
+      ]
+    },
+    {
+      "id": "report.2026-10-02",
+      "kind": "report",
+      "path": "reports/2026-10-02.md",
+      "track": "edition",
+      "status": "current",
+      "depends_on": [
+        "data.launches",
+        "data.decision-routes"
+      ],
+      "related": [
+        "guide.handbook"
+      ],
+      "review": {
+        "state": "inherited",
+        "checked_on": "2026-10-02",
+        "scope": "继承 r3 的记录；本轮未重新核验服务事实",
+        "next_review_on": null
+      },
+      "evidence": [
+        {
+          "kind": "prior-edition",
+          "ref": "editorial/qa-r3.md"
+        }
+      ]
+    },
+    {
+      "id": "usecase.recoverable-jobs",
+      "kind": "use-case",
+      "path": "use-cases/recoverable-jobs.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [
+        "example.job-state"
+      ],
+      "related": [
+        "reference.implementation"
+      ],
+      "review": {
+        "state": "checked",
+        "checked_on": "2026-10-02",
+        "scope": "合成 SQLite demo 与本地跨连接恢复回归；未调用云端服务",
+        "next_review_on": "2026-12-31"
+      },
+      "evidence": [
+        {
+          "kind": "local-executed",
+          "ref": "tests/test_job_recovery.py"
+        }
+      ]
+    }
+  ]
+}

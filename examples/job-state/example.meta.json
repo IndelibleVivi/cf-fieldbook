@@ -1,0 +1,34 @@
+{
+  "schema": "fieldbook.example/1",
+  "id": "example.job-state",
+  "default_mode": "offline",
+  "network_required": false,
+  "credentials_required": false,
+  "live_supported": false,
+  "run_from": "repository-root",
+  "run_command": [
+    "python3",
+    "examples/job-state/demo.py"
+  ],
+  "check_command": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_job_recovery.py",
+    "-v"
+  ],
+  "input_kind": "synthetic",
+  "observation_scope": [
+    "lease",
+    "late completion",
+    "retry",
+    "uncertain external result"
+  ],
+  "cloud_resources_created": [],
+  "teardown": "not applicable: offline checks create no cloud resources",
+  "evidence_notice": "Passing these checks does not prove service availability or model quality."
+}

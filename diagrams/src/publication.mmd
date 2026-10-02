@@ -1,0 +1,16 @@
+flowchart TB
+  accTitle: 一条不回写编辑源的出版链
+  accDescr: 精确源码输入经过离线检查和阅读预览，由作者接受后固定版本与输入摘要，生成当前阅读和冻结版次。后续勘误创建新修订，不使历史报告重新读取实时事实。完整版次锁与网站发布仍待实施。
+  A[编辑源<br/>正文 · catalog · 源码 · 图 · 样式]:::content
+  A --> B[离线检查<br/>引用 · 数据 · 例子 · 图示]:::gate
+  B --> C[阅读预览与目视检查]:::content
+  C --> D{接受这份<br/>具体 revision？}:::gate
+  D -->|否：回到编辑| A
+  D -->|是| E[固定 source 与输入摘要<br/>记录版次、范围与工具]:::content
+  E --> F[当前阅读入口<br/>从已批准源生成]:::output
+  E --> G[冻结版次<br/>MD · HTML · PDF · manifest]:::output
+  G --> H[后续勘误<br/>发布新的 revision]:::source
+  classDef source fill:#FFFFFF,stroke:#A4BEC6,color:#183544,stroke-width:1px
+  classDef content fill:#EFF9FB,stroke:#007F93,color:#183544,stroke-width:1.3px
+  classDef gate fill:#FFF4EC,stroke:#BE4B13,color:#183544,stroke-width:1.3px
+  classDef output fill:#FFFFFF,stroke:#007F93,color:#183544,stroke-width:1.8px

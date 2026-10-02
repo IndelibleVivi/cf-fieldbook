@@ -1,0 +1,614 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cloudflare 新发布观察 · Faye &amp; Cove</title><meta name="author" content="Faye &amp; Cove"><meta name="description" content="个人开发者与独立创作者参考报告"><style>/* Cyan × Orange. White paper, legible text, restrained editorial structure. */
+:root {
+  --cyan:#10b3ca; --orange:#ff7a2a; --ink:#183b46;
+  --muted:#58717a; --rule:#c6e4e9; --link:#087086;
+  color:var(--ink); background:#fff;
+  font-family:Inter,'Noto Sans CJK SC','PingFang SC','Microsoft YaHei',sans-serif;
+  font-size:11pt; line-height:1.8;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:#fff; }
+p { margin:0 0 3.8mm; orphans:3; widows:3; }
+a { color:var(--link); text-decoration:none; }
+a:hover { text-decoration:underline; }
+strong { color:#12303a; font-weight:650; }
+em { font-style:normal; color:var(--muted); font-size:.91em; }
+h1,h2,h3,h4 { break-after:avoid; }
+h1 { font-size:25pt; line-height:1.35; }
+h2 {
+  font-family:'Noto Serif CJK SC','Songti SC',serif;
+  font-weight:600; font-size:20pt; line-height:1.48;
+  margin:0 0 6mm; bookmark-level:1;
+}
+h3 { font-size:12pt; line-height:1.55; margin:5.2mm 0 2.6mm; font-weight:650; bookmark-level:2; }
+.chapter { margin-top:12mm; }
+.chapter.first { margin-top:0; }
+.chapter-head { break-inside:avoid; break-after:avoid; position:relative; padding-top:5mm; border-top:.7pt solid var(--rule); }
+.chapter-meta { display:flex; align-items:baseline; justify-content:space-between; line-height:1; margin-bottom:4mm; }
+.chapter-number { font-family:Inter,sans-serif; color:var(--cyan); font-size:27pt; font-weight:500; letter-spacing:-1pt; }
+.chapter-type { font-family:Inter,sans-serif; font-size:7.4pt; letter-spacing:1.2pt; font-weight:500; color:var(--muted); }
+.chapter-head::after { content:''; position:absolute; width:12mm; height:2.3pt; top:-1pt; left:0; background:var(--orange); }
+blockquote { margin:5mm 0; padding:2mm 0 2mm 4.3mm; border-left:2.6pt solid var(--orange); background:white; }
+blockquote p { font-size:10.1pt; line-height:1.8; }
+blockquote p:last-child { margin-bottom:0; }
+ul,ol { margin:3mm 0 4mm; padding-left:6mm; }
+li { padding:.5mm 0; }
+code { font-family:'DejaVu Sans Mono','Noto Sans CJK SC',monospace; font-size:.85em; overflow-wrap:anywhere; padding:0 .4mm; }
+pre { margin:5mm 0; padding:3.5mm 4mm; border-left:2pt solid var(--cyan); border-top:.5pt solid var(--rule); border-bottom:.5pt solid var(--rule); font-size:8.8pt; line-height:1.6; white-space:pre-wrap; overflow-wrap:anywhere; background:#fff; break-inside:avoid; }
+pre code { font-size:inherit; padding:0; }
+table { width:100%; border-collapse:collapse; table-layout:fixed; margin:5mm 0 5.5mm; font-size:9.7pt; line-height:1.65; }
+thead { display:table-header-group; }
+th,td { vertical-align:top; text-align:left; padding:2.7mm 2.3mm; border-bottom:.55pt solid var(--rule); overflow-wrap:anywhere; }
+th { border-top:1.4pt solid var(--cyan); background:#f0fbfc; color:#144957; font-weight:650; padding-top:2.7mm; padding-bottom:2.7mm; }
+td { background:#fff; }
+tr { break-inside:avoid; }
+th:first-child,td:first-child { width:25%; padding-left:0; }
+th:last-child,td:last-child { padding-right:0; }
+table.compact { font-size:9.25pt; }
+table.date-table td:first-child { color:#a4480b; font-weight:600; width:29%; }
+a.source-ref { display:inline; font-family:Inter,sans-serif; font-size:7.2pt; line-height:1; font-weight:550; color:var(--link); white-space:nowrap; vertical-align:.14em; letter-spacing:.1pt; }
+.figure { margin:6mm 0 6mm; padding:4mm 0; border-top:.65pt solid var(--rule); border-bottom:.65pt solid var(--rule); break-inside:avoid; }
+.figure svg { display:block; width:100%; height:auto; }
+.figure figcaption { margin-top:3mm; font-size:8.3pt; line-height:1.65; color:var(--muted); }
+.figure .fig-no { font-family:Inter,sans-serif; color:#a4480b; font-weight:600; margin-right:2mm; }
+.cover { background:#fff; height:297mm; padding:19mm 22mm 18mm; position:relative; overflow:hidden; }
+.cover-top { display:flex; justify-content:space-between; align-items:baseline; border-top:2.5pt solid var(--cyan); padding-top:4mm; font-size:8pt; line-height:1.3; font-family:Inter,sans-serif; }
+.cover-top::before { content:''; position:absolute; right:22mm; top:19mm; width:25mm; border-top:2.5pt solid var(--orange); }
+.publisher { font-weight:650; color:var(--ink); letter-spacing:.2pt; }
+.cover-series { color:var(--muted); font-size:7.4pt; letter-spacing:1.6pt; }
+.cover-kicker { font-size:8.5pt; letter-spacing:1.4pt; color:var(--link); margin-top:26mm; font-weight:550; }
+.cover-brand { font-family:'Nimbus Sans',Inter,sans-serif; font-weight:700; font-size:61pt; line-height:1; letter-spacing:-2.3pt; margin:5.5mm 0 4.5mm; color:var(--ink); }
+.cover-title { font-family:'Noto Serif CJK SC','Songti SC',serif; font-size:34pt; font-weight:600; line-height:1.5; letter-spacing:.1pt; margin-top:4mm; }
+.cover-subtitle { margin-top:6.5mm; font-size:11pt; line-height:1.8; color:#36545e; max-width:125mm; }
+.cover-art { position:absolute; bottom:37mm; left:22mm; right:22mm; }
+.cover-art svg { width:100%; height:auto; }
+.cover-bottom { position:absolute; bottom:16mm; left:22mm; right:22mm; border-top:.8pt solid var(--rule); padding-top:4mm; display:flex; justify-content:space-between; font-size:8.3pt; line-height:1.7; }
+.cover-bottom b { font-size:13pt; font-weight:500; }
+.cover-bottom .edition-note { text-align:right; color:var(--muted); font-size:7.8pt; }
+.cover.handbook .cover-kicker { margin-top:21mm; }
+.cover.handbook .cover-brand { font-size:52pt; }
+.cover.handbook .cover-title { font-size:29pt; line-height:1.55; }
+.cover.handbook .cover-subtitle { margin-top:5mm; }
+.cover.handbook .cover-art { bottom:34mm; }
+.toc { break-after:page; }
+.toc .eyebrow { color:var(--link); font:500 8pt Inter,sans-serif; letter-spacing:1.5pt; margin-bottom:5mm; }
+.toc h2 { font-size:26pt; margin:0 0 6mm; }
+.toc-intro { font-size:10pt; line-height:1.8; max-width:139mm; }
+.toc ol { list-style:none; padding:0; margin:7mm 0 5mm; }
+.toc li { padding:2.2mm 0; border-bottom:.6pt solid var(--rule); line-height:1.45; font-size:10.4pt; }
+.toc .toc-no { display:inline-block; width:10mm; color:#a4480b; font-family:Inter,sans-serif; font-size:9pt; }
+.toc a { color:var(--ink); display:block; }
+.toc a::after { content:leader(' ') target-counter(attr(href), page); color:var(--link); font-family:Inter,sans-serif; font-size:9pt; }
+.toc-foot { margin-top:7mm; border-left:2pt solid var(--orange); padding-left:4mm; color:var(--muted); font-size:9pt; }
+.opening { margin:0 0 9mm; padding:0 0 6mm; border-bottom:1pt solid var(--rule); }
+.opening p:first-child { font-family:'Noto Serif CJK SC','Songti SC',serif; font-size:13pt; line-height:1.9; margin-bottom:5mm; color:#12343e; }
+.opening p:last-child { font-size:9pt; color:var(--muted); margin-bottom:0; }
+.sources { break-before:page; }
+.sources h2 { font-size:22pt; padding-top:5mm; border-top:1.4pt solid var(--cyan); margin-bottom:4mm; }
+.source-note { font-size:9pt; color:var(--muted); line-height:1.7; margin-bottom:6mm; }
+.source-list { column-count:2; column-gap:9mm; }
+.source-entry { break-inside:avoid; margin:0 0 3.1mm; padding:0 0 2.7mm; border-bottom:.45pt solid var(--rule); font-size:9pt; line-height:1.65; }
+.source-entry .source-id { font:600 8pt Inter,sans-serif; color:#a4480b; display:block; margin-bottom:1mm; }
+.source-entry a { color:var(--ink); }
+.source-entry small { display:block; color:var(--muted); font:7.3pt Inter,sans-serif; line-height:1.5; margin-top:1mm; }
+.colophon { break-inside:avoid; margin-top:10mm; padding:8mm 0 3mm; border-top:1.5pt solid var(--cyan); position:relative; }
+.colophon::before { content:''; position:absolute; right:0; top:-1.5pt; width:21mm; border-top:1.5pt solid var(--orange); }
+.colophon .closing-title { font-family:'Noto Serif CJK SC',serif; font-size:16pt; margin-bottom:2mm; }
+.colophon .author-line { font-family:Inter,sans-serif; font-size:10pt; font-weight:600; margin-top:3mm; }
+.colophon .signature { font-family:'Nimbus Roman','Times New Roman',serif; font-style:italic; font-size:18pt; color:var(--ink); margin:1mm 0 0; }
+.colophon .smallprint { font-size:8.5pt; color:var(--muted); line-height:1.7; max-width:139mm; }
+@page {
+  size:A4; margin:20mm 23mm 20mm;
+  @top-left { content:'FIELD EDITIONS'; font:500 8pt Inter; color:#36545e; vertical-align:middle; }
+  @top-right { content:string(shortTitle); font-family:'Noto Sans CJK SC'; font-size:8pt; color:#58717a; }
+  @bottom-left { content:'CLOUDFLARE  /  2026.10'; font:7.5pt Inter; letter-spacing:.7pt; color:#58717a; }
+  @bottom-right { content:counter(page,decimal-leading-zero); font:500 11pt Inter; color:#087086; }
+}
+@page cover { margin:0; @top-left {content:none} @top-right {content:none} @bottom-left {content:none} @bottom-right {content:none} }
+@media print {
+  .cover { page:cover; break-after:page; }
+  .screen-nav,.screen-only { display:none!important; }
+  .document-name { string-set:shortTitle content(); position:absolute; width:0; height:0; overflow:hidden; }
+  .jump-page { break-before:page; margin-top:0; }
+  .no-print { display:none; }
+}
+@media screen {
+  html { scroll-behavior:smooth; }
+  body { color:var(--ink); }
+  .document-name { display:none; }
+  .cover { height:920px; max-width:900px; margin:0 auto; padding:55px 65px; }
+  .cover-top::before {right:65px;top:55px;}
+  .cover-kicker {margin-top:94px;}
+  .cover-brand {font-size:86px;}
+  .cover-title {font-size:46px;}
+  .cover-subtitle {font-size:18px;}
+  .cover-art {left:65px;right:65px;bottom:130px;}
+  .cover.handbook .cover-art {bottom:106px;}
+  .cover-bottom {left:65px;right:65px;bottom:46px;}
+  .cover-bottom .edition-note {font-size:12px;}
+  .toc,main { max-width:820px; padding:48px 56px; margin:0 auto; }
+  .toc {border-top:1px solid var(--rule);}
+  .toc a::after {content:'↗';float:right;}
+  .toc li {font-size:16px; padding:10px 0;}
+  main {font-size:17px;line-height:1.95;padding-top:10px;}
+  h2 {font-size:30px;scroll-margin-top:70px;}
+  h3 {font-size:20px;}
+  .chapter {margin-top:60px;}
+  .chapter-meta {margin-bottom:18px;}
+  .chapter-number {font-size:42px;}
+  .chapter-type {font-size:11px;}
+  p {margin-bottom:19px;}
+  .opening p:first-child {font-size:23px;}
+  .opening p:last-child {font-size:14px;}
+  table {font-size:14px;line-height:1.8;}
+  th,td {padding:12px 10px;}
+  pre {font-size:13px;}
+  blockquote p {font-size:16px;}
+  .source-ref {font-size:11px!important;}
+  .sources {margin-top:70px;}
+  .source-entry {font-size:14px;}
+  .source-entry small {font-size:10px;}
+  .source-note {font-size:14px;}
+  .source-list {column-gap:36px;}
+  .screen-nav {position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.98);border-bottom:1px solid var(--rule);padding:12px max(20px,calc((100vw - 790px)/2));font-size:12px;line-height:1.5;}
+  .screen-nav a {margin-left:18px;white-space:nowrap;}
+  .screen-nav b {white-space:nowrap;}
+  .colophon .closing-title {font-size:23px;}
+  .colophon .smallprint {font-size:14px;}
+  .colophon .signature {font-size:28px;}
+  :focus-visible {outline:2px solid #087086; outline-offset:4px;}
+}
+@media screen and (max-width:620px) {
+  .cover {height:790px;padding:30px 24px;}
+  .cover-top::before {right:24px;top:30px;width:65px;}
+  .cover-top {font-size:12px;}
+  .cover-series {font-size:9px;letter-spacing:.9px;}
+  .cover-kicker,.cover.handbook .cover-kicker {margin-top:72px;font-size:10px;}
+  .cover-brand,.cover.handbook .cover-brand {font-size:57px;letter-spacing:-2px;}
+  .cover-title,.cover.handbook .cover-title {font-size:34px;line-height:1.5;}
+  .cover-subtitle {font-size:15px;margin-top:22px;}
+  .cover-art,.cover.handbook .cover-art {left:24px;right:24px;bottom:155px;}
+  .cover-bottom {left:24px;right:24px;bottom:41px;font-size:12px;}
+  .cover-bottom b {font-size:17px;}
+  .cover-bottom .edition-note {font-size:10px;}
+  .toc,main {padding:32px 23px;}
+  main {font-size:16px;line-height:1.9;}
+  .opening p:first-child {font-size:21px;}
+  h2 {font-size:27px;}
+  h3 {font-size:19px;}
+  table,table.compact {font-size:12px;line-height:1.8;}
+  th,td {padding:9px 6px;}
+  .source-list {column-count:1;}
+  .source-note {font-size:13px;}
+  .screen-nav {padding:10px 18px;font-size:11px;}
+  .screen-nav a {margin-left:14px;}
+  .chapter-type {font-size:9px;letter-spacing:.5px;}
+}
+@media (prefers-reduced-motion:reduce) {html {scroll-behavior:auto;}}
+
+table.keep-table {break-inside:avoid;}
+
+/* Compact linked endnotes: titles carry information; repeated domains are optional. */
+.source-entry {margin:0 0 1.8mm;padding:0 0 1.4mm;font-size:8.8pt;line-height:1.7;}
+.source-entry .source-id {display:inline-block;width:9mm;margin:0;font-size:7.8pt;vertical-align:baseline;}
+.source-entry a {display:inline;}
+@media print {.source-entry small {display:none;} .colophon {margin-top:7mm;padding-top:6mm;}}
+
+@media print {
+  .source-entry {margin-bottom:1mm;padding-bottom:.65mm;line-height:1.55;font-size:8.7pt;}
+  .colophon {margin-top:6mm;padding-top:5mm;}
+}
+
+.in-notes .closing-title {font-size:13pt;}
+.in-notes .smallprint {font-size:8pt;}
+.in-notes .signature {font-size:16pt;}
+.in-notes .author-line {font-size:9pt;}
+
+.cover.comparison .cover-title {font-size:32pt;}
+.colophon .author-line {font-size:9pt; overflow-wrap:anywhere;}
+
+/* Keep short bibliography columns at their content height, not page height. */
+.source-list {column-count:auto;display:table;width:100%;table-layout:fixed;}
+.source-col {display:table-cell;vertical-align:top;width:50%;}
+.source-col:first-child {padding-right:4.5mm;}
+.source-col:last-child {padding-left:4.5mm;}
+@media screen and (max-width:620px) {
+ .source-list,.source-col {display:block;width:100%;}
+ .source-col:first-child,.source-col:last-child {padding:0;}
+ .cover.comparison .cover-title {font-size:34px;}
+}
+@media print {
+ .source-entry {margin:0 0 .45mm;padding:0 0 .25mm;font-size:8.7pt;line-height:1.4;}
+ .colophon {margin-top:4mm;padding-top:3mm;}
+ .colophon .closing-title {font-size:13pt;line-height:1.3;margin-bottom:1.5mm;}
+ .colophon .smallprint {font-size:8pt;line-height:1.5;margin-bottom:2mm;}
+ .colophon .author-line {font-size:9pt;line-height:1.3;margin-top:1mm;}
+ .colophon .signature {font-size:16pt;line-height:1.25;margin:2mm 0 0;}
+}
+</style></head><body class="report"><div class="document-name">新发布观察</div><section class="cover report" aria-label="封面">
+    <div class="cover-top"><span class="publisher">INDEPENDENT REFERENCE</span><span class="cover-series">CLOUDFLARE / FIELD EDITIONS</span></div>
+    <div class="cover-kicker">NEW LAUNCHES / FOR INDIVIDUALS</div><div class="cover-brand">Cloudflare</div>
+    <div class="cover-title">新发布观察</div><div class="cover-subtitle">运行环境、检索与维护工具的新变化。<br>现在可以用什么，又适合放在哪里。</div>
+    <div class="cover-art"><svg xmlns="http://www.w3.org/2000/svg" width="760" height="296" viewBox="0 0 760 296" role="img" aria-labelledby="title desc"><title id="title">运行与留下的成果</title><desc id="desc">封面图以分开的青色与橙色线条表示运行环境和独立保留的成果，是本刊主题示意，不是产品架构。</desc><style>text{font-family:Inter,'Noto Sans CJK SC',sans-serif;fill:#183B46;font-size:20px}.small{font-size:16px;fill:#58717A}.num{font-family:Inter,sans-serif}</style><path d="M4 169 H164 C226 169 218 56 289 56 H732" fill="none" stroke="#10B3CA" stroke-width="17"/><path d="M164 169 H335 C384 169 399 241 455 241 H735" fill="none" stroke="#FF7A2A" stroke-width="17"/><line x1="30" y1="22" x2="30" y2="271" stroke="#C6E4E9" stroke-width="1" /><line x1="526" y1="22" x2="526" y2="271" stroke="#C6E4E9" stroke-width="1" /><rect x="294" y="27" width="186" height="58" rx="2" fill="white" stroke="#183B46" stroke-width="1.5"/><text x="387" y="64" text-anchor="middle">运行环境</text><rect x="502" y="211" width="188" height="58" rx="2" fill="white" stroke="#183B46" stroke-width="1.5"/><text x="596" y="248" text-anchor="middle">留下的成果</text><circle cx="164" cy="169" r="11" fill="white" stroke="#183B46" stroke-width="2"/><text x="62" y="127" class="small">一次工作</text><text x="698" y="118" text-anchor="end" font-weight="600" style="font-size:64px">01</text></svg></div><div class="cover-bottom"><div><b>2026 / 10</b><br>资料截至 2026-10-02</div><div class="edition-note">BOOK 01 · 阅读版 3<br>独立参考 · 可点击来源索引</div></div></section><div class="screen-nav"><b>新发布观察</b><span><a href="#contents">目录</a><a href="#sources">来源</a><a href="cf-practical-handbook-2026-10-02-cyan-orange.html">相关读物</a></span></div><nav class="toc" id="contents" aria-label="目录"><div class="eyebrow">CONTENTS / READING PATH</div><h2>从这里翻开</h2><p class="toc-intro">先读感兴趣的方向，费用与开放状态可随时回查。每个章节和来源编号都能点击。</p><ol><li><a href="#chapter-01"><span class="toc-no">01</span>先看变化，再看产品名</a></li><li><a href="#chapter-02"><span class="toc-no">02</span>能恢复的工作环境</a></li><li><a href="#chapter-03"><span class="toc-no">03</span>少搬一次日志，少猜一个版本</a></li><li><a href="#chapter-04"><span class="toc-no">04</span>让搜索找回一张图</a></li><li><a href="#chapter-05"><span class="toc-no">05</span>有时只需要一个选择</a></li><li><a href="#chapter-06"><span class="toc-no">06</span>浏览器与创作工作台</a></li><li><a href="#chapter-07"><span class="toc-no">07</span>三种名字很新、用途很不同的数据服务</a></li><li><a href="#chapter-08"><span class="toc-no">08</span>把费用放回使用过程</a></li><li><a href="#chapter-09"><span class="toc-no">09</span>发布状态速查</a></li><li><a href="#chapter-10"><span class="toc-no">10</span>申请与比赛，先读条件</a></li><li><a href="#chapter-11"><span class="toc-no">11</span>使用场景，不是项目处方</a></li><li><a href="#sources"><span class="toc-no">S</span>来源索引与署名</a></li></ol><p class="toc-foot">来源编号可点击。开放状态与生效日期按资料截止日记录；实施代码与详细状态约束另放仓库的技术参考。</p></nav><main><section class="opening">
+
+<p>一次运行结束，文件还在。页面关掉，任务能重新接上。报错出现，不必再靠人从日志里拼出故事。这一轮 Cloudflare 发布，把过去需要自己连接的几段工作拉近了。<a class="source-ref" href="https://blog.cloudflare.com/faster-agent-sandboxes/" title="Containers 新运行接口与 Sandbox">S04</a> <a class="source-ref" href="https://blog.cloudflare.com/next-git-platform-on-cloudflare/" title="Artifacts 公开测试发布">S07</a> <a class="source-ref" href="https://blog.cloudflare.com/real-time-issue-detection/" title="Workers Issues 发布">S11</a></p>
+<p>这份报告从个人使用出发，看新能力能省下什么劳动、适合放在哪里，以及它的开放状态和费用。具体项目各有历史与约束，文中的场景供读者对照，不是一套必须采用的组合。</p>
+<p>资料截止 <strong>2026 年 10 月 2 日</strong>，主要覆盖 9 月 28 日至 10 月 1 日的发布；邮件另册处理。阅读版 3 修正作者与 GitHub 的呈现，并重新核对、扩充决策模型专题；其余发布信息沿用本期资料快照。<a class="source-ref" href="https://www.cloudflare.com/birthday-week/" title="Birthday Week 2026 发布总览">S01</a></p>
+</section><section class="chapter first" id="chapter-01"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">01</span><span class="chapter-type">THE SHIFT</span></div><h2>先看变化，再看产品名</h2></header>
+<h3>执行环境有了下一次</h3>
+<p>以前，把代码放进一个临时环境，往往意味着运行结束就要重新准备。新的 Containers 快照和 Artifacts 给出了两种不同的延续：一份保存装好依赖的文件环境，一份保存可审查的文件历史。它们让短时执行更容易重复使用，不必顺带成为常驻服务器。<a class="source-ref" href="https://blog.cloudflare.com/faster-agent-sandboxes/" title="Containers 新运行接口与 Sandbox">S04</a> <a class="source-ref" href="https://developers.cloudflare.com/containers/guides/snapshots/" title="Containers 文件系统快照">S05</a> <a class="source-ref" href="https://blog.cloudflare.com/next-git-platform-on-cloudflare/" title="Artifacts 公开测试发布">S07</a></p>
+<h3>平台开始接住维护劳动</h3>
+<p><code>cf</code> CLI 将资源查询与操作放进更统一的命令入口；Workers Issues 将失败与部署、源码和调用材料关联起来。对独立维护者，最直接的收益可能不是多做一个应用，而是少在控制台和编辑器之间搬一次材料。<a class="source-ref" href="https://blog.cloudflare.com/cloudflare-cf-cli-launch/" title="cf CLI 发布">S02</a> <a class="source-ref" href="https://developers.cloudflare.com/cf/" title="cf CLI 文档">S03</a> <a class="source-ref" href="https://blog.cloudflare.com/real-time-issue-detection/" title="Workers Issues 发布">S11</a></p>
+<h3>检索与判断变得更专门</h3>
+<p>AI Search 将图片纳入正式支持的检索路径；Clef 则针对有限选项做判断。一个帮助人找回东西，一个帮助程序选择下一步。它们都值得通过小样本认识，而不是一接入就替换所有模型调用。<a class="source-ref" href="https://blog.cloudflare.com/ai-search-ga/" title="AI Search GA">S09</a> <a class="source-ref" href="https://blog.cloudflare.com/clef-decision-models/" title="Clef 与强化学习平台发布">S16</a></p>
+<blockquote>
+<p><strong>怎样读这一期</strong><br/>
+想试执行环境，读第 2 章；想改善维护，读第 3 章；资料与模型见第 4–5 章；浏览器和创作工具见第 6 章。费用、开放状态与申请日期分别在第 8–10 章。最后一章留了几种使用情境，没有默认的“个人最佳技术栈”。</p>
+</blockquote>
+</section><section class="chapter jump-page" id="chapter-02"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">02</span><span class="chapter-type">WORKSPACE</span></div><h2>能恢复的工作环境</h2></header>
+<h3>Containers：把准备工作存下来</h3>
+<p>9 月 30 日的更新提供了原生 <code>ctx.container</code> 控制路线，支持运行时选择已配置的镜像与实例类型，也提供预制系统镜像。需要完整 Linux、编译器或原生依赖的任务，可以据此安排执行环境；普通字段处理和轻量代码，仍可能只需要 Worker 或 Dynamic Worker。<a class="source-ref" href="https://blog.cloudflare.com/faster-agent-sandboxes/" title="Containers 新运行接口与 Sandbox">S04</a> <a class="source-ref" href="https://developers.cloudflare.com/sandbox/" title="Sandbox SDK">S59</a></p>
+<p><strong>最有价值的是准备昂贵、执行短暂的任务。</strong> 安装依赖、取得特定仓库版本、放好输入样本，有时比检查本身还慢。把这一刻存成基线，下次不必从空目录开始。</p>
+<p>快照只保存文件系统，不保存运行进程和内存；它绑定创建时的镜像版本。当前保留期为 30 天，每次恢复刷新期限，暂不支持自定义 TTL，而且需要 <code>durable_object</code> 调度。<a class="source-ref" href="https://developers.cloudflare.com/containers/guides/snapshots/" title="Containers 文件系统快照">S05</a></p>
+<figure class="figure"><svg aria-labelledby="title desc" height="255" role="img" viewbox="0 0 740 255" width="740" xmlns="http://www.w3.org/2000/svg"><title id="title">同一个基线，两份文件环境</title><desc id="desc">准备好的文件和依赖基线分别恢复为环境 A 与 B。两边独立修改和检查，不表示进程恢复或结果自动合并。</desc><style>text{font-family:Inter,'Noto Sans CJK SC',sans-serif;fill:#183B46;font-size:20px}.small{font-size:16px;fill:#58717A}.num{font-family:Inter,sans-serif}</style><rect fill="white" height="70" rx="2" stroke="#10B3CA" stroke-width="2" width="192" x="12" y="89"></rect><text text-anchor="middle" x="108" y="119">准备好的文件</text><text class="small" text-anchor="middle" x="108" y="143">与依赖基线</text><path d="M204 124 H269 V48 H317 M269 124 V204 H317" fill="none" stroke="#10B3CA" stroke-width="3"></path><rect fill="white" height="64" rx="2" stroke="#10B3CA" stroke-width="2" width="145" x="317" y="16"></rect><text text-anchor="middle" x="389" y="56">环境 A</text><rect fill="white" height="64" rx="2" stroke="#10B3CA" stroke-width="2" width="145" x="317" y="172"></rect><text text-anchor="middle" x="389" y="212">环境 B</text><line stroke="#FF7A2A" stroke-width="3" x1="462" x2="523" y1="48" y2="48"></line><line stroke="#FF7A2A" stroke-width="3" x1="462" x2="523" y1="204" y2="204"></line><rect fill="white" height="64" rx="2" stroke="#FF7A2A" stroke-width="2" width="182" x="523" y="16"></rect><text text-anchor="middle" x="614" y="55">修改 · 检查</text><rect fill="white" height="64" rx="2" stroke="#FF7A2A" stroke-width="2" width="182" x="523" y="172"></rect><text text-anchor="middle" x="614" y="211">修改 · 检查</text><line stroke="#C6E4E9" stroke-width="2" x1="719" x2="719" y1="16" y2="236"></line><text class="small" text-anchor="middle" x="360" y="125">同一个起点，独立试验</text></svg><figcaption><span class="fig-no">FIG.</span>文件系统可以复用；进程与任务状态另行接续。示意的是一种工作方式，不是自动合并。</figcaption></figure>
+<table class="keep-table">
+<thead>
+<tr>
+<th>希望留下什么</th>
+<th>用什么保存</th>
+<th>下次回来得到什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>装好依赖的环境</td>
+<td>容器文件系统快照</td>
+<td>文件和环境基线，不是暂停中的进程</td>
+</tr>
+<tr>
+<td>源码、文档的变化</td>
+<td>Artifacts 或现有 Git 仓库</td>
+<td>可比较的版本历史</td>
+</tr>
+<tr>
+<td>导出文件与媒体</td>
+<td>R2 等对象存储</td>
+<td>独立于运行环境的产物</td>
+</tr>
+<tr>
+<td>任务完成到哪一步</td>
+<td>应用状态记录</td>
+<td>能据此决定如何继续的事实</td>
+</tr>
+</tbody>
+</table>
+<p><em>这是一种职责划分建议，表中的载体并非必须全部采用。</em></p>
+<h3>Sandbox 1.0：迁移时看行为，不只改包名</h3>
+<p>1.0 路线由应用编写 Durable Object，通过 <code>this.ctx.container</code> 控制环境；<code>exec()</code> 接收参数数组，默认不经过 shell，每次调用独立指定工作目录与环境。旧版的持久 shell session、镜像自带工具和生命周期假设不能直接照搬。<a class="source-ref" href="https://developers.cloudflare.com/sandbox/sdk/migrate/changes-in-1-0/" title="Sandbox SDK 1.0 迁移差异">S72</a></p>
+<p>旧 Containers 类与旧 Sandbox SDK 的维护计划节点为 <strong>2026-12-31</strong>。这是迁移需要关注的日期，不是所有旧部署会在当天停止工作的声明。<a class="source-ref" href="https://blog.cloudflare.com/faster-agent-sandboxes/" title="Containers 新运行接口与 Sandbox">S04</a> <a class="source-ref" href="https://developers.cloudflare.com/sandbox/sdk/migrate/changes-in-1-0/" title="Sandbox SDK 1.0 迁移差异">S72</a></p>
+<h3>Artifacts：工作结束以后，文件继续存在</h3>
+<p>Artifacts 提供 Git 协议和可编程仓库接口，支持创建、分叉及按仓库授权。文件变化可以接入事件订阅，也可与 Workers Builds 组合。它适合留住临时 workspace 产生的成果；人的审阅、正式源码的接受决定和已有协作入口仍可以留在原处。<a class="source-ref" href="https://blog.cloudflare.com/next-git-platform-on-cloudflare/" title="Artifacts 公开测试发布">S07</a></p>
+<p>一个轻量试法是从同一基线开出两份环境，对同一问题做两个方案，交回补丁、测试结果与产物。比较结束再决定保留哪份文件，而不是先搭一套远程开发平台。</p>
+<h3>一个容易漏看的更新</h3>
+<p>10 月 1 日的 Durable Objects 更新，让部分等待中的 RPC、容器监视和其他操作在客户端断开后继续阻止空闲回收。兼容日期为 <code>2026-10-01</code> 或更晚时默认启用；单项待完成操作最多获得 15 分钟的保活保护，期间仍产生时长费用。它减少中断，但不是跨崩溃恢复机制。<a class="source-ref" href="https://developers.cloudflare.com/changelog/post/2026-10-01-pending-io-keep-alive/" title="Durable Objects pending I/O 保活">S70</a></p>
+</section><section class="chapter" id="chapter-03"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">03</span><span class="chapter-type">OPERATIONS</span></div><h2>少搬一次日志，少猜一个版本</h2></header>
+<h3><code>cf</code> CLI：先从看清账户开始</h3>
+<p>新的 <code>cf</code> CLI 已进入公开 beta，提供覆盖更广控制面的命令、搜索和 JSON 输出。现有 Wrangler 项目可以先使用资源命令，不必立即转换全部配置。Wrangler 计划至少维护到 <code>cf</code> GA 后 18 个月，目前无需为了尝鲜集体迁移。<a class="source-ref" href="https://blog.cloudflare.com/cloudflare-cf-cli-launch/" title="cf CLI 发布">S02</a> <a class="source-ref" href="https://developers.cloudflare.com/cf/" title="cf CLI 文档">S03</a></p>
+<p>个人使用可以从只读盘点开始：有哪些 Worker，分别绑定什么资源，哪个版本正在服务哪个入口。等这些关系能被稳定查询，再考虑自动化修改。</p>
+<h3>Workers Issues：让一个错误带着上下文到来</h3>
+<p>Issues 可以聚合同类失败，并关联调用、部署及源码材料，再通过 webhook 或其他集成交给后续工具。公开 beta 期间免费，面向所有 Workers 账户，只处理启用后的新流量。<a class="source-ref" href="https://blog.cloudflare.com/real-time-issue-detection/" title="Workers Issues 发布">S11</a> <a class="source-ref" href="https://developers.cloudflare.com/workers/observability/issues/" title="Workers Issues 文档">S12</a></p>
+<p>第一次接入，建议让它产出一份调查材料：什么时候发生、对应哪个版本、怎样复现、已有测试是什么。修复仍通过原来的审阅与发布路径。这样先省掉搬运劳动，再决定是否扩大自动化。</p>
+<p>使用 Wrangler 时需要 <strong>4.134.0 或更高版本</strong>，并把 <code>observability.issues.enabled</code> 写进配置；只在控制台打开，下一次部署可能覆盖。它也不会自动看到没有进入 Worker 的本机脚本或第三方故障。<a class="source-ref" href="https://developers.cloudflare.com/workers/observability/issues/" title="Workers Issues 文档">S12</a></p>
+<h3>CI：交回能看的结果</h3>
+<p>Workers Builds 在 Paid 下包含每月 6,000 构建分钟、6 路并发，单次构建仍限 20 分钟。它适合 Worker 和前端的检查、构建与发布，不是通用 macOS／Windows runner。<a class="source-ref" href="https://developers.cloudflare.com/workers/ci-cd/builds/limits-and-pricing/" title="Workers Builds 限制与价格">S35</a></p>
+<p>比增加一条“构建成功”通知更有用的，是交回一个隔离预览、固定输入下的操作过程，以及导出后能重开的样本。前端的结果应该能看、能按、能比较。</p>
+<p>Preview URL 与数据隔离要分别确认。当前 DO 和 Containers 有自动隔离支持；D1、R2、KV、Queues、Vectorize 等若仍指向同一资源，预览会共享相应数据。<a class="source-ref" href="https://developers.cloudflare.com/workers/previews/resources/" title="Workers 预览资源隔离">S63</a></p>
+</section><section class="chapter" id="chapter-04"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">04</span><span class="chapter-type">SEARCH</span></div><h2>让搜索找回一张图</h2></header>
+<h3>AI Search GA 带来的实际变化</h3>
+<p>10 月 1 日，AI Search 正式发布，支持通过多模态 embedding 索引图片像素；纯文本 embedding 也可使用图片描述路线。两者不是同一种视觉检索。扫描 PDF 可使用 OCR，音频和视频直接摄取仍是后续方向。<a class="source-ref" href="https://blog.cloudflare.com/ai-search-ga/" title="AI Search GA">S09</a></p>
+<p>个人资料里经常有这样的东西：记得大致布局，却忘了文件名的截图；记得一句意思，却想不起用词的文章；只有扫描件的材料。对这些输入，先让搜索返回原件与定位，比立即生成一段总结更容易判断质量。</p>
+<p>例如，查“主体偏左、文字沿轮廓走的构图”，再放入一张颜色相近、布局不同的反例。这比单查“蓝色海报”更能看出搜索是否理解了关系。文档查询也应包含旧版本和找不到答案的情况。</p>
+<h3>适合省掉什么，不适合省掉什么</h3>
+<p>AI Search 可以省去一部分分块、索引与检索维护。权限较简单的资料集合，适合先用小样本试。复杂撤回、严格版本控制和自定义混合排序，则可能更适合保留自己的状态库与检索管线。</p>
+<p>当前限制也值得提前看：纯文本／代码和启用 OCR 的 PDF 可到 10 MiB；未启用 OCR 的 PDF 及其他受支持格式仍为 4 MiB。自定义元数据字段限 5 个，字符串的可过滤索引覆盖前 64 个 UTF-8 字节。复杂权限不能只靠把一个很长的规则字符串塞进 metadata。<a class="source-ref" href="https://developers.cloudflare.com/ai-search/platform/limits-pricing/" title="AI Search 限制与价格">S10</a></p>
+<h3>11 月开始采用新账单</h3>
+<p>新计费自 <strong>2026-11-01</strong>生效，每账户每月包含 500 万摄取 token、10 GB·月存储、1,000 次语义类查询和另 1,000 次全文查询。语义、向量与混合查询属于同一计量组。<a class="source-ref" href="https://developers.cloudflare.com/ai-search/platform/limits-pricing/" title="AI Search 限制与价格">S10</a></p>
+<table class="keep-table">
+<thead>
+<tr>
+<th>超出包含量的项目</th>
+<th>标价</th>
+<th>计算时记住</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>基础摄取</td>
+<td>$0.75／百万 token</td>
+<td>分块重叠重复计入</td>
+</tr>
+<tr>
+<td>图片处理</td>
+<td>另加 $0.50／百万 token</td>
+<td>与基础摄取共享 500 万额度</td>
+</tr>
+<tr>
+<td>存储</td>
+<td>$2／GB·月</td>
+<td>不是普通 R2 的单价</td>
+</tr>
+<tr>
+<td>语义类查询</td>
+<td>$0.75／千次</td>
+<td>不按每个索引另送额度</td>
+</tr>
+<tr>
+<td>全文查询</td>
+<td>$0.10／千次</td>
+<td>与语义额度分开</td>
+</tr>
+</tbody>
+</table>
+<p>内部 Workers AI embedding、重排、存储、向量索引与网站抓取已纳入 AI Search；生成答案、查询改写和外部模型仍可能单独计费。不要继续套用旧 beta 账单。<a class="source-ref" href="https://blog.cloudflare.com/ai-search-ga/" title="AI Search GA">S09</a> <a class="source-ref" href="https://developers.cloudflare.com/ai-search/platform/limits-pricing/" title="AI Search 限制与价格">S10</a></p>
+</section><section class="chapter" id="chapter-05"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">05</span><span class="chapter-type">MODELS</span></div><h2>有时只需要一个选择</h2></header>
+<h3>Clef 与 Jev：先区分模型，再比较入口</h3>
+<p>这类模型接收 <code>state</code> 与有限的 <code>questions</code>，直接返回概率、类别或分数。它们适合把“读一段材料、做一个窄判断”从长篇生成中分离出来；不是替整个任务写报告的聊天模型。<a class="source-ref" href="https://blog.cloudflare.com/clef-decision-models/" title="Clef 与强化学习平台发布">S16</a> <a class="source-ref" href="https://openrouter.ai/docs/guides/community/jev" title="OpenRouter：Jev 的两种接口">S76</a></p>
+<p>Cloudflare 自己托管 Clef 与 Clef-flash，也在第三方模型目录中提供 <code>typesafe/jev</code>。后者仍属于 TypeSafe 的模型路线，不能把“通过 CF 调用”写成“在 CF 上运行同一套自有模型”。<a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef/" title="Clef 模型卡">S17</a> <a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef-flash/" title="Clef-flash 模型卡">S18</a> <a class="source-ref" href="https://developers.cloudflare.com/ai/models/typesafe/jev/" title="Jev：Cloudflare 第三方模型目录">S73</a></p>
+<table class="keep-table">
+<thead>
+<tr>
+<th>模型／接入</th>
+<th style="text-align:right">输入单价，美元／百万 token</th>
+<th>主要区别</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Jev，经 CF</td>
+<td style="text-align:right">0.042</td>
+<td>TypeSafe 第三方模型；纯文本判断</td>
+</tr>
+<tr>
+<td>Clef-flash</td>
+<td style="text-align:right">0.09</td>
+<td>CF 托管；9B；支持图片扩展</td>
+</tr>
+<tr>
+<td>Clef</td>
+<td style="text-align:right">0.24</td>
+<td>CF 托管；27B；支持图片扩展</td>
+</tr>
+</tbody>
+</table>
+<p>以上是模型标价，不含充值费、Worker、日志与重试。CF Unified Billing 购买 credits 另收 5%；Workers Paid 的固定费用不等于第三方模型额度。<a class="source-ref" href="https://developers.cloudflare.com/ai/models/typesafe/jev/" title="Jev：Cloudflare 第三方模型目录">S73</a> <a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef/" title="Clef 模型卡">S17</a> <a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef-flash/" title="Clef-flash 模型卡">S18</a> <a class="source-ref" href="https://developers.cloudflare.com/ai-gateway/features/unified-billing/" title="Cloudflare AI Gateway：Unified Billing">S80</a></p>
+<p>上下文不能只写“64k 对 32k”：Clef 两款目录列 65,536；Jev 原厂允许总请求 64k，但 <code>state + 最长单题</code> 不超过 32k，CF 与 OpenRouter 的 Jev 目录则标 32,000。应按所选入口限制输入。<a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef/" title="Clef 模型卡">S17</a> <a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef-flash/" title="Clef-flash 模型卡">S18</a> <a class="source-ref" href="https://docs.typesafe.ai/models" title="TypeSafe：Jev 版本、价格与上下文预算">S74</a> <a class="source-ref" href="https://openrouter.ai/typesafe/jev-1.13/" title="OpenRouter：Jev 1.13 价格与供应商">S75</a></p>
+<p>这也不是一个总分即可解决的选择。CF 自测中，Clef 在部分分类指标领先，但 Jev 在 When2Call 与 BRIGHT 两项高于两款 Clef；这些是供应商的实验结果，不是本手册的实测。窄任务先用自己的材料，比较同等错误风险下能自动处理多少，才有工程意义。<a class="source-ref" href="https://blog.cloudflare.com/clef-decision-models/" title="Clef 与强化学习平台发布">S16</a></p>
+<p>完整的供应路径、费用演算、兼容差异与试验设计，见本资料包的《Clef 与 Jev：模型、入口与判断成本》。配套强化学习目前仍采用设计合作形式，不是普通 Paid 账户默认开放的自助训练。<a class="source-ref" href="https://blog.cloudflare.com/clef-decision-models/" title="Clef 与强化学习平台发布">S16</a></p>
+<h3>AutoRouter：只在可以换模型的地方换</h3>
+<p>AI Gateway 的 <code>cloudflare/auto</code> 可以在允许的候选模型中路由。beta 期间路由本身免费，实际推理照常计费。可替换的小任务适合试；固定底模的实验或需要稳定行为的会话，应保留明确选择。<a class="source-ref" href="https://blog.cloudflare.com/auto-router/" title="AutoRouter 发布">S13</a></p>
+<p>User Insights 则帮助查看流经 Gateway 的调用归属、模型与费用，功能本身免费。它不能看见绕过 Gateway 的调用，异常标记也不会自动阻止请求。<a class="source-ref" href="https://developers.cloudflare.com/ai-gateway/observability/user-insights/" title="AI Gateway User Insights">S14</a></p>
+<p>先看清现有开销，再决定哪些任务值得自动选模型，是更容易解释变化的一种顺序。</p>
+<blockquote>
+<p><strong>日志也有自己的价格边界</strong><br/>
+首次创建 Gateway 在 2026-09-24 或之后的账户，日志走 Workers Logs 规则；更早客户仍有 Legacy Logs。Unified Billing 充值另收 5%。路由免费、日志免费和推理免费是三件事。<a class="source-ref" href="https://developers.cloudflare.com/ai-gateway/reference/pricing/" title="AI Gateway 价格与日志">S15</a></p>
+</blockquote>
+</section><section class="chapter" id="chapter-06"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">06</span><span class="chapter-type">BROWSER &amp; CREATION</span></div><h2>浏览器与创作工作台</h2></header>
+<h3>Kitesurf：网页进入终端</h3>
+<p>这次 Kitesurf 更新加入更多网页兼容能力、WebMCP 和终端交互。支持 Kitty 图像协议的终端能显示页面，其他环境有 ANSI 回退，并可回传点击与滚动。当前仍是 beta，开源尚在计划中。<a class="source-ref" href="https://blog.cloudflare.com/kitesurf-update/" title="Kitesurf 更新">S19</a></p>
+<p>它适合独立体验：读公开网页、看 agent 所见的页面，或试一个终端交互。若最终用户使用 Safari、Chrome 或手机浏览器，产品验收仍应回到那些实际环境。</p>
+<h3>Cloudflare OS：看工作怎样跨会话延续</h3>
+<p>已有自部署开源版本；10 月 1 日新增的是托管候补，以及仓库、外部工具和导出能力改进。全托管版本还不能视为每个账户已可使用的套餐功能。<a class="source-ref" href="https://blog.cloudflare.com/managed-cloudflare-os/" title="Cloudflare OS 托管候补">S20</a></p>
+<p>值得借鉴的是文件、授权和长任务怎样组织，人离开后又如何回到工作现场。自部署仍要计算底层存储、推理与维护，不必为了研究它就把关键工作迁过去。</p>
+<h3>EmDash：生成之后，还能继续编辑</h3>
+<p>EmDash 1.0 是基于 Astro 的稳定 CMS，提供插件与管理能力；EmDash Build 则是另一个 alpha 项目：在 Sandbox 中生成网站，以 Artifacts 留下文件变化，最终形成能继续管理的站点。<a class="source-ref" href="https://blog.cloudflare.com/emdash-cms-plugin-registry/" title="EmDash 1.0 与 EmDash Build">S21</a></p>
+<p>对独立作者，重点是内容能否继续编辑、导出和发布；对开发者，可以分别研究 CMS 与生成器。它们不要求读者同时接受同一套工作方式。</p>
+</section><section class="chapter" id="chapter-07"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">07</span><span class="chapter-type">DATA</span></div><h2>三种名字很新、用途很不同的数据服务</h2></header>
+<h3>K2：消息处理完，还需要重新读吗？</h3>
+<p>K2 是带保留期的事件日志，允许不同消费者从各自位置读取和重放。公开 beta 需要 Workers Paid，当前账户可存 10 GB，常规保留上限为 30 天，更长保留需申请。<a class="source-ref" href="https://blog.cloudflare.com/cloudflare-k2-streams/" title="K2 发布">S22</a> <a class="source-ref" href="https://developers.cloudflare.com/k2/" title="K2 文档">S23</a></p>
+<p>选择点在于历史是否要反复使用。只有一个程序稍后生成缩略图，队列通常更直接；索引、分析与修复程序需要独立回放同一历史时，事件流才有更具体的位置。其有序性仍要结合分区、确认位置和自己的业务关系理解。<a class="source-ref" href="https://blog.cloudflare.com/cloudflare-k2-streams/" title="K2 发布">S22</a></p>
+<h3>Basin：面向分析，不是替换每一个数据库</h3>
+<p>Basin 将 Pipelines、Catalog 与 SQL 整合成正式的数据分析平台，基于 R2 与 Apache Iceberg。已有相应资源可继续工作，名称与接口逐步迁移。<a class="source-ref" href="https://blog.cloudflare.com/cloudflare-basin/" title="Basin GA">S24</a> <a class="source-ref" href="https://developers.cloudflare.com/changelog/product-group/developer-platform/" title="开发者平台 Changelog">S33</a></p>
+<p>较大的事件历史或实验批次值得研究；少量文件和 SQLite 已经够用时，不必为了“有数据”而引入数据湖。分析查询与日常事务状态各有职责。</p>
+<h3>KV Instant：先看写入单价</h3>
+<p>KV Instant 面向小体量、极少写入、极大量读取的配置，目前为私有 beta。它的账单与普通 KV 差别很大：<strong>读取 $0.20／百万次，写入、删除和列举 $0.10／次，存储 $100／MB·月。</strong><a class="source-ref" href="https://blog.cloudflare.com/workers-kv-instant/" title="KV Instant 私测与价格">S25</a></p>
+<p>1,000 次 Class A 操作就是 $100。它不是普通笔记库、聊天历史或频繁变化的任务状态的便宜替代品；名字相近，不能沿用估价。</p>
+</section><section class="chapter" id="chapter-08"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">08</span><span class="chapter-type">ECONOMICS</span></div><h2>把费用放回使用过程</h2></header>
+<h3>$5 是起点，不是整个账单</h3>
+<p>Workers Paid 最低为每账户每月 $5，相应包含量由多个项目共用。浏览器、容器、模型、存储和日志有各自的计量单位。先算工作量，再扣一次共享包含量，比为每个小项目单独套一份“免费额度”更可靠。<a class="source-ref" href="https://developers.cloudflare.com/workers/platform/pricing/" title="Workers 价格">S34</a></p>
+<table>
+<thead>
+<tr>
+<th>常用资源</th>
+<th>本期记录的包含量</th>
+<th>主要观察项</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Workers Paid</td>
+<td>1,000 万请求；3,000 万 CPU 毫秒／月</td>
+<td>动态请求、实际 CPU <a class="source-ref" href="https://developers.cloudflare.com/workers/platform/pricing/" title="Workers 价格">S34</a></td>
+</tr>
+<tr>
+<td>Workers Builds</td>
+<td>6,000 分钟；6 路并发／月</td>
+<td>重复构建、单次 20 分钟上限 <a class="source-ref" href="https://developers.cloudflare.com/workers/ci-cd/builds/limits-and-pricing/" title="Workers Builds 限制与价格">S35</a></td>
+</tr>
+<tr>
+<td>Containers</td>
+<td>25 GiB·小时内存；375 vCPU·分钟；200 GB·小时磁盘／月</td>
+<td>启动到关闭的总时长 <a class="source-ref" href="https://developers.cloudflare.com/containers/platform/pricing/" title="Containers 价格">S06</a></td>
+</tr>
+<tr>
+<td>Browser Run</td>
+<td>10 浏览器小时／月</td>
+<td>会话时长、并发 <a class="source-ref" href="https://developers.cloudflare.com/browser-run/pricing/" title="Browser Run 价格">S36</a></td>
+</tr>
+<tr>
+<td>R2 Standard</td>
+<td>10 GB·月；100 万 Class A；1,000 万 Class B</td>
+<td>文件体量、对象操作 <a class="source-ref" href="https://developers.cloudflare.com/r2/pricing/" title="R2 价格">S38</a></td>
+</tr>
+<tr>
+<td>Vectorize Paid</td>
+<td>5,000 万查询维度；1,000 万存储维度／月</td>
+<td>条目数还要乘维度 <a class="source-ref" href="https://developers.cloudflare.com/vectorize/platform/pricing/" title="Vectorize 价格">S40</a></td>
+</tr>
+<tr>
+<td>Workers AI</td>
+<td>每天 10,000 Neurons</td>
+<td>模型之间消耗不同 <a class="source-ref" href="https://developers.cloudflare.com/workers-ai/platform/pricing/" title="Workers AI 价格">S41</a></td>
+</tr>
+</tbody>
+</table>
+<p>R2 使用自己的免费层；Workers AI 的日额度也不是 Paid 独占。以上不是该账户尚余多少额度的证明。</p>
+<h3>同一个两分钟任务，可以产生不同账单</h3>
+<p>假设每月 100 次任务，每次执行两分钟，规格为 4 GiB 内存、0.5 vCPU、8 GB 磁盘。若任务结束立即关闭，合计约 13.33 GiB·小时内存、最多 100 vCPU·分钟、26.67 GB·小时磁盘，在当前容器包含量内。<a class="source-ref" href="https://developers.cloudflare.com/containers/platform/pricing/" title="Containers 价格">S06</a></p>
+<p>若每次多空闲十分钟，总内存时间变成 80 GiB·小时，磁盘变成 160 GB·小时。多出的 55 GiB·小时内存按当前单价约 <strong>$0.495</strong>；CPU 不应把空闲时间也按满载算。例子未计模型、DO、网络与日志。<a class="source-ref" href="https://developers.cloudflare.com/containers/platform/pricing/" title="Containers 价格">S06</a></p>
+<figure class="figure"><svg aria-labelledby="title desc" height="335" role="img" viewbox="0 0 740 335" width="740" xmlns="http://www.w3.org/2000/svg"><title id="title">关闭时间改变内存用量</title><desc id="desc">相同 4 GiB 配置每月执行100次。立即关闭每次2分钟，总内存13.33GiB小时；每次另空闲10分钟，总内存80GiB小时。条长按0至12分钟同一尺度绘制。</desc><style>text{font-family:Inter,'Noto Sans CJK SC',sans-serif;fill:#183B46;font-size:20px}.small{font-size:16px;fill:#58717A}.num{font-family:Inter,sans-serif}</style><text font-weight="600" x="0" y="24">每次 2 分钟的任务</text><text class="small" text-anchor="end" x="738" y="24">同一规格 · 100 次／月</text><text x="0" y="96">立即关闭</text><text x="0" y="174">多等十分钟</text><rect fill="#10B3CA" height="46" rx="2" stroke="#10B3CA" stroke-width="0" width="90" x="154" y="65"></rect><rect fill="#10B3CA" height="46" rx="2" stroke="#10B3CA" stroke-width="0" width="90" x="154" y="143"></rect><rect fill="#FF7A2A" height="46" rx="2" stroke="#FF7A2A" stroke-width="0" width="450" x="244" y="143"></rect><text font-weight="600" text-anchor="middle" x="199" y="94">2 min</text><text font-weight="600" text-anchor="middle" x="199" y="172">2 min</text><text font-weight="600" text-anchor="middle" x="469" y="172">空闲 10 min</text><line stroke="#C6E4E9" stroke-width="1.5" x1="154" x2="154" y1="208" y2="215"></line><text class="small" text-anchor="middle" x="154" y="241">0</text><line stroke="#C6E4E9" stroke-width="1.5" x1="244" x2="244" y1="208" y2="215"></line><text class="small" text-anchor="middle" x="244" y="241">2</text><line stroke="#C6E4E9" stroke-width="1.5" x1="334" x2="334" y1="208" y2="215"></line><text class="small" text-anchor="middle" x="334" y="241">4</text><line stroke="#C6E4E9" stroke-width="1.5" x1="424" x2="424" y1="208" y2="215"></line><text class="small" text-anchor="middle" x="424" y="241">6</text><line stroke="#C6E4E9" stroke-width="1.5" x1="514" x2="514" y1="208" y2="215"></line><text class="small" text-anchor="middle" x="514" y="241">8</text><line stroke="#C6E4E9" stroke-width="1.5" x1="604" x2="604" y1="208" y2="215"></line><text class="small" text-anchor="middle" x="604" y="241">10</text><line stroke="#C6E4E9" stroke-width="1.5" x1="694" x2="694" y1="208" y2="215"></line><text class="small" text-anchor="middle" x="694" y="241">12</text><line stroke="#C6E4E9" stroke-width="1.5" x1="154" x2="694" y1="208" y2="208"></line><text class="small" text-anchor="end" x="739" y="241">分钟</text><text font-weight="600" x="0" y="286">内存用量：13.33 → 80 GiB·小时／月</text><text class="small" x="0" y="315">运行时长变成 6 倍；CPU 不把空闲时间按满载计算。</text></svg><figcaption><span class="fig-no">FIG.</span>同一任务数与配置，条长按每次运行分钟数绘制。费用依据 S06；详细假设见正文。</figcaption></figure>
+<table class="keep-table">
+<thead>
+<tr>
+<th>每次任务的生命周期</th>
+<th style="text-align:right">每月运行时长</th>
+<th style="text-align:right">每月内存用量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>执行 2 分钟后关闭</td>
+<td style="text-align:right">3.33 小时</td>
+<td style="text-align:right">13.33 GiB·小时</td>
+</tr>
+<tr>
+<td>执行 2 分钟，再空闲 10 分钟</td>
+<td style="text-align:right">20 小时</td>
+<td style="text-align:right">80 GiB·小时</td>
+</tr>
+</tbody>
+</table>
+<p><em>同一规格、同一任务数的示例演算；不是真实账户用量。</em></p>
+<p>另外两笔可复算的例子：11 月 AI Search 新计费下，600 万纯文本摄取 token、2 GB·月、3,000 次语义查询、500 次全文查询，且没有图片处理与生成，超额合计 <strong>$2.25</strong>；Artifacts 每月 20,000 次操作、3 GB·月，超额合计 <strong>$2.50</strong>。<a class="source-ref" href="https://developers.cloudflare.com/ai-search/platform/limits-pricing/" title="AI Search 限制与价格">S10</a> <a class="source-ref" href="https://developers.cloudflare.com/artifacts/platform/pricing/" title="Artifacts 价格">S08</a></p>
+<h3>把这些日期留在日历里</h3>
+<table class="date-table keep-table">
+<thead>
+<tr>
+<th>日期</th>
+<th>变化</th>
+<th>需要做的事</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026-09-24 起</td>
+<td>新 Gateway 客户日志规则变化</td>
+<td>看首次 Gateway 创建日期 <a class="source-ref" href="https://developers.cloudflare.com/ai-gateway/reference/pricing/" title="AI Gateway 价格与日志">S15</a></td>
+</tr>
+<tr>
+<td>2026-10-14／15</td>
+<td>Artifacts 计费日期有一天官方冲突</td>
+<td>价格页写 14 日，博文写 15 日；预算按较早日准备 <a class="source-ref" href="https://blog.cloudflare.com/next-git-platform-on-cloudflare/" title="Artifacts 公开测试发布">S07</a> <a class="source-ref" href="https://developers.cloudflare.com/artifacts/platform/pricing/" title="Artifacts 价格">S08</a></td>
+</tr>
+<tr>
+<td>2026-11-01</td>
+<td>AI Search 新计费</td>
+<td>重新估摄取、查询与额外模型费 <a class="source-ref" href="https://developers.cloudflare.com/ai-search/platform/limits-pricing/" title="AI Search 限制与价格">S10</a></td>
+</tr>
+<tr>
+<td>2026-12-31</td>
+<td>旧容器类／Sandbox SDK 维护节点</td>
+<td>安排迁移验证，不解释为当日停机 <a class="source-ref" href="https://blog.cloudflare.com/faster-agent-sandboxes/" title="Containers 新运行接口与 Sandbox">S04</a></td>
+</tr>
+<tr>
+<td><code>cf</code> GA 后至少 18 个月</td>
+<td>Wrangler 计划维护期</td>
+<td>GA 日期未定，不猜具体停用日 <a class="source-ref" href="https://blog.cloudflare.com/cloudflare-cf-cli-launch/" title="cf CLI 发布">S02</a></td>
+</tr>
+</tbody>
+</table>
+<p>账单提醒用于发现趋势；真正限制开销，还要靠任务截止时间、最大并发、调用次数和数据保留期。提醒不等于自动封顶。</p>
+</section><section class="chapter" id="chapter-09"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">09</span><span class="chapter-type">RELEASE INDEX</span></div><h2>发布状态速查</h2></header>
+<p>GA 表示该产品正式发布；不意味着相关的 SDK、托管版和地区全部同步开放。下面保留各自状态，便于回查。</p>
+<h3>可以调用、安装或进入公开测试</h3>
+<table class="compact">
+<thead>
+<tr>
+<th>能力</th>
+<th>本期状态与入口</th>
+<th>来源</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cf</code> CLI</td>
+<td>公开 beta，可与现有 Wrangler 项目并行使用资源命令</td>
+<td><a class="source-ref" href="https://blog.cloudflare.com/cloudflare-cf-cli-launch/" title="cf CLI 发布">S02</a> <a class="source-ref" href="https://developers.cloudflare.com/cf/" title="cf CLI 文档">S03</a></td>
+</tr>
+<tr>
+<td>Workers Issues</td>
+<td>公开 beta；配置启用后处理新流量</td>
+<td><a class="source-ref" href="https://developers.cloudflare.com/workers/observability/issues/" title="Workers Issues 文档">S12</a></td>
+</tr>
+<tr>
+<td>Containers／快照</td>
+<td>新调度为公开 beta 路线；Paid；快照需 DO 调度</td>
+<td><a class="source-ref" href="https://blog.cloudflare.com/faster-agent-sandboxes/" title="Containers 新运行接口与 Sandbox">S04</a> <a class="source-ref" href="https://developers.cloudflare.com/containers/guides/snapshots/" title="Containers 文件系统快照">S05</a></td>
+</tr>
+<tr>
+<td>Sandbox SDK 1.0</td>
+<td>新接口与迁移文档已提供；底层仍有 beta 状态</td>
+<td><a class="source-ref" href="https://developers.cloudflare.com/sandbox/" title="Sandbox SDK">S59</a> <a class="source-ref" href="https://developers.cloudflare.com/sandbox/sdk/migrate/changes-in-1-0/" title="Sandbox SDK 1.0 迁移差异">S72</a></td>
+</tr>
+<tr>
+<td>Artifacts</td>
+<td>公开 beta，Paid</td>
+<td><a class="source-ref" href="https://blog.cloudflare.com/next-git-platform-on-cloudflare/" title="Artifacts 公开测试发布">S07</a> <a class="source-ref" href="https://developers.cloudflare.com/artifacts/platform/pricing/" title="Artifacts 价格">S08</a></td>
+</tr>
+<tr>
+<td>AI Search</td>
+<td>GA，11 月新计费</td>
+<td><a class="source-ref" href="https://blog.cloudflare.com/ai-search-ga/" title="AI Search GA">S09</a> <a class="source-ref" href="https://developers.cloudflare.com/ai-search/platform/limits-pricing/" title="AI Search 限制与价格">S10</a></td>
+</tr>
+<tr>
+<td>Clef／Clef-flash</td>
+<td>Workers AI 模型可调用</td>
+<td><a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef/" title="Clef 模型卡">S17</a> <a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef-flash/" title="Clef-flash 模型卡">S18</a></td>
+</tr>
+<tr>
+<td>AutoRouter／User Insights</td>
+<td>路由 beta；使用分析已开放</td>
+<td><a class="source-ref" href="https://blog.cloudflare.com/auto-router/" title="AutoRouter 发布">S13</a> <a class="source-ref" href="https://developers.cloudflare.com/ai-gateway/observability/user-insights/" title="AI Gateway User Insights">S14</a></td>
+</tr>
+<tr>
+<td>Kitesurf</td>
+<td>beta，Playground／终端</td>
+<td><a class="source-ref" href="https://blog.cloudflare.com/kitesurf-update/" title="Kitesurf 更新">S19</a></td>
+</tr>
+<tr>
+<td>EmDash 1.0／Build</td>
+<td>CMS 稳定版／生成器 alpha</td>
+<td><a class="source-ref" href="https://blog.cloudflare.com/emdash-cms-plugin-registry/" title="EmDash 1.0 与 EmDash Build">S21</a></td>
+</tr>
+<tr>
+<td>K2／Basin</td>
+<td>事件流公开 beta／分析平台 GA</td>
+<td><a class="source-ref" href="https://developers.cloudflare.com/k2/" title="K2 文档">S23</a> <a class="source-ref" href="https://blog.cloudflare.com/cloudflare-basin/" title="Basin GA">S24</a></td>
+</tr>
+</tbody>
+</table>
+<h3>申请、候补与其他值得留意的发布</h3>
+<p>Cloudflare OS 托管版候补、KV Instant 私有 beta、Clef 强化学习设计合作及 Monetization Gateway 封闭 beta，各有独立申请条件。Monetization Gateway 使用 HTTP 402 为 API／MCP 等访问计费，当前面向符合条件的美国卖家；登记候补不等于已经得到可用服务。<a class="source-ref" href="https://blog.cloudflare.com/managed-cloudflare-os/" title="Cloudflare OS 托管候补">S20</a> <a class="source-ref" href="https://blog.cloudflare.com/workers-kv-instant/" title="KV Instant 私测与价格">S25</a> <a class="source-ref" href="https://blog.cloudflare.com/clef-decision-models/" title="Clef 与强化学习平台发布">S16</a> <a class="source-ref" href="https://blog.cloudflare.com/monetization-gateway-beta/" title="Monetization Gateway 封闭测试">S30</a></p>
+<p>其他发布可按现有技术栈选择：Workers OAuth Provider v1 提供授权与资源服务拆分等能力；Rust／Emscripten 扩大运行时实验；Forge 从 API 规范生成可维护接口；Vinext 1.0 面向 Next.js 的 Vite 迁移；Threat Signals 提供一个安全情报 RSS 的免费分析入口、最长保存 30 天。<a class="source-ref" href="https://developers.cloudflare.com/changelog/post/2026-10-01-workers-oauth-provider-1x/" title="Workers OAuth Provider v1">S71</a> <a class="source-ref" href="https://blog.cloudflare.com/rust-workers-emscripten-target/" title="Rust Emscripten target">S26</a> <a class="source-ref" href="https://blog.cloudflare.com/forge-open-source-generation-pipeline/" title="Forge 生成工具链">S27</a> <a class="source-ref" href="https://blog.cloudflare.com/vinext-nextjs-on-vite/" title="Vinext 1.0">S28</a> <a class="source-ref" href="https://blog.cloudflare.com/threat-signals/" title="Threat Signals">S29</a></p>
+<p>Registrar 的程序化入口，以及 Workers 的 ML-KEM／ML-DSA opt-in 接口，也在本轮发布范围内。搜索域名不等于授权购买，实验密码接口不等于整套系统已完成后量子迁移。企业功能、研究原型与申请中的 CA 不作为个人套餐现成福利计算。<a class="source-ref" href="https://www.cloudflare.com/birthday-week/" title="Birthday Week 2026 发布总览">S01</a> <a class="source-ref" href="https://developers.cloudflare.com/changelog/product-group/developer-platform/" title="开发者平台 Changelog">S33</a></p>
+</section><section class="chapter" id="chapter-10"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">10</span><span class="chapter-type">PROGRAMMES</span></div><h2>申请与比赛，先读条件</h2></header>
+<p><strong>Git 平台比赛</strong>的截止为 <strong>2026-10-14 23:59 PDT</strong>。正式规则要求美国或加拿大合法居民、起始时满 18 岁，使用 Workers 与 Artifacts，支持多个 agent 并行工作，并提交源码、运行说明及 5–10 分钟演示。源码许可限 MIT、Apache-2.0 或指定 BSD；第一名的 $25,000 是 Cloudflare credits，不是现金。现场展示和其他条件仍应读完整规则。<a class="source-ref" href="https://www.cloudflare.com/documents/build-next-gen-git-platform-competition-terms.pdf" title="Git 平台比赛正式规则">S32</a></p>
+<p><strong>The Cold Start</strong>面向位于美国或加拿大、融资少于 $1,000 万的早期创业公司，申请截止日期为 <strong>2026-10-02</strong>，奖项为 $500,000 Cloudflare credits。本期恰在截止日形成，阅读时先检查申请入口，不将它当作长期开放项目。<a class="source-ref" href="https://blog.cloudflare.com/introducing-the-cold-start/" title="The Cold Start">S31</a></p>
+<p>对多数个人试验，公开入口上的一次完整使用已经足以积累判断。是否改许可证、经营商业项目或参加比赛，应与作品计划有关，不必由 credits 金额决定。</p>
+</section><section class="chapter" id="chapter-11"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">11</span><span class="chapter-type">USE CASES</span></div><h2>使用场景，不是项目处方</h2></header>
+<p>每个人的项目、数据和维护习惯不同。以下只是编辑提出的试验情境，没有云端实测结论，也不是一套推荐组合。</p>
+<p><strong>想少搬一次日志。</strong> 用一个测试 Worker 的无害失败，检查 Issues 能否连起错误、版本与复现材料。先减少调查准备，自动修复和自动发布以后分别决定。</p>
+<p><strong>想找回自己的视觉材料。</strong> 选 30–50 张获准使用的图，保留来源，用真实查询比较多模态与图片描述。加入颜色相似、构图不同的反例，判断是否真的找回了原件。</p>
+<p><strong>想比较两种实现。</strong> 从同一文件基线开两份环境，交回补丁、可运行结果和同样的检查。关闭后再恢复一次，看准备是否更快、成果是否更易比较，而不先搭完整平台。</p>
+<p><strong>想替掉一小段重复判断。</strong> 让 Clef-flash 先只给分类建议，写清误判代价，允许无法判断，再和规则或已有模型比较。</p>
+
+</section><section class="sources" id="sources"><h2>来源索引</h2><p class="source-note">本次重新核对决策模型、接入路径与价格；其他发布条目沿用 2026-10-02 原版来源记录。资料核验不等于账户或模型实测。</p><div class="source-list"><div class="source-col"><div class="source-entry" id="S01"><span class="source-id">S01</span><a href="https://www.cloudflare.com/birthday-week/">Birthday Week 2026 发布总览</a><small>www.cloudflare.com</small></div><div class="source-entry" id="S02"><span class="source-id">S02</span><a href="https://blog.cloudflare.com/cloudflare-cf-cli-launch/">cf CLI 发布</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S03"><span class="source-id">S03</span><a href="https://developers.cloudflare.com/cf/">cf CLI 文档</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S04"><span class="source-id">S04</span><a href="https://blog.cloudflare.com/faster-agent-sandboxes/">Containers 新运行接口与 Sandbox</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S05"><span class="source-id">S05</span><a href="https://developers.cloudflare.com/containers/guides/snapshots/">Containers 文件系统快照</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S06"><span class="source-id">S06</span><a href="https://developers.cloudflare.com/containers/platform/pricing/">Containers 价格</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S07"><span class="source-id">S07</span><a href="https://blog.cloudflare.com/next-git-platform-on-cloudflare/">Artifacts 公开测试发布</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S08"><span class="source-id">S08</span><a href="https://developers.cloudflare.com/artifacts/platform/pricing/">Artifacts 价格</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S09"><span class="source-id">S09</span><a href="https://blog.cloudflare.com/ai-search-ga/">AI Search GA</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S10"><span class="source-id">S10</span><a href="https://developers.cloudflare.com/ai-search/platform/limits-pricing/">AI Search 限制与价格</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S11"><span class="source-id">S11</span><a href="https://blog.cloudflare.com/real-time-issue-detection/">Workers Issues 发布</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S12"><span class="source-id">S12</span><a href="https://developers.cloudflare.com/workers/observability/issues/">Workers Issues 文档</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S13"><span class="source-id">S13</span><a href="https://blog.cloudflare.com/auto-router/">AutoRouter 发布</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S14"><span class="source-id">S14</span><a href="https://developers.cloudflare.com/ai-gateway/observability/user-insights/">AI Gateway User Insights</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S15"><span class="source-id">S15</span><a href="https://developers.cloudflare.com/ai-gateway/reference/pricing/">AI Gateway 价格与日志</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S16"><span class="source-id">S16</span><a href="https://blog.cloudflare.com/clef-decision-models/">Clef 与强化学习平台发布</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S17"><span class="source-id">S17</span><a href="https://developers.cloudflare.com/workers-ai/models/clef/">Clef 模型卡</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S18"><span class="source-id">S18</span><a href="https://developers.cloudflare.com/workers-ai/models/clef-flash/">Clef-flash 模型卡</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S19"><span class="source-id">S19</span><a href="https://blog.cloudflare.com/kitesurf-update/">Kitesurf 更新</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S20"><span class="source-id">S20</span><a href="https://blog.cloudflare.com/managed-cloudflare-os/">Cloudflare OS 托管候补</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S21"><span class="source-id">S21</span><a href="https://blog.cloudflare.com/emdash-cms-plugin-registry/">EmDash 1.0 与 EmDash Build</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S22"><span class="source-id">S22</span><a href="https://blog.cloudflare.com/cloudflare-k2-streams/">K2 发布</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S23"><span class="source-id">S23</span><a href="https://developers.cloudflare.com/k2/">K2 文档</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S24"><span class="source-id">S24</span><a href="https://blog.cloudflare.com/cloudflare-basin/">Basin GA</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S25"><span class="source-id">S25</span><a href="https://blog.cloudflare.com/workers-kv-instant/">KV Instant 私测与价格</a><small>blog.cloudflare.com</small></div></div><div class="source-col"><div class="source-entry" id="S26"><span class="source-id">S26</span><a href="https://blog.cloudflare.com/rust-workers-emscripten-target/">Rust Emscripten target</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S27"><span class="source-id">S27</span><a href="https://blog.cloudflare.com/forge-open-source-generation-pipeline/">Forge 生成工具链</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S28"><span class="source-id">S28</span><a href="https://blog.cloudflare.com/vinext-nextjs-on-vite/">Vinext 1.0</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S29"><span class="source-id">S29</span><a href="https://blog.cloudflare.com/threat-signals/">Threat Signals</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S30"><span class="source-id">S30</span><a href="https://blog.cloudflare.com/monetization-gateway-beta/">Monetization Gateway 封闭测试</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S31"><span class="source-id">S31</span><a href="https://blog.cloudflare.com/introducing-the-cold-start/">The Cold Start</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S32"><span class="source-id">S32</span><a href="https://www.cloudflare.com/documents/build-next-gen-git-platform-competition-terms.pdf">Git 平台比赛正式规则</a><small>www.cloudflare.com</small></div><div class="source-entry" id="S33"><span class="source-id">S33</span><a href="https://developers.cloudflare.com/changelog/product-group/developer-platform/">开发者平台 Changelog</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S34"><span class="source-id">S34</span><a href="https://developers.cloudflare.com/workers/platform/pricing/">Workers 价格</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S35"><span class="source-id">S35</span><a href="https://developers.cloudflare.com/workers/ci-cd/builds/limits-and-pricing/">Workers Builds 限制与价格</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S36"><span class="source-id">S36</span><a href="https://developers.cloudflare.com/browser-run/pricing/">Browser Run 价格</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S38"><span class="source-id">S38</span><a href="https://developers.cloudflare.com/r2/pricing/">R2 价格</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S40"><span class="source-id">S40</span><a href="https://developers.cloudflare.com/vectorize/platform/pricing/">Vectorize 价格</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S41"><span class="source-id">S41</span><a href="https://developers.cloudflare.com/workers-ai/platform/pricing/">Workers AI 价格</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S59"><span class="source-id">S59</span><a href="https://developers.cloudflare.com/sandbox/">Sandbox SDK</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S63"><span class="source-id">S63</span><a href="https://developers.cloudflare.com/workers/previews/resources/">Workers 预览资源隔离</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S70"><span class="source-id">S70</span><a href="https://developers.cloudflare.com/changelog/post/2026-10-01-pending-io-keep-alive/">Durable Objects pending I/O 保活</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S71"><span class="source-id">S71</span><a href="https://developers.cloudflare.com/changelog/post/2026-10-01-workers-oauth-provider-1x/">Workers OAuth Provider v1</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S72"><span class="source-id">S72</span><a href="https://developers.cloudflare.com/sandbox/sdk/migrate/changes-in-1-0/">Sandbox SDK 1.0 迁移差异</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S73"><span class="source-id">S73</span><a href="https://developers.cloudflare.com/ai/models/typesafe/jev/">Jev：Cloudflare 第三方模型目录</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S74"><span class="source-id">S74</span><a href="https://docs.typesafe.ai/models">TypeSafe：Jev 版本、价格与上下文预算</a><small>docs.typesafe.ai</small></div><div class="source-entry" id="S75"><span class="source-id">S75</span><a href="https://openrouter.ai/typesafe/jev-1.13/">OpenRouter：Jev 1.13 价格与供应商</a><small>openrouter.ai</small></div><div class="source-entry" id="S76"><span class="source-id">S76</span><a href="https://openrouter.ai/docs/guides/community/jev">OpenRouter：Jev 的两种接口</a><small>openrouter.ai</small></div><div class="source-entry" id="S80"><span class="source-id">S80</span><a href="https://developers.cloudflare.com/ai-gateway/features/unified-billing/">Cloudflare AI Gateway：Unified Billing</a><small>developers.cloudflare.com</small></div></div></div></section><section class="colophon" id="colophon"><div class="closing-title">关于这一版</div><p class="smallprint">面向个人使用的独立参考资料，不是 Cloudflare 官方出版物。产品事实保留来源，场景与判断属于编辑分析。本次未进行账户操作或云端部署。</p><div class="author-line">GitHub · <a href="https://github.com/IndelibleVivi">github.com/IndelibleVivi</a></div><div class="signature">made by Faye &amp; Cove</div></section></main></body></html>

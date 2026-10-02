@@ -1,0 +1,16 @@
+flowchart TB
+  accTitle: 内容版本如何修订、被取代、归档和撤下
+  accDescr: 当前版在候选修订期间继续可读。发现变化后产生候选，审阅通过才发布新版本并标记旧版被取代。不再适用的资料归档；隐私或危险错误立即撤下，修复后重新审阅。
+  A[已发布的当前版 n]:::content --> B[发现变化或到达复核日]:::source
+  B --> C[候选修订 n+1<br/>当前版不被半成品覆盖]:::content
+  C --> D{事实与作品<br/>审阅通过？}:::gate
+  D -->|否| C
+  D -->|是| E[发布 n+1<br/>旧版标记被取代并链接新版]:::output
+  A -->|不再适用或停止维护| F[归档<br/>保留历史，不再默认推荐]:::source
+  A -->|泄密或危险误导| G[立即撤下<br/>停止分发问题内容]:::gate
+  G --> H[清理公开副本与修复]:::source
+  H --> C
+  classDef source fill:#FFFFFF,stroke:#A4BEC6,color:#183544,stroke-width:1px
+  classDef content fill:#EFF9FB,stroke:#007F93,color:#183544,stroke-width:1.3px
+  classDef gate fill:#FFF4EC,stroke:#BE4B13,color:#183544,stroke-width:1.3px
+  classDef output fill:#FFFFFF,stroke:#007F93,color:#183544,stroke-width:1.8px

@@ -1,0 +1,9 @@
+{
+  "name": "cf-fieldbook",
+  "private": true,
+  "version": "0.1.0",
+  "description": "An independent, locally buildable Cloudflare reference and publication source.",
+  "devDependencies": {
+    "mermaid": "11.17.2"
+  }
+}

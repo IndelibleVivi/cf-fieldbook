@@ -1,0 +1,26 @@
+# 从阅读版 r3 接续
+
+CF Fieldbook 以 architecture-1 包为仓库起点，承接 r3 正文、来源、测试与三个例子。原始输入完整保留在维护者本地；私人讨论和接续记录不属于公共仓库。
+
+## 文件与行为的去向
+
+| 材料 | 当前处理 |
+|---|---|
+| reports | 原文与来源定义保留，后续事实同步不回写历史报告 |
+| guides、comparisons、services | 叙述保留；决策模型的重复数据改由显式 fact blocks 共源 |
+| catalog | 原路径保留；内容索引加入恢复任务用例及本地合成测试证据 |
+| examples | 保留三个可运行机制；job-state 增加失败与恢复 demo、回归检查与限制说明 |
+| reference/implementation | 保留稳定入口，供阅读站与例子引用 |
+| editorial | r3 QA/出版记录保留历史身份，不承担当前操作指令 |
+| tools/render.py | canonical 三册 renderer；只读冻结输入，禁止默认覆盖 dist |
+| tools/content.py、editions.py | 显式同步维护数据，固定版次输入并验证输出身份 |
+| tools/build_site.py | canonical 阅读站；替代 architecture-1 的单独 design-reader 生成路径 |
+| dist | 原始三册 MD/HTML/PDF 保留；新本地候选在 .build/editions |
+| assets/motifs | 原生青猫与日出 SVG，用于首页和新候选封面 |
+| docs 与 CONTRIBUTING | 当前机制、读者说明和维护操作；私人 handoff 不导入 |
+
+## 现有边界
+
+静态站、事实投影和本地版次冻结已经实现。字段级全库事实登记、来源自动监测、定时维护、云端例子适配器和正式发布自动化没有实现；现有任务不依赖它们。
+
+结构检查不理解产品事实真假。新增测试证明本地机制，不替代云端实测。新 PDF 属于视觉候选，旧 r3 PDF 仍是继承作品；公开状态及下一步见 [当前状态](current-state.md)。

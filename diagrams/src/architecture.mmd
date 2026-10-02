@@ -1,0 +1,21 @@
+flowchart TB
+  accTitle: CF Fieldbook 的仓库架构
+  accDescr: 公共来源与仓库外脱敏重构的实践，经人工编辑形成正文、精确数据与合成例子。离线检查与只读构建产生当前阅读和冻结版次；图是目标架构，不声称全部发布自动化已实现。
+  A[官方资料与公开来源]:::source
+  B[私人实践<br/>在仓库外总结与重构]:::source
+  C[核对 · 选择 · 编辑]:::gate
+  A --> C
+  B -->|只引入可公开材料| C
+  C --> D[Markdown 正文<br/>手册 · 服务 · 用例 · 比较]:::content
+  C --> E[精确记录 catalog<br/>来源 · 路线 · 日期 · 关联]:::content
+  C --> F[公共例子与 reference<br/>合成输入 · 实现 · 检查]:::content
+  D --> G[离线检查与只读构建]:::gate
+  E --> G
+  F --> G
+  M[Mermaid 图源与样式]:::source --> G
+  G --> H[当前阅读<br/>GitHub Markdown · 网页]:::output
+  G --> I[冻结出版物<br/>有版次的 MD · HTML · PDF]:::output
+  classDef source fill:#FFFFFF,stroke:#A4BEC6,color:#183544,stroke-width:1px
+  classDef content fill:#EFF9FB,stroke:#007F93,color:#183544,stroke-width:1.3px
+  classDef gate fill:#FFF4EC,stroke:#BE4B13,color:#183544,stroke-width:1.3px
+  classDef output fill:#FFFFFF,stroke:#007F93,color:#183544,stroke-width:1.8px

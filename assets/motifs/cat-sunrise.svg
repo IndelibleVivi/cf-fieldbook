@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-labelledby="title desc">
+<title id="title">青色猫望向橙色日出</title><desc id="desc">一只青色的猫坐在书页般展开的地平线上，安静地看着升起的橙色太阳。</desc>
+<rect width="600" height="400" fill="#fff"/>
+<g fill="none" stroke="#BE4B13" stroke-width="1.5" stroke-linecap="round">
+<path d="M392 147v-15M346 160l-9-13M436 160l9-13M322 197l-16-4M459 196l16-4"/>
+</g>
+<path d="M328 256a64 64 0 0 1 128 0" fill="#BE4B13"/>
+<path d="M265 258c49-9 148-7 269 5" fill="none" stroke="#BE4B13" stroke-width="1.5"/>
+<path d="M271 271c56-10 142-7 223 0M321 280c59-4 92-2 133 0" fill="none" stroke="#BE4B13" stroke-width="1" opacity=".55"/>
+<g fill="#007F93">
+<path d="M191 269c-17-3-28-18-31-41-2-15 2-42 13-60 7-12 17-21 25-26l-5-30 19 12 18-17 4 31c12 2 19 12 17 23-2 10-11 17-23 18-8 1-12 5-12 13 0 21 13 38 16 56 2 9 0 16-4 21z"/>
+<path d="M178 254c-28-2-51-16-53-35-1-14 10-22 21-17 5 2 4 8-1 8-7-1-9 5-5 11 7 10 24 13 39 12z"/>
+<path d="M187 264h60c7 0 11 4 10 7h-69z"/>
+</g>
+<path d="M228 144l8-1" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M239 157l19 3m-20 3 15 9" fill="none" stroke="#007F93" stroke-width="1" stroke-linecap="round"/>
+<g fill="none" stroke="#007F93" stroke-linecap="round">
+<path d="M57 276c113-15 196-12 242 5 61-10 137-8 247 4" stroke-width="1.5"/>
+<path d="M64 286c104-10 181-8 235 6 64-8 149-6 240 4" stroke-width="1" opacity=".65"/>
+<path d="M71 298c88-6 166-2 228 9 55-5 133-3 233 5M299 282v39" stroke-width="1" opacity=".45"/>
+</g>
+<circle cx="81" cy="119" r="2.2" fill="#007F93"/><path d="M81 137v32" stroke="#D3E4E8" stroke-width="1"/>
+<path d="M513 119h25M526 106v25" stroke="#D3E4E8" stroke-width="1"/>
+</svg>

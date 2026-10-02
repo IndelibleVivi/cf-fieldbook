@@ -1,0 +1,398 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Clef 与 Jev：模型、入口与判断成本 · Faye &amp; Cove</title><meta name="author" content="Faye &amp; Cove"><meta name="description" content="一份面向个人开发者的决策模型比较"><style>/* Cyan × Orange. White paper, legible text, restrained editorial structure. */
+:root {
+  --cyan:#10b3ca; --orange:#ff7a2a; --ink:#183b46;
+  --muted:#58717a; --rule:#c6e4e9; --link:#087086;
+  color:var(--ink); background:#fff;
+  font-family:Inter,'Noto Sans CJK SC','PingFang SC','Microsoft YaHei',sans-serif;
+  font-size:11pt; line-height:1.8;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:#fff; }
+p { margin:0 0 3.8mm; orphans:3; widows:3; }
+a { color:var(--link); text-decoration:none; }
+a:hover { text-decoration:underline; }
+strong { color:#12303a; font-weight:650; }
+em { font-style:normal; color:var(--muted); font-size:.91em; }
+h1,h2,h3,h4 { break-after:avoid; }
+h1 { font-size:25pt; line-height:1.35; }
+h2 {
+  font-family:'Noto Serif CJK SC','Songti SC',serif;
+  font-weight:600; font-size:20pt; line-height:1.48;
+  margin:0 0 6mm; bookmark-level:1;
+}
+h3 { font-size:12pt; line-height:1.55; margin:5.2mm 0 2.6mm; font-weight:650; bookmark-level:2; }
+.chapter { margin-top:12mm; }
+.chapter.first { margin-top:0; }
+.chapter-head { break-inside:avoid; break-after:avoid; position:relative; padding-top:5mm; border-top:.7pt solid var(--rule); }
+.chapter-meta { display:flex; align-items:baseline; justify-content:space-between; line-height:1; margin-bottom:4mm; }
+.chapter-number { font-family:Inter,sans-serif; color:var(--cyan); font-size:27pt; font-weight:500; letter-spacing:-1pt; }
+.chapter-type { font-family:Inter,sans-serif; font-size:7.4pt; letter-spacing:1.2pt; font-weight:500; color:var(--muted); }
+.chapter-head::after { content:''; position:absolute; width:12mm; height:2.3pt; top:-1pt; left:0; background:var(--orange); }
+blockquote { margin:5mm 0; padding:2mm 0 2mm 4.3mm; border-left:2.6pt solid var(--orange); background:white; }
+blockquote p { font-size:10.1pt; line-height:1.8; }
+blockquote p:last-child { margin-bottom:0; }
+ul,ol { margin:3mm 0 4mm; padding-left:6mm; }
+li { padding:.5mm 0; }
+code { font-family:'DejaVu Sans Mono','Noto Sans CJK SC',monospace; font-size:.85em; overflow-wrap:anywhere; padding:0 .4mm; }
+pre { margin:5mm 0; padding:3.5mm 4mm; border-left:2pt solid var(--cyan); border-top:.5pt solid var(--rule); border-bottom:.5pt solid var(--rule); font-size:8.8pt; line-height:1.6; white-space:pre-wrap; overflow-wrap:anywhere; background:#fff; break-inside:avoid; }
+pre code { font-size:inherit; padding:0; }
+table { width:100%; border-collapse:collapse; table-layout:fixed; margin:5mm 0 5.5mm; font-size:9.7pt; line-height:1.65; }
+thead { display:table-header-group; }
+th,td { vertical-align:top; text-align:left; padding:2.7mm 2.3mm; border-bottom:.55pt solid var(--rule); overflow-wrap:anywhere; }
+th { border-top:1.4pt solid var(--cyan); background:#f0fbfc; color:#144957; font-weight:650; padding-top:2.7mm; padding-bottom:2.7mm; }
+td { background:#fff; }
+tr { break-inside:avoid; }
+th:first-child,td:first-child { width:25%; padding-left:0; }
+th:last-child,td:last-child { padding-right:0; }
+table.compact { font-size:9.25pt; }
+table.date-table td:first-child { color:#a4480b; font-weight:600; width:29%; }
+a.source-ref { display:inline; font-family:Inter,sans-serif; font-size:7.2pt; line-height:1; font-weight:550; color:var(--link); white-space:nowrap; vertical-align:.14em; letter-spacing:.1pt; }
+.figure { margin:6mm 0 6mm; padding:4mm 0; border-top:.65pt solid var(--rule); border-bottom:.65pt solid var(--rule); break-inside:avoid; }
+.figure svg { display:block; width:100%; height:auto; }
+.figure figcaption { margin-top:3mm; font-size:8.3pt; line-height:1.65; color:var(--muted); }
+.figure .fig-no { font-family:Inter,sans-serif; color:#a4480b; font-weight:600; margin-right:2mm; }
+.cover { background:#fff; height:297mm; padding:19mm 22mm 18mm; position:relative; overflow:hidden; }
+.cover-top { display:flex; justify-content:space-between; align-items:baseline; border-top:2.5pt solid var(--cyan); padding-top:4mm; font-size:8pt; line-height:1.3; font-family:Inter,sans-serif; }
+.cover-top::before { content:''; position:absolute; right:22mm; top:19mm; width:25mm; border-top:2.5pt solid var(--orange); }
+.publisher { font-weight:650; color:var(--ink); letter-spacing:.2pt; }
+.cover-series { color:var(--muted); font-size:7.4pt; letter-spacing:1.6pt; }
+.cover-kicker { font-size:8.5pt; letter-spacing:1.4pt; color:var(--link); margin-top:26mm; font-weight:550; }
+.cover-brand { font-family:'Nimbus Sans',Inter,sans-serif; font-weight:700; font-size:61pt; line-height:1; letter-spacing:-2.3pt; margin:5.5mm 0 4.5mm; color:var(--ink); }
+.cover-title { font-family:'Noto Serif CJK SC','Songti SC',serif; font-size:34pt; font-weight:600; line-height:1.5; letter-spacing:.1pt; margin-top:4mm; }
+.cover-subtitle { margin-top:6.5mm; font-size:11pt; line-height:1.8; color:#36545e; max-width:125mm; }
+.cover-art { position:absolute; bottom:37mm; left:22mm; right:22mm; }
+.cover-art svg { width:100%; height:auto; }
+.cover-bottom { position:absolute; bottom:16mm; left:22mm; right:22mm; border-top:.8pt solid var(--rule); padding-top:4mm; display:flex; justify-content:space-between; font-size:8.3pt; line-height:1.7; }
+.cover-bottom b { font-size:13pt; font-weight:500; }
+.cover-bottom .edition-note { text-align:right; color:var(--muted); font-size:7.8pt; }
+.cover.handbook .cover-kicker { margin-top:21mm; }
+.cover.handbook .cover-brand { font-size:52pt; }
+.cover.handbook .cover-title { font-size:29pt; line-height:1.55; }
+.cover.handbook .cover-subtitle { margin-top:5mm; }
+.cover.handbook .cover-art { bottom:34mm; }
+.toc { break-after:page; }
+.toc .eyebrow { color:var(--link); font:500 8pt Inter,sans-serif; letter-spacing:1.5pt; margin-bottom:5mm; }
+.toc h2 { font-size:26pt; margin:0 0 6mm; }
+.toc-intro { font-size:10pt; line-height:1.8; max-width:139mm; }
+.toc ol { list-style:none; padding:0; margin:7mm 0 5mm; }
+.toc li { padding:2.2mm 0; border-bottom:.6pt solid var(--rule); line-height:1.45; font-size:10.4pt; }
+.toc .toc-no { display:inline-block; width:10mm; color:#a4480b; font-family:Inter,sans-serif; font-size:9pt; }
+.toc a { color:var(--ink); display:block; }
+.toc a::after { content:leader(' ') target-counter(attr(href), page); color:var(--link); font-family:Inter,sans-serif; font-size:9pt; }
+.toc-foot { margin-top:7mm; border-left:2pt solid var(--orange); padding-left:4mm; color:var(--muted); font-size:9pt; }
+.opening { margin:0 0 9mm; padding:0 0 6mm; border-bottom:1pt solid var(--rule); }
+.opening p:first-child { font-family:'Noto Serif CJK SC','Songti SC',serif; font-size:13pt; line-height:1.9; margin-bottom:5mm; color:#12343e; }
+.opening p:last-child { font-size:9pt; color:var(--muted); margin-bottom:0; }
+.sources { break-before:page; }
+.sources h2 { font-size:22pt; padding-top:5mm; border-top:1.4pt solid var(--cyan); margin-bottom:4mm; }
+.source-note { font-size:9pt; color:var(--muted); line-height:1.7; margin-bottom:6mm; }
+.source-list { column-count:2; column-gap:9mm; }
+.source-entry { break-inside:avoid; margin:0 0 3.1mm; padding:0 0 2.7mm; border-bottom:.45pt solid var(--rule); font-size:9pt; line-height:1.65; }
+.source-entry .source-id { font:600 8pt Inter,sans-serif; color:#a4480b; display:block; margin-bottom:1mm; }
+.source-entry a { color:var(--ink); }
+.source-entry small { display:block; color:var(--muted); font:7.3pt Inter,sans-serif; line-height:1.5; margin-top:1mm; }
+.colophon { break-inside:avoid; margin-top:10mm; padding:8mm 0 3mm; border-top:1.5pt solid var(--cyan); position:relative; }
+.colophon::before { content:''; position:absolute; right:0; top:-1.5pt; width:21mm; border-top:1.5pt solid var(--orange); }
+.colophon .closing-title { font-family:'Noto Serif CJK SC',serif; font-size:16pt; margin-bottom:2mm; }
+.colophon .author-line { font-family:Inter,sans-serif; font-size:10pt; font-weight:600; margin-top:3mm; }
+.colophon .signature { font-family:'Nimbus Roman','Times New Roman',serif; font-style:italic; font-size:18pt; color:var(--ink); margin:1mm 0 0; }
+.colophon .smallprint { font-size:8.5pt; color:var(--muted); line-height:1.7; max-width:139mm; }
+@page {
+  size:A4; margin:20mm 23mm 20mm;
+  @top-left { content:'FIELD EDITIONS'; font:500 8pt Inter; color:#36545e; vertical-align:middle; }
+  @top-right { content:string(shortTitle); font-family:'Noto Sans CJK SC'; font-size:8pt; color:#58717a; }
+  @bottom-left { content:'CLOUDFLARE  /  2026.10'; font:7.5pt Inter; letter-spacing:.7pt; color:#58717a; }
+  @bottom-right { content:counter(page,decimal-leading-zero); font:500 11pt Inter; color:#087086; }
+}
+@page cover { margin:0; @top-left {content:none} @top-right {content:none} @bottom-left {content:none} @bottom-right {content:none} }
+@media print {
+  .cover { page:cover; break-after:page; }
+  .screen-nav,.screen-only { display:none!important; }
+  .document-name { string-set:shortTitle content(); position:absolute; width:0; height:0; overflow:hidden; }
+  .jump-page { break-before:page; margin-top:0; }
+  .no-print { display:none; }
+}
+@media screen {
+  html { scroll-behavior:smooth; }
+  body { color:var(--ink); }
+  .document-name { display:none; }
+  .cover { height:920px; max-width:900px; margin:0 auto; padding:55px 65px; }
+  .cover-top::before {right:65px;top:55px;}
+  .cover-kicker {margin-top:94px;}
+  .cover-brand {font-size:86px;}
+  .cover-title {font-size:46px;}
+  .cover-subtitle {font-size:18px;}
+  .cover-art {left:65px;right:65px;bottom:130px;}
+  .cover.handbook .cover-art {bottom:106px;}
+  .cover-bottom {left:65px;right:65px;bottom:46px;}
+  .cover-bottom .edition-note {font-size:12px;}
+  .toc,main { max-width:820px; padding:48px 56px; margin:0 auto; }
+  .toc {border-top:1px solid var(--rule);}
+  .toc a::after {content:'↗';float:right;}
+  .toc li {font-size:16px; padding:10px 0;}
+  main {font-size:17px;line-height:1.95;padding-top:10px;}
+  h2 {font-size:30px;scroll-margin-top:70px;}
+  h3 {font-size:20px;}
+  .chapter {margin-top:60px;}
+  .chapter-meta {margin-bottom:18px;}
+  .chapter-number {font-size:42px;}
+  .chapter-type {font-size:11px;}
+  p {margin-bottom:19px;}
+  .opening p:first-child {font-size:23px;}
+  .opening p:last-child {font-size:14px;}
+  table {font-size:14px;line-height:1.8;}
+  th,td {padding:12px 10px;}
+  pre {font-size:13px;}
+  blockquote p {font-size:16px;}
+  .source-ref {font-size:11px!important;}
+  .sources {margin-top:70px;}
+  .source-entry {font-size:14px;}
+  .source-entry small {font-size:10px;}
+  .source-note {font-size:14px;}
+  .source-list {column-gap:36px;}
+  .screen-nav {position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.98);border-bottom:1px solid var(--rule);padding:12px max(20px,calc((100vw - 790px)/2));font-size:12px;line-height:1.5;}
+  .screen-nav a {margin-left:18px;white-space:nowrap;}
+  .screen-nav b {white-space:nowrap;}
+  .colophon .closing-title {font-size:23px;}
+  .colophon .smallprint {font-size:14px;}
+  .colophon .signature {font-size:28px;}
+  :focus-visible {outline:2px solid #087086; outline-offset:4px;}
+}
+@media screen and (max-width:620px) {
+  .cover {height:790px;padding:30px 24px;}
+  .cover-top::before {right:24px;top:30px;width:65px;}
+  .cover-top {font-size:12px;}
+  .cover-series {font-size:9px;letter-spacing:.9px;}
+  .cover-kicker,.cover.handbook .cover-kicker {margin-top:72px;font-size:10px;}
+  .cover-brand,.cover.handbook .cover-brand {font-size:57px;letter-spacing:-2px;}
+  .cover-title,.cover.handbook .cover-title {font-size:34px;line-height:1.5;}
+  .cover-subtitle {font-size:15px;margin-top:22px;}
+  .cover-art,.cover.handbook .cover-art {left:24px;right:24px;bottom:155px;}
+  .cover-bottom {left:24px;right:24px;bottom:41px;font-size:12px;}
+  .cover-bottom b {font-size:17px;}
+  .cover-bottom .edition-note {font-size:10px;}
+  .toc,main {padding:32px 23px;}
+  main {font-size:16px;line-height:1.9;}
+  .opening p:first-child {font-size:21px;}
+  h2 {font-size:27px;}
+  h3 {font-size:19px;}
+  table,table.compact {font-size:12px;line-height:1.8;}
+  th,td {padding:9px 6px;}
+  .source-list {column-count:1;}
+  .source-note {font-size:13px;}
+  .screen-nav {padding:10px 18px;font-size:11px;}
+  .screen-nav a {margin-left:14px;}
+  .chapter-type {font-size:9px;letter-spacing:.5px;}
+}
+@media (prefers-reduced-motion:reduce) {html {scroll-behavior:auto;}}
+
+table.keep-table {break-inside:avoid;}
+
+/* Compact linked endnotes: titles carry information; repeated domains are optional. */
+.source-entry {margin:0 0 1.8mm;padding:0 0 1.4mm;font-size:8.8pt;line-height:1.7;}
+.source-entry .source-id {display:inline-block;width:9mm;margin:0;font-size:7.8pt;vertical-align:baseline;}
+.source-entry a {display:inline;}
+@media print {.source-entry small {display:none;} .colophon {margin-top:7mm;padding-top:6mm;}}
+
+@media print {
+  .source-entry {margin-bottom:1mm;padding-bottom:.65mm;line-height:1.55;font-size:8.7pt;}
+  .colophon {margin-top:6mm;padding-top:5mm;}
+}
+
+.in-notes .closing-title {font-size:13pt;}
+.in-notes .smallprint {font-size:8pt;}
+.in-notes .signature {font-size:16pt;}
+.in-notes .author-line {font-size:9pt;}
+
+.cover.comparison .cover-title {font-size:32pt;}
+.colophon .author-line {font-size:9pt; overflow-wrap:anywhere;}
+
+/* Keep short bibliography columns at their content height, not page height. */
+.source-list {column-count:auto;display:table;width:100%;table-layout:fixed;}
+.source-col {display:table-cell;vertical-align:top;width:50%;}
+.source-col:first-child {padding-right:4.5mm;}
+.source-col:last-child {padding-left:4.5mm;}
+@media screen and (max-width:620px) {
+ .source-list,.source-col {display:block;width:100%;}
+ .source-col:first-child,.source-col:last-child {padding:0;}
+ .cover.comparison .cover-title {font-size:34px;}
+}
+@media print {
+ .source-entry {margin:0 0 .45mm;padding:0 0 .25mm;font-size:8.7pt;line-height:1.4;}
+ .colophon {margin-top:4mm;padding-top:3mm;}
+ .colophon .closing-title {font-size:13pt;line-height:1.3;margin-bottom:1.5mm;}
+ .colophon .smallprint {font-size:8pt;line-height:1.5;margin-bottom:2mm;}
+ .colophon .author-line {font-size:9pt;line-height:1.3;margin-top:1mm;}
+ .colophon .signature {font-size:16pt;line-height:1.25;margin:2mm 0 0;}
+}
+</style></head><body class="comparison"><div class="document-name">Clef 与 Jev</div><section class="cover comparison" aria-label="封面">
+    <div class="cover-top"><span class="publisher">INDEPENDENT REFERENCE</span><span class="cover-series">CLOUDFLARE / FIELD EDITIONS</span></div>
+    <div class="cover-kicker">A COMPARISON / DECISION MODELS</div><div class="cover-brand">Cloudflare</div>
+    <div class="cover-title">Clef 与 Jev</div><div class="cover-subtitle">模型、供应路径与判断成本。<br>从接得上，到值得放进工作流。</div>
+    <div class="cover-art"><svg xmlns="http://www.w3.org/2000/svg" width="760" height="296" viewBox="0 0 760 296" role="img" aria-labelledby="title desc"><title id="title">运行与留下的成果</title><desc id="desc">封面图以分开的青色与橙色线条表示模型选择和独立保留的成果，是本刊主题示意，不是产品架构。</desc><style>text{font-family:Inter,'Noto Sans CJK SC',sans-serif;fill:#183B46;font-size:20px}.small{font-size:16px;fill:#58717A}.num{font-family:Inter,sans-serif}</style><path d="M4 169 H164 C226 169 218 56 289 56 H732" fill="none" stroke="#10B3CA" stroke-width="17"/><path d="M164 169 H335 C384 169 399 241 455 241 H735" fill="none" stroke="#FF7A2A" stroke-width="17"/><line x1="30" y1="22" x2="30" y2="271" stroke="#C6E4E9" stroke-width="1" /><line x1="526" y1="22" x2="526" y2="271" stroke="#C6E4E9" stroke-width="1" /><rect x="294" y="27" width="186" height="58" rx="2" fill="white" stroke="#183B46" stroke-width="1.5"/><text x="387" y="64" text-anchor="middle">模型选择</text><rect x="502" y="211" width="188" height="58" rx="2" fill="white" stroke="#183B46" stroke-width="1.5"/><text x="596" y="248" text-anchor="middle">留下的成果</text><circle cx="164" cy="169" r="11" fill="white" stroke="#183B46" stroke-width="2"/><text x="62" y="127" class="small">一次判断</text><text x="698" y="118" text-anchor="end" font-weight="600" style="font-size:64px">03</text></svg></div><div class="cover-bottom"><div><b>2026 / 10</b><br>资料截至 2026-10-02</div><div class="edition-note">BOOK 03 · 阅读版 3<br>独立参考 · 可点击来源索引</div></div></section><div class="screen-nav"><b>Clef 与 Jev</b><span><a href="#contents">目录</a><a href="#sources">来源</a><a href="cf-launches-individuals-2026-10-02-cyan-orange.html">相关读物</a></span></div><nav class="toc" id="contents" aria-label="目录"><div class="eyebrow">CONTENTS / READING PATH</div><h2>从这里翻开</h2><p class="toc-intro">先确定正在比较的是模型还是入口，再读价格、限制和试验方法。</p><ol><li><a href="#chapter-01"><span class="toc-no">01</span>先把模型、接口与平台分开</a></li><li><a href="#chapter-02"><span class="toc-no">02</span>现在有哪些供应路径</a></li><li><a href="#chapter-03"><span class="toc-no">03</span>便宜多少，以及真正该算什么</a></li><li><a href="#chapter-04"><span class="toc-no">04</span>“API 兼容”仍然需要适配层</a></li><li><a href="#chapter-05"><span class="toc-no">05</span>厂商的比较，告诉了我们什么</a></li><li><a href="#chapter-06"><span class="toc-no">06</span>第一轮试验应该怎样长出来</a></li><li><a href="#chapter-07"><span class="toc-no">07</span>这篇专题怎样继续维护</a></li><li><a href="#sources"><span class="toc-no">S</span>来源索引与署名</a></li></ol><p class="toc-foot">来源编号可点击。开放状态与生效日期按资料截止日记录；实施代码与详细状态约束另放仓库的技术参考。</p></nav><main><section class="opening">
+<p>一个便宜的判断接口，值得拿来替代哪些大模型调用？这个问题不能只比较单价。还要知道返回的数字代表什么、模型读到了多少材料，以及一次误判会把后续工作带到哪里。</p>
+<p>本篇核对截至 2026-10-02 的官方模型卡、接口和供应目录。下面的价格是标价，费用示例是演算，性能数据有明确出处；本资料包没有调用真实模型。不要把离线请求测试读成模型效果测试。</p>
+</section><section class="chapter first" id="chapter-01"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">01</span><span class="chapter-type">MODELS</span></div><h2>先把模型、接口与平台分开</h2></header>
+<p><strong>Jev 是 TypeSafe 的决策模型；Clef 与 Clef-flash 是 Cloudflare 的决策模型。Cloudflare 同时提供自有模型和第三方 Jev 的调用入口。</strong> 因此，选择 CF 不等于只能用 Clef，比较 Jev 与 Clef 也不必同时搬迁账户和整套应用。<a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef/" title="Clef 模型卡">S17</a> <a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef-flash/" title="Clef-flash 模型卡">S18</a> <a class="source-ref" href="https://developers.cloudflare.com/ai/models/typesafe/jev/" title="Jev：Cloudflare 第三方模型目录">S73</a></p>
+<p>它们接收待判断的状态与带类型的问题，不以长篇回答为目标。<code>noul</code> 返回条件成立的概率；<code>choice</code> 在有限选项中选择并返回各选项概率；<code>score</code> 在有序等级上给出分数及分布。适合判断、分类和排序，不能直接替代负责开放式规划与写作的模型。<a class="source-ref" href="https://openrouter.ai/docs/guides/community/jev" title="OpenRouter：Jev 的两种接口">S76</a></p>
+<table class="keep-table">
+<thead>
+<tr>
+<th>对象</th>
+<th>解决的问题</th>
+<th>不能从名字推出的事</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>模型</td>
+<td>用什么权重做判断</td>
+<td>在哪个地区、哪个平台实际运行</td>
+</tr>
+<tr>
+<td>API / SDK</td>
+<td>请求、响应和错误怎样表达</td>
+<td>换一个模型 ID 就能无条件互换</td>
+</tr>
+<tr>
+<td>接入与结算平台</td>
+<td>使用哪种凭据、账单、日志和路由</td>
+<td>后面一定是独立的推理供应商</td>
+</tr>
+</tbody>
+</table>
+<p>一个常见的比较误差，是将“Jev 走 OpenRouter、Clef 走 CF”的总延迟写成模型速度差。这里同时变了模型和网络路径。更清楚的实验是先固定 CF，比较三款模型；再固定 Jev，比较原厂与不同网关。</p>
+</section><section class="chapter" id="chapter-02"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">02</span><span class="chapter-type">PROVIDERS</span></div><h2>现在有哪些供应路径</h2></header>
+<table class="keep-table">
+<thead>
+<tr>
+<th>接入路径</th>
+<th>模型选择器</th>
+<th style="text-align:right">输入价：美元／百万 token</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CF Workers AI → Clef</td>
+<td><code>@cf/cloudflare/clef</code></td>
+<td style="text-align:right">0.24</td>
+</tr>
+<tr>
+<td>CF Workers AI → Clef-flash</td>
+<td><code>@cf/cloudflare/clef-flash</code></td>
+<td style="text-align:right">0.09</td>
+</tr>
+<tr>
+<td>CF 第三方目录 → Jev</td>
+<td><code>typesafe/jev</code></td>
+<td style="text-align:right">0.042</td>
+</tr>
+<tr>
+<td>TypeSafe 原厂 → Jev</td>
+<td><code>jev-1.13.0</code></td>
+<td style="text-align:right">0.042</td>
+</tr>
+<tr>
+<td>OpenRouter → Jev</td>
+<td><code>typesafe/jev-1.13</code></td>
+<td style="text-align:right">0.042</td>
+</tr>
+<tr>
+<td>Vercel AI Gateway → Jev</td>
+<td><code>typesafe-ai/jev</code></td>
+<td style="text-align:right">页面显示 0.04；精度另核</td>
+</tr>
+</tbody>
+</table>
+<p>CF 两款 Clef 的价格来自 Workers AI；Jev 的 CF、原厂和 OpenRouter 路径都明列输入 $0.042、输出 $0。Vercel 官方目录显示的是 $0.04，现有显示精度不足以判断它是否真的比 $0.042 更便宜。本次只取到了该官方页面的搜索摘录，不用它推算精确账单。<a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef/" title="Clef 模型卡">S17</a> <a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef-flash/" title="Clef-flash 模型卡">S18</a> <a class="source-ref" href="https://developers.cloudflare.com/ai/models/typesafe/jev/" title="Jev：Cloudflare 第三方模型目录">S73</a> <a class="source-ref" href="https://docs.typesafe.ai/models" title="TypeSafe：Jev 版本、价格与上下文预算">S74</a> <a class="source-ref" href="https://openrouter.ai/typesafe/jev-1.13/" title="OpenRouter：Jev 1.13 价格与供应商">S75</a> <a class="source-ref" href="https://vercel.com/ai-gateway/models/jev" title="Vercel AI Gateway：Jev 目录显示价与 SDK 示例">S81</a></p>
+<p>TypeSafe 原厂使用 <code>/v1/systemone</code>。OpenRouter 既有 <code>/api/alpha/decisions</code>，也有适配 TypeSafe SDK 的 <code>/api/v1/systemone</code>，使用 OpenRouter 的 key 与账单。CF 则提供 AI binding 和 <code>/accounts/{account}/ai/run</code> 统一 REST 入口，不能自行猜一个 CF <code>/decisions</code> 路由。<a class="source-ref" href="https://docs.typesafe.ai/models" title="TypeSafe：Jev 版本、价格与上下文预算">S74</a> <a class="source-ref" href="https://openrouter.ai/docs/guides/community/jev" title="OpenRouter：Jev 的两种接口">S76</a> <a class="source-ref" href="https://developers.cloudflare.com/ai-gateway/usage/rest-api/" title="Cloudflare AI Gateway：统一 REST API">S79</a></p>
+<p>OpenRouter 的 Jev 供应商仍列为 TypeSafe，CF 目录也标明 Jev 为第三方。多接几个网关可以改变入口和结算方式，但不能据此声称已经获得几套相互独立的模型后端。<a class="source-ref" href="https://developers.cloudflare.com/ai/models/typesafe/jev/" title="Jev：Cloudflare 第三方模型目录">S73</a> <a class="source-ref" href="https://openrouter.ai/typesafe/jev-1.13/" title="OpenRouter：Jev 1.13 价格与供应商">S75</a></p>
+<h3>开放权重是另一条路线</h3>
+<p>Clef 与 Clef-flash 发布了 Apache-2.0 权重，可以研究和自托管；硬件、推理服务与维护成本由部署者承担。Jev 在这里列出的则是托管 API。把 Clef 自托管跑起来，是另一项实验，不应套用 CF 的按 token 标价。配套 CF 强化学习服务目前采用设计合作路线，不能当作 $5 Workers Paid 包含的自助训练功能。<a class="source-ref" href="https://huggingface.co/Cloudflare/clef" title="Cloudflare Clef：开放模型权重与模型卡">S82</a> <a class="source-ref" href="https://huggingface.co/Cloudflare/clef-flash" title="Cloudflare Clef-flash：开放模型权重与模型卡">S83</a> <a class="source-ref" href="https://blog.cloudflare.com/clef-decision-models/" title="Clef 与强化学习平台发布">S16</a></p>
+</section><section class="chapter" id="chapter-03"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">03</span><span class="chapter-type">COST</span></div><h2>便宜多少，以及真正该算什么</h2></header>
+<p>假设一个月完成 10,000 次判断，每次的<strong>总计费输入</strong>为 5,000 token，包含状态、问题与选项，总计 5,000 万输入 token；不发生缓存和重试。按模型标价演算：<a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef/" title="Clef 模型卡">S17</a> <a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef-flash/" title="Clef-flash 模型卡">S18</a> <a class="source-ref" href="https://developers.cloudflare.com/ai/models/typesafe/jev/" title="Jev：Cloudflare 第三方模型目录">S73</a></p>
+<table class="keep-table">
+<thead>
+<tr>
+<th>模型</th>
+<th>计算</th>
+<th style="text-align:right">模型费用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Jev</td>
+<td>50 × $0.042</td>
+<td style="text-align:right">$2.10</td>
+</tr>
+<tr>
+<td>Clef-flash</td>
+<td>50 × $0.09</td>
+<td style="text-align:right">$4.50</td>
+</tr>
+<tr>
+<td>Clef</td>
+<td>50 × $0.24</td>
+<td style="text-align:right">$12.00</td>
+</tr>
+</tbody>
+</table>
+<p>这是假定各路线都计入同样数量 token 的对照，不是“同一句话天然使用相同 tokenizer”的保证。实际应读回每条路线的 usage；多题可以共用状态时，也不能把每道题都粗暴算成一次完整长请求。</p>
+<p>CF Unified Billing 对充值另收 5%，例如购买 $100 credits 支付 $105；推理标价本身不加价。Workers AI 可以采用不同计费设置，不能给全部调用无条件乘上 1.05；走第三方 Jev 时尤其要明确使用的是哪条授权与结算路线。<a class="source-ref" href="https://developers.cloudflare.com/ai-gateway/features/unified-billing/" title="Cloudflare AI Gateway：Unified Billing">S80</a></p>
+<p>个人用量下，每月几美元的模型价差可能小于一次错误路由造成的返工。更合适的成本表是：<strong>模型 + 重试 + 大模型接管 + Worker／日志 + 人工核对</strong>。一个更便宜但经常把“没读够材料”判成“可以开始”的模型，未必更省。</p>
+</section><section class="chapter" id="chapter-04"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">04</span><span class="chapter-type">CONTRACTS</span></div><h2>“API 兼容”仍然需要适配层</h2></header>
+<h3>相同的问题，可以有不同的请求外壳</h3>
+<p>CF 的 Jev 模型卡使用 <code>env.AI.run('typesafe/jev', { state, questions })</code>；Clef 模型卡除了外层选择器，还要求输入中的 <code>model: 'clef'</code> 或 <code>'clef-flash'</code>。统一 REST 入口另包一层 <code>{ model, input }</code>。本包离线示例把这些外壳分别构造，不把它们混成一个字符串替换。<a class="source-ref" href="https://developers.cloudflare.com/ai/models/typesafe/jev/" title="Jev：Cloudflare 第三方模型目录">S73</a> <a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef/" title="Clef 模型卡">S17</a> <a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef-flash/" title="Clef-flash 模型卡">S18</a> <a class="source-ref" href="https://developers.cloudflare.com/ai-gateway/usage/rest-api/" title="Cloudflare AI Gateway：统一 REST API">S79</a></p>
+<p>Vercel 的示例使用 <code>experimental_evaluate</code>，其中布尔问题写作 <code>boolean</code>；这是 SDK 的表述，不能原样当成原厂 <code>noul</code> 请求。平台协议、SDK 版本、请求字段与返回字段都应在一次适配测试中保留。<a class="source-ref" href="https://vercel.com/ai-gateway/models/jev" title="Vercel AI Gateway：Jev 目录显示价与 SDK 示例">S81</a></p>
+<h3>上下文限制要按路由记录</h3>
+<p>Clef 两款目录列 65,536 token。Jev 原厂是<strong>整个请求 64k、状态加最长单题 32k</strong>，因为同一状态用于多个问题；CF 与 OpenRouter 目录则直接列 32,000。比较时以各自实际入口的限制为准，不写成泛化的“Jev 永远只有 32k”。<a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef/" title="Clef 模型卡">S17</a> <a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef-flash/" title="Clef-flash 模型卡">S18</a> <a class="source-ref" href="https://docs.typesafe.ai/models" title="TypeSafe：Jev 版本、价格与上下文预算">S74</a> <a class="source-ref" href="https://openrouter.ai/typesafe/jev-1.13/" title="OpenRouter：Jev 1.13 价格与供应商">S75</a></p>
+<p>Clef 当前 schema 允许最多 64 个问题，并提供最多四张嵌入式图片的扩展，不接受远程图片 URL；长状态可能被截断。模型宣传中的视觉能力不等于任意视频文件都能塞进当前请求。Jev 是纯文本输入，图片需要预先转换成文字，转换误差也应计入结果。<a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef/" title="Clef 模型卡">S17</a> <a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef-flash/" title="Clef-flash 模型卡">S18</a> <a class="source-ref" href="https://docs.typesafe.ai/models" title="TypeSafe：Jev 版本、价格与上下文预算">S74</a></p>
+<h3>同名置信度，不能共享一个阈值</h3>
+<p>Jev 的 confidence 是从输出概率分布算出的统计量，不是另一个监督者确认的正确率。原厂也列出了否定、数值／日期、上下文干扰等已知边界：同义的 Noul 与 Choice 表述不一定给出一致结果，两个互补问题也未必严格相加为一。<a class="source-ref" href="https://docs.typesafe.ai/confidence" title="TypeSafe：confidence 的含义">S77</a> <a class="source-ref" href="https://docs.typesafe.ai/model-jaggedness/jev-1.13" title="TypeSafe：Jev 1.13 已知能力边界">S78</a></p>
+<p>因此，把旧模型的 0.9 阈值照搬给新模型，没有自动成立的理由。拒绝回答、交给更强模型、继续读取材料等出口应当在应用里明确存在。权限、精确计数和日期比较可以由程序确定的部分，不交给概率判断充当最终裁决。</p>
+</section><section class="chapter" id="chapter-05"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">05</span><span class="chapter-type">EVIDENCE</span></div><h2>厂商的比较，告诉了我们什么</h2></header>
+<p>Cloudflare 发布文中的自测并没有形成处处相同的排序。下面选取三项，展示排名会随任务改变；这些不是本资料包的实测，也不是独立复现。<a class="source-ref" href="https://blog.cloudflare.com/clef-decision-models/" title="Clef 与强化学习平台发布">S16</a></p>
+<table class="keep-table">
+<thead>
+<tr>
+<th>指标</th>
+<th style="text-align:right">Clef</th>
+<th style="text-align:right">Clef-flash</th>
+<th style="text-align:right">Jev</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>When2Call · accuracy</td>
+<td style="text-align:right">72.37</td>
+<td style="text-align:right">65.58</td>
+<td style="text-align:right">80.97</td>
+</tr>
+<tr>
+<td>CLINC150+OOS · macro-F1</td>
+<td style="text-align:right">97.43</td>
+<td style="text-align:right">66.77</td>
+<td style="text-align:right">89.27</td>
+</tr>
+<tr>
+<td>BRIGHT · nDCG@10</td>
+<td style="text-align:right">45.91</td>
+<td style="text-align:right">39.26</td>
+<td style="text-align:right">47.52</td>
+</tr>
+</tbody>
+</table>
+<p>不能把不同比例尺的三项平均成自己的总分。更值得追问的是：面对“不属于任何现有类别”的输入，是否会硬选一个？检索相关性强，不代表工具调用时机也强；更大的模型，也不意味着每个任务一定优于小款。</p>
+<p>速度同样应该回到实际入口测。关闭响应缓存，保留重试和失败，报告相同输入组的 p50、p95 与完成率，而不是只挑一条最快响应。供应商自测、网关实时统计和个人网络下的时延属于三种观察，不能拼成同一张排行榜。</p>
+</section><section class="chapter" id="chapter-06"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">06</span><span class="chapter-type">EXPERIMENT</span></div><h2>第一轮试验应该怎样长出来</h2></header>
+<p>建议先做一个窄任务：收到材料以后，下一步是<strong>直接分类、读取原文、检索上下文，还是材料不足</strong>。这是可重做的建议性决策，不直接产生外部写入。先写简单规则作基线，再比较模型是否真的改善了规则做不好的部分。</p>
+<p>样本先拆成开发集与留出集。中文、英文、中英混合分别保留；加入否定、修订、引述、相近选项、找不到答案与刻意缺少背景的材料。TypeSafe 明确说 Jev 的训练主要面向英语，CJK 可以处理但不保证同等表现，因而中文材料值得单独检验。<a class="source-ref" href="https://docs.typesafe.ai/models" title="TypeSafe：Jev 版本、价格与上下文预算">S74</a></p>
+<p>分两轮改变条件：第一轮在 CF 上比较 Jev、Clef-flash、Clef，固定任务与外壳适配后的语义输入；第二轮固定 Jev、相同语义版本与输入，再比较 TypeSafe／CF／OpenRouter。若某个入口不能钉住同一版本，就把它作为不同实验条件，而不是假装只换了网络。</p>
+<p>最有用的指标通常不是一个总准确率，而是：在愿意接受的误判风险下，自动处理了多少；错误地认为材料足够的比例；交给人或大模型的比例；完成率、尾部延迟和每百次被接受判断的总成本。少量样本只能帮助发现问题，不能宣称已校准到千分之一风险。</p>
+<p>另外做几项便宜的对照：交换选项顺序、替换同义词、加入无关段落、把一题单独发送或与其他问题合并。保持语义相同时结果变化多大，本身就是值得记录的性质。数据、prompt、选项集合和实际响应版本应一起保存，才能复读失败。</p>
+<p>本包 <code>examples/decision-routing/</code> 只提供离线请求构造与成本演算。它没有配置账号、发送请求或生成看似真实的模型结果；首轮语义测评仍待执行。</p>
+</section><section class="chapter" id="chapter-07"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">07</span><span class="chapter-type">MAINTENANCE</span></div><h2>这篇专题怎样继续维护</h2></header>
+<p>服务页保留当前可用入口；用例页解释为何需要这个判断；示例固定请求形状和检查方法；专题记录比较；本期报告则保存当时知道的情况。新的价格或模型版本先更新来源和路由记录，再定位受影响的读物，不要求每次重写整份手册。</p>
+<p>这里的最小比较单位建议是：<strong>任务版本 × 输入集合 × 模型版本 × 供应路径 × 策略阈值</strong>。缺掉任何一项，“上次好用，这次变差”都会难以解释。可以从一张简单的运行记录开始，不必先做在线 benchmark 平台。</p>
+
+</section><section class="sources" id="sources"><h2>来源索引</h2><p class="source-note">本次重新核对决策模型、接入路径与价格；其他发布条目沿用 2026-10-02 原版来源记录。资料核验不等于账户或模型实测。</p><div class="source-list"><div class="source-col"><div class="source-entry" id="S16"><span class="source-id">S16</span><a href="https://blog.cloudflare.com/clef-decision-models/">Clef 与强化学习平台发布</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S17"><span class="source-id">S17</span><a href="https://developers.cloudflare.com/workers-ai/models/clef/">Clef 模型卡</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S18"><span class="source-id">S18</span><a href="https://developers.cloudflare.com/workers-ai/models/clef-flash/">Clef-flash 模型卡</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S73"><span class="source-id">S73</span><a href="https://developers.cloudflare.com/ai/models/typesafe/jev/">Jev：Cloudflare 第三方模型目录</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S74"><span class="source-id">S74</span><a href="https://docs.typesafe.ai/models">TypeSafe：Jev 版本、价格与上下文预算</a><small>docs.typesafe.ai</small></div><div class="source-entry" id="S75"><span class="source-id">S75</span><a href="https://openrouter.ai/typesafe/jev-1.13/">OpenRouter：Jev 1.13 价格与供应商</a><small>openrouter.ai</small></div><div class="source-entry" id="S76"><span class="source-id">S76</span><a href="https://openrouter.ai/docs/guides/community/jev">OpenRouter：Jev 的两种接口</a><small>openrouter.ai</small></div></div><div class="source-col"><div class="source-entry" id="S77"><span class="source-id">S77</span><a href="https://docs.typesafe.ai/confidence">TypeSafe：confidence 的含义</a><small>docs.typesafe.ai</small></div><div class="source-entry" id="S78"><span class="source-id">S78</span><a href="https://docs.typesafe.ai/model-jaggedness/jev-1.13">TypeSafe：Jev 1.13 已知能力边界</a><small>docs.typesafe.ai</small></div><div class="source-entry" id="S79"><span class="source-id">S79</span><a href="https://developers.cloudflare.com/ai-gateway/usage/rest-api/">Cloudflare AI Gateway：统一 REST API</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S80"><span class="source-id">S80</span><a href="https://developers.cloudflare.com/ai-gateway/features/unified-billing/">Cloudflare AI Gateway：Unified Billing</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S81"><span class="source-id">S81</span><a href="https://vercel.com/ai-gateway/models/jev">Vercel AI Gateway：Jev 目录显示价与 SDK 示例</a><small>vercel.com</small></div><div class="source-entry" id="S82"><span class="source-id">S82</span><a href="https://huggingface.co/Cloudflare/clef">Cloudflare Clef：开放模型权重与模型卡</a><small>huggingface.co</small></div><div class="source-entry" id="S83"><span class="source-id">S83</span><a href="https://huggingface.co/Cloudflare/clef-flash">Cloudflare Clef-flash：开放模型权重与模型卡</a><small>huggingface.co</small></div></div></div></section><section class="colophon" id="colophon"><div class="closing-title">关于这一版</div><p class="smallprint">面向个人使用的独立参考资料，不是 Cloudflare 官方出版物。产品事实保留来源，场景与判断属于编辑分析。本次未进行账户操作或云端部署。</p><div class="author-line">GitHub · <a href="https://github.com/IndelibleVivi">github.com/IndelibleVivi</a></div><div class="signature">made by Faye &amp; Cove</div></section></main></body></html>

@@ -1,0 +1,2 @@
+# Markdown's two trailing spaces are meaningful hard line breaks, including frozen r3 text.
+*.md whitespace=-blank-at-eol

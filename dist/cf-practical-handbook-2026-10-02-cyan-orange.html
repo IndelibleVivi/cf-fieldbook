@@ -1,0 +1,660 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cloudflare 个人基础设施实践手册 · Faye &amp; Cove</title><meta name="author" content="Faye &amp; Cove"><meta name="description" content="从一个入口到可恢复的应用与自动化"><style>/* Cyan × Orange. White paper, legible text, restrained editorial structure. */
+:root {
+  --cyan:#10b3ca; --orange:#ff7a2a; --ink:#183b46;
+  --muted:#58717a; --rule:#c6e4e9; --link:#087086;
+  color:var(--ink); background:#fff;
+  font-family:Inter,'Noto Sans CJK SC','PingFang SC','Microsoft YaHei',sans-serif;
+  font-size:11pt; line-height:1.8;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:#fff; }
+p { margin:0 0 3.8mm; orphans:3; widows:3; }
+a { color:var(--link); text-decoration:none; }
+a:hover { text-decoration:underline; }
+strong { color:#12303a; font-weight:650; }
+em { font-style:normal; color:var(--muted); font-size:.91em; }
+h1,h2,h3,h4 { break-after:avoid; }
+h1 { font-size:25pt; line-height:1.35; }
+h2 {
+  font-family:'Noto Serif CJK SC','Songti SC',serif;
+  font-weight:600; font-size:20pt; line-height:1.48;
+  margin:0 0 6mm; bookmark-level:1;
+}
+h3 { font-size:12pt; line-height:1.55; margin:5.2mm 0 2.6mm; font-weight:650; bookmark-level:2; }
+.chapter { margin-top:12mm; }
+.chapter.first { margin-top:0; }
+.chapter-head { break-inside:avoid; break-after:avoid; position:relative; padding-top:5mm; border-top:.7pt solid var(--rule); }
+.chapter-meta { display:flex; align-items:baseline; justify-content:space-between; line-height:1; margin-bottom:4mm; }
+.chapter-number { font-family:Inter,sans-serif; color:var(--cyan); font-size:27pt; font-weight:500; letter-spacing:-1pt; }
+.chapter-type { font-family:Inter,sans-serif; font-size:7.4pt; letter-spacing:1.2pt; font-weight:500; color:var(--muted); }
+.chapter-head::after { content:''; position:absolute; width:12mm; height:2.3pt; top:-1pt; left:0; background:var(--orange); }
+blockquote { margin:5mm 0; padding:2mm 0 2mm 4.3mm; border-left:2.6pt solid var(--orange); background:white; }
+blockquote p { font-size:10.1pt; line-height:1.8; }
+blockquote p:last-child { margin-bottom:0; }
+ul,ol { margin:3mm 0 4mm; padding-left:6mm; }
+li { padding:.5mm 0; }
+code { font-family:'DejaVu Sans Mono','Noto Sans CJK SC',monospace; font-size:.85em; overflow-wrap:anywhere; padding:0 .4mm; }
+pre { margin:5mm 0; padding:3.5mm 4mm; border-left:2pt solid var(--cyan); border-top:.5pt solid var(--rule); border-bottom:.5pt solid var(--rule); font-size:8.8pt; line-height:1.6; white-space:pre-wrap; overflow-wrap:anywhere; background:#fff; break-inside:avoid; }
+pre code { font-size:inherit; padding:0; }
+table { width:100%; border-collapse:collapse; table-layout:fixed; margin:5mm 0 5.5mm; font-size:9.7pt; line-height:1.65; }
+thead { display:table-header-group; }
+th,td { vertical-align:top; text-align:left; padding:2.7mm 2.3mm; border-bottom:.55pt solid var(--rule); overflow-wrap:anywhere; }
+th { border-top:1.4pt solid var(--cyan); background:#f0fbfc; color:#144957; font-weight:650; padding-top:2.7mm; padding-bottom:2.7mm; }
+td { background:#fff; }
+tr { break-inside:avoid; }
+th:first-child,td:first-child { width:25%; padding-left:0; }
+th:last-child,td:last-child { padding-right:0; }
+table.compact { font-size:9.25pt; }
+table.date-table td:first-child { color:#a4480b; font-weight:600; width:29%; }
+a.source-ref { display:inline; font-family:Inter,sans-serif; font-size:7.2pt; line-height:1; font-weight:550; color:var(--link); white-space:nowrap; vertical-align:.14em; letter-spacing:.1pt; }
+.figure { margin:6mm 0 6mm; padding:4mm 0; border-top:.65pt solid var(--rule); border-bottom:.65pt solid var(--rule); break-inside:avoid; }
+.figure svg { display:block; width:100%; height:auto; }
+.figure figcaption { margin-top:3mm; font-size:8.3pt; line-height:1.65; color:var(--muted); }
+.figure .fig-no { font-family:Inter,sans-serif; color:#a4480b; font-weight:600; margin-right:2mm; }
+.cover { background:#fff; height:297mm; padding:19mm 22mm 18mm; position:relative; overflow:hidden; }
+.cover-top { display:flex; justify-content:space-between; align-items:baseline; border-top:2.5pt solid var(--cyan); padding-top:4mm; font-size:8pt; line-height:1.3; font-family:Inter,sans-serif; }
+.cover-top::before { content:''; position:absolute; right:22mm; top:19mm; width:25mm; border-top:2.5pt solid var(--orange); }
+.publisher { font-weight:650; color:var(--ink); letter-spacing:.2pt; }
+.cover-series { color:var(--muted); font-size:7.4pt; letter-spacing:1.6pt; }
+.cover-kicker { font-size:8.5pt; letter-spacing:1.4pt; color:var(--link); margin-top:26mm; font-weight:550; }
+.cover-brand { font-family:'Nimbus Sans',Inter,sans-serif; font-weight:700; font-size:61pt; line-height:1; letter-spacing:-2.3pt; margin:5.5mm 0 4.5mm; color:var(--ink); }
+.cover-title { font-family:'Noto Serif CJK SC','Songti SC',serif; font-size:34pt; font-weight:600; line-height:1.5; letter-spacing:.1pt; margin-top:4mm; }
+.cover-subtitle { margin-top:6.5mm; font-size:11pt; line-height:1.8; color:#36545e; max-width:125mm; }
+.cover-art { position:absolute; bottom:37mm; left:22mm; right:22mm; }
+.cover-art svg { width:100%; height:auto; }
+.cover-bottom { position:absolute; bottom:16mm; left:22mm; right:22mm; border-top:.8pt solid var(--rule); padding-top:4mm; display:flex; justify-content:space-between; font-size:8.3pt; line-height:1.7; }
+.cover-bottom b { font-size:13pt; font-weight:500; }
+.cover-bottom .edition-note { text-align:right; color:var(--muted); font-size:7.8pt; }
+.cover.handbook .cover-kicker { margin-top:21mm; }
+.cover.handbook .cover-brand { font-size:52pt; }
+.cover.handbook .cover-title { font-size:29pt; line-height:1.55; }
+.cover.handbook .cover-subtitle { margin-top:5mm; }
+.cover.handbook .cover-art { bottom:34mm; }
+.toc { break-after:page; }
+.toc .eyebrow { color:var(--link); font:500 8pt Inter,sans-serif; letter-spacing:1.5pt; margin-bottom:5mm; }
+.toc h2 { font-size:26pt; margin:0 0 6mm; }
+.toc-intro { font-size:10pt; line-height:1.8; max-width:139mm; }
+.toc ol { list-style:none; padding:0; margin:7mm 0 5mm; }
+.toc li { padding:2.2mm 0; border-bottom:.6pt solid var(--rule); line-height:1.45; font-size:10.4pt; }
+.toc .toc-no { display:inline-block; width:10mm; color:#a4480b; font-family:Inter,sans-serif; font-size:9pt; }
+.toc a { color:var(--ink); display:block; }
+.toc a::after { content:leader(' ') target-counter(attr(href), page); color:var(--link); font-family:Inter,sans-serif; font-size:9pt; }
+.toc-foot { margin-top:7mm; border-left:2pt solid var(--orange); padding-left:4mm; color:var(--muted); font-size:9pt; }
+.opening { margin:0 0 9mm; padding:0 0 6mm; border-bottom:1pt solid var(--rule); }
+.opening p:first-child { font-family:'Noto Serif CJK SC','Songti SC',serif; font-size:13pt; line-height:1.9; margin-bottom:5mm; color:#12343e; }
+.opening p:last-child { font-size:9pt; color:var(--muted); margin-bottom:0; }
+.sources { break-before:page; }
+.sources h2 { font-size:22pt; padding-top:5mm; border-top:1.4pt solid var(--cyan); margin-bottom:4mm; }
+.source-note { font-size:9pt; color:var(--muted); line-height:1.7; margin-bottom:6mm; }
+.source-list { column-count:2; column-gap:9mm; }
+.source-entry { break-inside:avoid; margin:0 0 3.1mm; padding:0 0 2.7mm; border-bottom:.45pt solid var(--rule); font-size:9pt; line-height:1.65; }
+.source-entry .source-id { font:600 8pt Inter,sans-serif; color:#a4480b; display:block; margin-bottom:1mm; }
+.source-entry a { color:var(--ink); }
+.source-entry small { display:block; color:var(--muted); font:7.3pt Inter,sans-serif; line-height:1.5; margin-top:1mm; }
+.colophon { break-inside:avoid; margin-top:10mm; padding:8mm 0 3mm; border-top:1.5pt solid var(--cyan); position:relative; }
+.colophon::before { content:''; position:absolute; right:0; top:-1.5pt; width:21mm; border-top:1.5pt solid var(--orange); }
+.colophon .closing-title { font-family:'Noto Serif CJK SC',serif; font-size:16pt; margin-bottom:2mm; }
+.colophon .author-line { font-family:Inter,sans-serif; font-size:10pt; font-weight:600; margin-top:3mm; }
+.colophon .signature { font-family:'Nimbus Roman','Times New Roman',serif; font-style:italic; font-size:18pt; color:var(--ink); margin:1mm 0 0; }
+.colophon .smallprint { font-size:8.5pt; color:var(--muted); line-height:1.7; max-width:139mm; }
+@page {
+  size:A4; margin:20mm 23mm 20mm;
+  @top-left { content:'FIELD EDITIONS'; font:500 8pt Inter; color:#36545e; vertical-align:middle; }
+  @top-right { content:string(shortTitle); font-family:'Noto Sans CJK SC'; font-size:8pt; color:#58717a; }
+  @bottom-left { content:'CLOUDFLARE  /  2026.10'; font:7.5pt Inter; letter-spacing:.7pt; color:#58717a; }
+  @bottom-right { content:counter(page,decimal-leading-zero); font:500 11pt Inter; color:#087086; }
+}
+@page cover { margin:0; @top-left {content:none} @top-right {content:none} @bottom-left {content:none} @bottom-right {content:none} }
+@media print {
+  .cover { page:cover; break-after:page; }
+  .screen-nav,.screen-only { display:none!important; }
+  .document-name { string-set:shortTitle content(); position:absolute; width:0; height:0; overflow:hidden; }
+  .jump-page { break-before:page; margin-top:0; }
+  .no-print { display:none; }
+}
+@media screen {
+  html { scroll-behavior:smooth; }
+  body { color:var(--ink); }
+  .document-name { display:none; }
+  .cover { height:920px; max-width:900px; margin:0 auto; padding:55px 65px; }
+  .cover-top::before {right:65px;top:55px;}
+  .cover-kicker {margin-top:94px;}
+  .cover-brand {font-size:86px;}
+  .cover-title {font-size:46px;}
+  .cover-subtitle {font-size:18px;}
+  .cover-art {left:65px;right:65px;bottom:130px;}
+  .cover.handbook .cover-art {bottom:106px;}
+  .cover-bottom {left:65px;right:65px;bottom:46px;}
+  .cover-bottom .edition-note {font-size:12px;}
+  .toc,main { max-width:820px; padding:48px 56px; margin:0 auto; }
+  .toc {border-top:1px solid var(--rule);}
+  .toc a::after {content:'↗';float:right;}
+  .toc li {font-size:16px; padding:10px 0;}
+  main {font-size:17px;line-height:1.95;padding-top:10px;}
+  h2 {font-size:30px;scroll-margin-top:70px;}
+  h3 {font-size:20px;}
+  .chapter {margin-top:60px;}
+  .chapter-meta {margin-bottom:18px;}
+  .chapter-number {font-size:42px;}
+  .chapter-type {font-size:11px;}
+  p {margin-bottom:19px;}
+  .opening p:first-child {font-size:23px;}
+  .opening p:last-child {font-size:14px;}
+  table {font-size:14px;line-height:1.8;}
+  th,td {padding:12px 10px;}
+  pre {font-size:13px;}
+  blockquote p {font-size:16px;}
+  .source-ref {font-size:11px!important;}
+  .sources {margin-top:70px;}
+  .source-entry {font-size:14px;}
+  .source-entry small {font-size:10px;}
+  .source-note {font-size:14px;}
+  .source-list {column-gap:36px;}
+  .screen-nav {position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.98);border-bottom:1px solid var(--rule);padding:12px max(20px,calc((100vw - 790px)/2));font-size:12px;line-height:1.5;}
+  .screen-nav a {margin-left:18px;white-space:nowrap;}
+  .screen-nav b {white-space:nowrap;}
+  .colophon .closing-title {font-size:23px;}
+  .colophon .smallprint {font-size:14px;}
+  .colophon .signature {font-size:28px;}
+  :focus-visible {outline:2px solid #087086; outline-offset:4px;}
+}
+@media screen and (max-width:620px) {
+  .cover {height:790px;padding:30px 24px;}
+  .cover-top::before {right:24px;top:30px;width:65px;}
+  .cover-top {font-size:12px;}
+  .cover-series {font-size:9px;letter-spacing:.9px;}
+  .cover-kicker,.cover.handbook .cover-kicker {margin-top:72px;font-size:10px;}
+  .cover-brand,.cover.handbook .cover-brand {font-size:57px;letter-spacing:-2px;}
+  .cover-title,.cover.handbook .cover-title {font-size:34px;line-height:1.5;}
+  .cover-subtitle {font-size:15px;margin-top:22px;}
+  .cover-art,.cover.handbook .cover-art {left:24px;right:24px;bottom:155px;}
+  .cover-bottom {left:24px;right:24px;bottom:41px;font-size:12px;}
+  .cover-bottom b {font-size:17px;}
+  .cover-bottom .edition-note {font-size:10px;}
+  .toc,main {padding:32px 23px;}
+  main {font-size:16px;line-height:1.9;}
+  .opening p:first-child {font-size:21px;}
+  h2 {font-size:27px;}
+  h3 {font-size:19px;}
+  table,table.compact {font-size:12px;line-height:1.8;}
+  th,td {padding:9px 6px;}
+  .source-list {column-count:1;}
+  .source-note {font-size:13px;}
+  .screen-nav {padding:10px 18px;font-size:11px;}
+  .screen-nav a {margin-left:14px;}
+  .chapter-type {font-size:9px;letter-spacing:.5px;}
+}
+@media (prefers-reduced-motion:reduce) {html {scroll-behavior:auto;}}
+
+table.keep-table {break-inside:avoid;}
+
+/* Compact linked endnotes: titles carry information; repeated domains are optional. */
+.source-entry {margin:0 0 1.8mm;padding:0 0 1.4mm;font-size:8.8pt;line-height:1.7;}
+.source-entry .source-id {display:inline-block;width:9mm;margin:0;font-size:7.8pt;vertical-align:baseline;}
+.source-entry a {display:inline;}
+@media print {.source-entry small {display:none;} .colophon {margin-top:7mm;padding-top:6mm;}}
+
+@media print {
+  .source-entry {margin-bottom:1mm;padding-bottom:.65mm;line-height:1.55;font-size:8.7pt;}
+  .colophon {margin-top:6mm;padding-top:5mm;}
+}
+
+.in-notes .closing-title {font-size:13pt;}
+.in-notes .smallprint {font-size:8pt;}
+.in-notes .signature {font-size:16pt;}
+.in-notes .author-line {font-size:9pt;}
+
+.cover.comparison .cover-title {font-size:32pt;}
+.colophon .author-line {font-size:9pt; overflow-wrap:anywhere;}
+
+/* Keep short bibliography columns at their content height, not page height. */
+.source-list {column-count:auto;display:table;width:100%;table-layout:fixed;}
+.source-col {display:table-cell;vertical-align:top;width:50%;}
+.source-col:first-child {padding-right:4.5mm;}
+.source-col:last-child {padding-left:4.5mm;}
+@media screen and (max-width:620px) {
+ .source-list,.source-col {display:block;width:100%;}
+ .source-col:first-child,.source-col:last-child {padding:0;}
+ .cover.comparison .cover-title {font-size:34px;}
+}
+@media print {
+ .source-entry {margin:0 0 .45mm;padding:0 0 .25mm;font-size:8.7pt;line-height:1.4;}
+ .colophon {margin-top:4mm;padding-top:3mm;}
+ .colophon .closing-title {font-size:13pt;line-height:1.3;margin-bottom:1.5mm;}
+ .colophon .smallprint {font-size:8pt;line-height:1.5;margin-bottom:2mm;}
+ .colophon .author-line {font-size:9pt;line-height:1.3;margin-top:1mm;}
+ .colophon .signature {font-size:16pt;line-height:1.25;margin:2mm 0 0;}
+}
+</style></head><body class="handbook"><div class="document-name">个人基础设施实践手册</div><section class="cover handbook" aria-label="封面">
+    <div class="cover-top"><span class="publisher">INDEPENDENT REFERENCE</span><span class="cover-series">CLOUDFLARE / FIELD EDITIONS</span></div>
+    <div class="cover-kicker">A PRACTICAL HANDBOOK</div><div class="cover-brand">Cloudflare</div>
+    <div class="cover-title">个人基础设施<br>实践手册</div><div class="cover-subtitle">从一个入口到可恢复的应用与自动化。<br>按需要阅读，按自己的环境实践。</div>
+    <div class="cover-art"><svg xmlns="http://www.w3.org/2000/svg" width="760" height="296" viewBox="0 0 760 296" role="img" aria-labelledby="title desc"><title id="title">一册可以翻阅的实践手册</title><desc id="desc">封面以错开的青色页框和橙色折线表示入口、内容与维护三个阅读层次。</desc><style>text{font-family:Inter,'Noto Sans CJK SC',sans-serif;fill:#183B46;font-size:20px}.small{font-size:16px;fill:#58717A}.num{font-family:Inter,sans-serif}</style><rect x="57" y="22" width="528" height="70" rx="2" fill="white" stroke="#10B3CA" stroke-width="1.5"/><line x1="82" y1="36" x2="82" y2="77" stroke="#10B3CA" stroke-width="7" /><text x="111" y="66" style="font-size:22px">入口与权限</text><rect x="73" y="109" width="590" height="70" rx="2" fill="white" stroke="#10B3CA" stroke-width="1.5"/><line x1="98" y1="123" x2="98" y2="164" stroke="#10B3CA" stroke-width="7" /><text x="127" y="153" style="font-size:22px">内容与任务</text><rect x="89" y="196" width="648" height="70" rx="2" fill="white" stroke="#10B3CA" stroke-width="1.5"/><line x1="114" y1="210" x2="114" y2="251" stroke="#10B3CA" stroke-width="7" /><text x="143" y="240" style="font-size:22px">维护与恢复</text><path d="M549 10 H634 V66 L677 66 V153 L720 153 V280" fill="none" stroke="#FF7A2A" stroke-width="15"/><text x="4" y="256" font-weight="600" style="font-size:58px">02</text></svg></div><div class="cover-bottom"><div><b>2026 / 10</b><br>资料截至 2026-10-02</div><div class="edition-note">BOOK 02 · 阅读版 3<br>独立参考 · 可点击来源索引</div></div></section><div class="screen-nav"><b>个人基础设施实践手册</b><span><a href="#contents">目录</a><a href="#sources">来源</a><a href="cf-launches-individuals-2026-10-02-cyan-orange.html">相关读物</a></span></div><nav class="toc" id="contents" aria-label="目录"><div class="eyebrow">CONTENTS / READING PATH</div><h2>从这里翻开</h2><p class="toc-intro">不必顺着所有章节施工。选一件手边的事，沿着它的入口、状态、结果与维护读下去。</p><ol><li><a href="#chapter-01"><span class="toc-no">01</span>从手边的事情开始</a></li><li><a href="#chapter-02"><span class="toc-no">02</span>给一个请求找路</a></li><li><a href="#chapter-03"><span class="toc-no">03</span>发布第一个小入口</a></li><li><a href="#chapter-04"><span class="toc-no">04</span>私人服务的门与钥匙</a></li><li><a href="#chapter-05"><span class="toc-no">05</span>保存内容，也保存它的来历</a></li><li><a href="#chapter-06"><span class="toc-no">06</span>一次任务，可能执行不止一次</a></li><li><a href="#chapter-07"><span class="toc-no">07</span>先找回原件，再组织答案</a></li><li><a href="#chapter-08"><span class="toc-no">08</span>模型、路由与三种缓存</a></li><li><a href="#chapter-09"><span class="toc-no">09</span>给机一间临时工作室</a></li><li><a href="#chapter-10"><span class="toc-no">10</span>发布以后，真的用一遍</a></li><li><a href="#chapter-11"><span class="toc-no">11</span>留下够用的记录</a></li><li><a href="#chapter-12"><span class="toc-no">12</span>算清持续成本</a></li><li><a href="#chapter-13"><span class="toc-no">13</span>坏了、恢复、暂时不用</a></li><li><a href="#chapter-14"><span class="toc-no">14</span>继续维护这份手册</a></li><li><a href="#sources"><span class="toc-no">S</span>来源索引与署名</a></li></ol><p class="toc-foot">来源编号可点击。开放状态与生效日期按资料截止日记录；实施代码与详细状态约束另放仓库的技术参考。</p></nav><main><section class="opening">
+
+<p>一个网站能打开，只是开始。用了几周以后，问题会变得更具体：手机怎么访问，朋友能看哪些内容，文件放在哪里，任务断了能否继续，暂时不用时会不会还在付费。</p>
+<p>本手册从这些问题出发。它不要求先学完 Cloudflare，也不把服务组合当作唯一答案。已有服务器、数据库和工作方式都可以保留，只在出现实际需要的地方加入新的能力。</p>
+<p>本版承接既有《Cloudflare 用途盘点与实战教程》的 7 月基础版和 8 月扩充版，以 <strong>2026-10-02</strong> 的来源快照为依据。阅读版 3 修正署名并补入决策模型的供应路径，详细代码和状态约束保留在仓库的 <code>reference/implementation.md</code>。邮件不在本期范围内。</p>
+</section><section class="chapter first" id="chapter-01"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">01</span><span class="chapter-type">START HERE</span></div><h2>从手边的事情开始</h2></header>
+<p>如果只是想发布网页或小 API，从第 2–3 章开始就够了。已有本机或 VPS 服务，希望安全访问，重点读第 4 章。内容与文件的保存看第 5 章；自动化经常重复、超时或丢结果，看第 6 章。</p>
+<p>检索、模型与 agent 执行分别在第 7–9 章。系统已经能运行，却越来越难维护，可以直接读第 10–13 章。各章不构成强制施工顺序。</p>
+<p>本手册解释做法；配套《Cloudflare 新发布观察》记录当期产品变化和价格时间线。工具名或价格影响决策时，可通过文内来源编号回查。</p>
+</section><section class="chapter jump-page" id="chapter-02"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">02</span><span class="chapter-type">ROUTES</span></div><h2>给一个请求找路</h2></header>
+<h3>先分清：入口、程序、数据</h3>
+<p>浏览器输入域名，先找到服务入口，再由程序处理请求，最后按需要读取数据库或文件。DNS 和 HTTPS 让请求到达正确的地方；Worker 可以在 Cloudflare 上运行程序；Tunnel 则把入口连接到仍在本机或服务器运行的程序。<a class="source-ref" href="https://developers.cloudflare.com/workers/runtime-apis/bindings/" title="Workers Bindings">S45</a> <a class="source-ref" href="https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/" title="Cloudflare Tunnel">S47</a></p>
+<p>因此，小应用有两种同样合理的起点。第一种是 Worker 加必要的数据存储。第二种是 Access／Tunnel 加现有应用，数据库继续留在原来的服务器。选择取决于程序需要什么环境，不取决于控制台里有多少服务可以开。</p>
+<figure class="figure"><svg aria-labelledby="title desc" height="292" role="img" viewbox="0 0 740 292" width="740" xmlns="http://www.w3.org/2000/svg"><title id="title">两种应用入口</title><desc id="desc">路线A：浏览器到Worker，再到绑定的数据资源。路线B：浏览器经Tunnel到原有应用与数据。私人访问另外安排Access与应用授权。</desc><style>text{font-family:Inter,'Noto Sans CJK SC',sans-serif;fill:#183B46;font-size:20px}.small{font-size:16px;fill:#58717A}.num{font-family:Inter,sans-serif}</style><text font-weight="600" x="0" y="23">A  /  程序运行在平台上</text><rect fill="white" height="62" rx="2" stroke="#10B3CA" stroke-width="2" width="145" x="0" y="44"></rect><text text-anchor="middle" x="72.5" y="82">浏览器</text><rect fill="white" height="62" rx="2" stroke="#10B3CA" stroke-width="2" width="176" x="238" y="44"></rect><text text-anchor="middle" x="326.0" y="82">Worker</text><rect fill="white" height="62" rx="2" stroke="#10B3CA" stroke-width="2" width="218" x="508" y="44"></rect><text text-anchor="middle" x="617.0" y="82">绑定的数据资源</text><line stroke="#10B3CA" stroke-width="2" x1="145" x2="237" y1="75" y2="75"></line><line stroke="#10B3CA" stroke-width="2" x1="414" x2="508" y1="75" y2="75"></line><text font-weight="600" x="0" y="150">B  /  程序留在原设备</text><rect fill="white" height="62" rx="2" stroke="#FF7A2A" stroke-width="2" width="145" x="0" y="172"></rect><text text-anchor="middle" x="72.5" y="210">浏览器</text><rect fill="white" height="62" rx="2" stroke="#FF7A2A" stroke-width="2" width="176" x="238" y="172"></rect><text text-anchor="middle" x="326.0" y="210">Tunnel</text><rect fill="white" height="62" rx="2" stroke="#FF7A2A" stroke-width="2" width="218" x="508" y="172"></rect><text text-anchor="middle" x="617.0" y="210">原有应用与数据</text><line stroke="#FF7A2A" stroke-width="2" x1="145" x2="238" y1="203" y2="203"></line><line stroke="#FF7A2A" stroke-width="2" x1="414" x2="508" y1="203" y2="203"></line><text class="small" x="0" y="273">需要私人访问时，在入口安排 Access 与应用授权。</text></svg><figcaption><span class="fig-no">FIG.</span>两种常见路线，不要求同时采用。Tunnel 不替原设备运行程序。</figcaption></figure>
+<table class="keep-table">
+<thead>
+<tr>
+<th>路线</th>
+<th>请求怎样走</th>
+<th>程序与数据在哪里</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>新建边缘应用</td>
+<td>浏览器 → Worker → 绑定的数据资源</td>
+<td>应用运行在平台上，按需选择存储</td>
+</tr>
+<tr>
+<td>保留已有服务</td>
+<td>浏览器 → Access（需要时）→ Tunnel → 原应用</td>
+<td>仍由原设备／服务器运行</td>
+</tr>
+</tbody>
+</table>
+<p><em>这是两种常见组合，不要求一个项目同时采用。</em></p>
+<h3>绑定：把资源交给应用，而不是交出整套账户</h3>
+<p>在 Worker 里，<code>env.DB</code> 可以指向一项 D1 数据库，<code>env.FILES</code> 可以指向一个 R2 bucket。这种 binding 是部署时给予程序的能力，通常不需要在业务代码里再携带账户管理 key。<a class="source-ref" href="https://developers.cloudflare.com/workers/runtime-apis/bindings/" title="Workers Bindings">S45</a></p>
+<p>可以把三件事分开记：管理工具负责创建和部署资源；binding 让应用使用被分配的资源；应用再决定哪位用户能读写哪些内容。</p>
+<p>同一账户的 Worker 之间，可以用 Service Binding 调用指定服务，减少公网入口和重复凭据。调用关系由部署配置和可靠身份建立；请求里随手加一个 <code>x-service-id</code>，并不能自己证明是谁发来的。<a class="source-ref" href="https://developers.cloudflare.com/workers/runtime-apis/bindings/service-bindings/" title="Service Bindings">S57</a></p>
+</section><section class="chapter" id="chapter-03"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">03</span><span class="chapter-type">FIRST WORKER</span></div><h2>发布第一个小入口</h2></header>
+<h3>先选一个很容易判断对错的功能</h3>
+<p>健康检查适合起步：<code>GET /health</code> 返回固定 JSON，未知路径返回 404，不读取文件、不调用模型、不接受业务写入。这样一旦响应不对，排查范围很小。</p>
+<p>随包的 <code>examples/health-worker/</code> 已有完整源码、配置模板和测试。它还检查 HEAD 与不允许的方法；人读手册时先理解行为，实施时再打开完整文件。</p>
+<table class="keep-table">
+<thead>
+<tr>
+<th>发出的请求</th>
+<th>应得到什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET /health</code></td>
+<td>200，固定 JSON</td>
+</tr>
+<tr>
+<td><code>HEAD /health</code></td>
+<td>200，没有正文</td>
+</tr>
+<tr>
+<td><code>POST /health</code></td>
+<td>405，注明允许的方法</td>
+</tr>
+<tr>
+<td><code>GET /missing</code></td>
+<td>404</td>
+</tr>
+<tr>
+<td>请求夹带私有头</td>
+<td>响应不回显这些内容</td>
+</tr>
+</tbody>
+</table>
+<p>在仓库根目录，可先做离线检查：</p>
+<pre><code class="language-bash">node --test examples/health-worker/worker.test.mjs
+python3 tools/check.py
+</code></pre>
+<p>这检查的是示例行为和资料一致性，不会登录或部署 Cloudflare。健康响应本身也只证明这个 handler 工作，不能代表所有数据库与外部依赖都正常。</p>
+<h3>再接入开发与部署工具</h3>
+<p>当前 <code>cf</code> CLI 处于公开 beta，Wrangler 仍受支持。新项目可沿官方脚手架选择工具；既有项目不需要为了新命令立即迁移。记录实际版本与依赖锁文件，比依赖某台机器的全局安装更容易重建。<a class="source-ref" href="https://blog.cloudflare.com/cloudflare-cf-cli-launch/" title="cf CLI 发布">S02</a> <a class="source-ref" href="https://developers.cloudflare.com/cf/" title="cf CLI 文档">S03</a> <a class="source-ref" href="https://developers.cloudflare.com/workers/get-started/guide/" title="Workers 入门">S66</a></p>
+<p>采用 Wrangler 且已在项目里安装固定版本时，可先启动本地开发：</p>
+<pre><code class="language-bash">npx --no-install wrangler dev --port 8787
+</code></pre>
+<p>然后在另一终端请求本地 <code>/health</code> 和 <code>/missing</code>。本地通过后，再核对目标账户、路由和配置，执行单独的远端部署。完整命令与模板留在实施参考中；本包没有替读者安装工具或创建生产入口。</p>
+<h3>前端加入后，多检查一次缓存</h3>
+<p>Workers Static Assets 可把网页与 API 一起发布。要确定静态资源和 Worker 的处理顺序，避免 SPA fallback 把不存在的 API 变成一张“看起来正常”的首页。静态资源与动态请求也有不同计费规则。<a class="source-ref" href="https://developers.cloudflare.com/workers/static-assets/" title="Workers Static Assets">S46</a> <a class="source-ref" href="https://developers.cloudflare.com/workers/platform/pricing/" title="Workers 价格">S34</a></p>
+<p>私人 PWA 可以先只缓存公开壳，私有 API 使用 <code>no-store</code>。检查退出登录、切换用户和更新旧版本之后的行为：用户已经离开，并不意味着浏览器里保存过的内容自动消失。</p>
+</section><section class="chapter" id="chapter-04"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">04</span><span class="chapter-type">ACCESS</span></div><h2>私人服务的门与钥匙</h2></header>
+<h3>能到达，不等于有权使用</h3>
+<p>Access 可以保护一个 hostname 或指定路径，让用户先完成身份验证。应用依赖该身份时，应验证 JWT 的签名、issuer、audience 与有效期，而不是只看请求头是否存在。<a class="source-ref" href="https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/validating-json/" title="Access JWT 验证">S48</a></p>
+<p>拿到可信身份之后，应用继续决定角色、资源和动作。没有必要机械地再叠几份 bearer；额外凭据应当服务于单独撤销、机器作用域或动作确认，而不是仅仅增加层数。</p>
+<p>对机器客户端，Service Tokens 能避免模拟网页登录。按用途单独签发，设置有效期和撤销方式，再映射到允许的操作范围。浏览器里的长期秘密、多人共用的万能 key，都不适合作为这种边界。<a class="source-ref" href="https://developers.cloudflare.com/cloudflare-one/access-controls/service-credentials/service-tokens/" title="Access Service Tokens">S49</a></p>
+<h3>不只测“自己能打开”</h3>
+<p>上线前也试匿名用户、已登录但没有资格的用户、过期 token 和错误 audience。再列出所有替代入口：默认开发域名、其他 Custom Domain、预览地址、源站直连。保护一个域名，不会自动证明另一条路也安全。</p>
+<p>Cookie 会话的写请求还要处理 CSRF／Origin。私人数据应在权限检查以后读取，而不是先取得完整内容，再靠界面藏按钮。</p>
+<h3>已有服务器：Tunnel 只改变访问方式</h3>
+<p>Tunnel 由源站连接器主动向 Cloudflare 建立连接，把指定 hostname 的请求送到原应用。它不替原设备运行程序，不备份磁盘；笔记本关机后，程序仍会停。<a class="source-ref" href="https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/" title="Cloudflare Tunnel">S47</a></p>
+<pre><code class="language-yaml">ingress:
+  - hostname: app.example.com
+    service: http://127.0.0.1:8080
+  - service: http_status:404
+</code></pre>
+<p>这只是示例结构。端口要对应实际监听，最后一条为未知入口提供兜底；源站若还另开公网端口，仍需检查是否绕过访问限制。</p>
+<p>顺序可以很朴素：先确认本机 HTTP 正常，再检查连接器与 Tunnel，最后从外部验证 hostname 和权限。Quick Tunnel 适合短暂试验，长期入口使用可管理的命名配置。升级、日志和恢复方式依然属于服务器维护的一部分。</p>
+<h3>MCP 与私网各有自己的入口</h3>
+<p>远程 MCP 的 OAuth 发现、授权与 token 验证不是普通浏览器登录。Workers OAuth Provider v1 可作为授权服务与资源服务拆分的实现候选；连接成功后，仍要检验错误受众、过期令牌与跨资源请求。<a class="source-ref" href="https://developers.cloudflare.com/changelog/post/2026-10-01-workers-oauth-provider-1x/" title="Workers OAuth Provider v1">S71</a></p>
+<p>WARP 是设备接入与流量策略；Mesh 面向加入组织的设备和私网；Tunnel 发布明确选择的服务。Mesh 当前仍有 beta 标识。与现有 VPN 共存时，先用非关键设备观察路由和 DNS，保留不依赖待改路径的恢复入口。<a class="source-ref" href="https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-mesh/" title="Cloudflare Mesh">S61</a> <a class="source-ref" href="https://developers.cloudflare.com/cloudflare-one/team-and-resources/devices/cloudflare-one-client/configure/route-traffic/split-tunnels/" title="Split Tunnels">S62</a></p>
+</section><section class="chapter" id="chapter-05"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">05</span><span class="chapter-type">CONTENT</span></div><h2>保存内容，也保存它的来历</h2></header>
+<h3>一份文件，不只是一串字节</h3>
+<p>假设要保存一份文档。原件可以放在 R2，目录与当前版本放在 D1：谁拥有它、对应哪个对象、大小和 hash 是什么、现在是否仍可读取。大对象与结构化状态分开之后，查目录不必每次加载原件。<a class="source-ref" href="https://developers.cloudflare.com/d1/platform/pricing/" title="D1 价格">S37</a> <a class="source-ref" href="https://developers.cloudflare.com/r2/pricing/" title="R2 价格">S38</a></p>
+<table class="keep-table">
+<thead>
+<tr>
+<th>要保存的东西</th>
+<th>常见位置</th>
+<th>为什么要留下</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>原件、媒体、导出</td>
+<td>R2／已有文件存储</td>
+<td>以后能重新读取与处理</td>
+</tr>
+<tr>
+<td>目录、权限、版本指针</td>
+<td>D1／已有数据库</td>
+<td>知道当前哪一版有效</td>
+</tr>
+<tr>
+<td>检索索引</td>
+<td>Vectorize／托管检索</td>
+<td>帮助找到候选，而不是代替原文</td>
+</tr>
+<tr>
+<td>备份与恢复说明</td>
+<td>独立可取回的位置</td>
+<td>原服务失效时仍能使用</td>
+</tr>
+</tbody>
+</table>
+<p>这是建议的分工，不要求替换已有数据库。完整 SQL 示例保留在实施参考中。</p>
+<h3>更新、撤回与删除不要混成一个按钮</h3>
+<p>更新可以新增版本，再把当前指针切过去；撤回首先让内容不再对读者可见；物理删除才移除原件或派生数据。把三者分开，才能解释某个旧引用为什么存在，也更容易恢复误操作。</p>
+<p>R2 bucket 默认保持私有，通过授权入口或有时效的访问方式取文件。对象 key 尽量使用不含真实姓名、邮箱等含义的标识；上传还要限制大小、类型和校验结果。生命周期规则先限定 prefix，避免一条清理规则影响所有历史对象。<a class="source-ref" href="https://developers.cloudflare.com/r2/buckets/object-lifecycles/" title="R2 对象生命周期">S52</a></p>
+<h3>备份应该回答“能恢复什么”</h3>
+<p>D1 Time Travel 有计划相关的保留期，原地恢复会改变数据库。执行前保存当前状态和目标 bookmark，明确要恢复到哪一刻。需要更长保留时，另行安排导出；数据库有虚拟表或全文索引时，还要核对导出、导入的当前限制，不能假定所有内容都能一条命令来回。<a class="source-ref" href="https://developers.cloudflare.com/d1/reference/time-travel/" title="D1 Time Travel">S50</a> <a class="source-ref" href="https://developers.cloudflare.com/d1/best-practices/import-export-data/" title="D1 数据导出">S51</a></p>
+<p>一个可用的演练是恢复到隔离目标，再检查代表性记录、原件 hash、版本与权限。数据库恢复成功但文件缺失，或文件齐全但权限回到旧状态，都不算恢复完了。</p>
+</section><section class="chapter" id="chapter-06"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">06</span><span class="chapter-type">JOBS</span></div><h2>一次任务，可能执行不止一次</h2></header>
+<h3>先想清楚用户在等什么</h3>
+<p>用户上传文档后，网页可以先显示“已接收”，后台再生成预览或索引。Queues 适合将接收与处理分开；Workflows 适合有多个步骤、等待与恢复的流程；Durable Objects 适合按实体协调；Cron 负责按时间触发。<a class="source-ref" href="https://developers.cloudflare.com/queues/configuration/batching-retries/" title="Queues 重试与批处理">S53</a> <a class="source-ref" href="https://developers.cloudflare.com/workflows/build/rules-of-workflows/" title="Workflows 执行规则">S55</a> <a class="source-ref" href="https://developers.cloudflare.com/workers/configuration/cron-triggers/" title="Cron Triggers">S56</a> <a class="source-ref" href="https://developers.cloudflare.com/agents/" title="Agents SDK">S58</a></p>
+<p>不是每个应用都需要四种。一次短请求就能完成的事，可以继续直接执行。</p>
+<h3>为什么只记一个“处理过”会丢任务</h3>
+<p>考虑这样一段程序：先登记任务 ID，再做工作；重复收到同一 ID 就跳过。如果登记后进程退出，任务虽然“见过”，却永远没有做完。</p>
+<p>反过来也有问题：外部动作先成功，登记之前连接断掉，重试可能再做一次。解决方法不是挪一行代码，而是留下任务现在处于什么状态。</p>
+<figure class="figure"><svg aria-labelledby="title desc" height="225" role="img" viewbox="0 0 740 225" width="740" xmlns="http://www.w3.org/2000/svg"><title id="title">接收、执行与完成是不同阶段</title><desc id="desc">任务由已接收到执行中，再到结果已确认。如果执行的外部结果未知，先进入核对，而不是盲目再做。这里只画主要关系，不是完整状态机。</desc><style>text{font-family:Inter,'Noto Sans CJK SC',sans-serif;fill:#183B46;font-size:20px}.small{font-size:16px;fill:#58717A}.num{font-family:Inter,sans-serif}</style><rect fill="white" height="64" rx="2" stroke="#10B3CA" stroke-width="2" width="190" x="0" y="20"></rect><text font-weight="600" text-anchor="middle" x="95" y="59">已接收</text><rect fill="white" height="64" rx="2" stroke="#10B3CA" stroke-width="2" width="190" x="266" y="20"></rect><text font-weight="600" text-anchor="middle" x="361" y="59">执行中</text><rect fill="#ECF9FB" height="64" rx="2" stroke="#10B3CA" stroke-width="2" width="190" x="536" y="20"></rect><text font-weight="600" text-anchor="middle" x="631" y="59">结果已确认</text><line stroke="#10B3CA" stroke-width="3" x1="190" x2="266" y1="52" y2="52"></line><line stroke="#10B3CA" stroke-width="3" x1="456" x2="536" y1="52" y2="52"></line><path d="M361 84 V144 H455" fill="none" stroke="#FF7A2A" stroke-width="3"></path><rect fill="white" height="64" rx="2" stroke="#FF7A2A" stroke-width="2" width="271" x="455" y="113"></rect><text text-anchor="middle" x="590" y="152">结果未知 → 先核对</text><text class="small" x="0" y="142">不要把“已接收”当作“已完成”。</text><text class="small" x="0" y="205">只画主要关系；重试、取消与重复投递见状态表。</text></svg><figcaption><span class="fig-no">FIG.</span>接收、执行与完成分开记录。示意主线，不是完整状态机；其他分支见下表。</figcaption></figure>
+<table class="keep-table">
+<thead>
+<tr>
+<th>当前状态</th>
+<th>人能读懂的含义</th>
+<th>下次收到同一任务时</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>等待处理</td>
+<td>已经收下，还没开始</td>
+<td>可以领取</td>
+</tr>
+<tr>
+<td>执行中</td>
+<td>某次执行正在处理</td>
+<td>先检查它是否仍有效</td>
+</tr>
+<tr>
+<td>已完成</td>
+<td>结果已核实保存</td>
+<td>返回已有结果</td>
+</tr>
+<tr>
+<td>可以重试</td>
+<td>确认失败，再试不会扩大损失</td>
+<td>受预算限制地重试</td>
+</tr>
+<tr>
+<td>等待核对</td>
+<td>外部动作结果未知</td>
+<td>不盲目再做</td>
+</tr>
+<tr>
+<td>已取消</td>
+<td>后续执行不应再开始</td>
+<td>保留取消事实</td>
+</tr>
+</tbody>
+</table>
+<p>这些是本手册建议的状态，不是平台统一规定。实现中还需要区分不同 attempt：旧执行者即使迟到，也不能覆盖新一次的结果。租约过期只是恢复的一个条件，不证明旧程序已经停止。</p>
+<h3>数据库与队列之间留一个投递记录</h3>
+<p>写入数据库和发送队列是两件事。任务已写下、队列却没收到时，需要有地方看见这份待投递工作。常见做法是在同一次数据库提交里写任务和 outbox，再由投递器发送；重复发送由消费者的状态记录承接。</p>
+<p>Outbox 可以理解为“准备寄出的任务清单”。它保住待投递意图，不保证所有系统恰好执行一次。清单本身也要能查积压、重试与终止。</p>
+<p>Queues 可能重复投递；重试耗尽后，DLQ 可以保存需要调查的消息。Workflows 的步骤也可能重试，所以外部服务仍要有自己的幂等机制。<a class="source-ref" href="https://developers.cloudflare.com/queues/configuration/batching-retries/" title="Queues 重试与批处理">S53</a> <a class="source-ref" href="https://developers.cloudflare.com/queues/configuration/dead-letter-queues/" title="Queues 死信队列">S54</a> <a class="source-ref" href="https://developers.cloudflare.com/workflows/build/rules-of-workflows/" title="Workflows 执行规则">S55</a></p>
+<h3>结果未知，应该有一个明确位置</h3>
+<p>服务商支持 idempotency key 时，一次逻辑动作使用同一个 key，并按其契约查询或重试。不支持幂等、也无法查结果的外部动作，超时后先标为等待核对。</p>
+<p>离线示例 <code>examples/job-state/</code> 演示领取、迟到提交和未知结果的处理。上线之前，还需要注入真实失败：领取后退出、保存结果后丢 ACK、外部成功但客户端超时、取消与执行竞争。检查的是任务没消失、重复没扩大损失，而不只是成功路径能跑通。</p>
+<p>Workflows 当前 Paid 包含每月 50 万步骤与 1 GB·月状态，步骤和存储自 2026-08-10 起计费；等待不计 CPU，不等于保留状态没有费用。Cron 使用 UTC，按业务日期工作的任务应明确时区与逻辑时间窗。<a class="source-ref" href="https://developers.cloudflare.com/workflows/reference/pricing/" title="Workflows 价格">S44</a> <a class="source-ref" href="https://developers.cloudflare.com/workers/configuration/cron-triggers/" title="Cron Triggers">S56</a></p>
+</section><section class="chapter" id="chapter-07"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">07</span><span class="chapter-type">RETRIEVAL</span></div><h2>先找回原件，再组织答案</h2></header>
+<h3>托管检索与自己的管线</h3>
+<p>AI Search 可以接管一部分摄取、分块、索引和检索；Workers AI 加 Vectorize 则让应用自己安排这些环节。前者省维护，后者留下更多可修改的接口。两者都应先接受同一组真实问题的检验。<a class="source-ref" href="https://blog.cloudflare.com/ai-search-ga/" title="AI Search GA">S09</a> <a class="source-ref" href="https://developers.cloudflare.com/ai-search/platform/limits-pricing/" title="AI Search 限制与价格">S10</a> <a class="source-ref" href="https://developers.cloudflare.com/vectorize/platform/pricing/" title="Vectorize 价格">S40</a> <a class="source-ref" href="https://developers.cloudflare.com/workers-ai/platform/pricing/" title="Workers AI 价格">S41</a></p>
+<p>准备一组小集合：精确术语、同义改写、模糊描述、旧名称、没有答案的问题，以及不该返回的内容。记录已知答案在哪里，不只挑五个漂亮结果展示。</p>
+<p>10 月 GA 的 AI Search 已支持图片和 OCR。图片检索可用多模态路线，也可用文字描述路线；效果要用自己的材料比较。文件上限、字段数与模型条件仍需按本期来源核对。<a class="source-ref" href="https://blog.cloudflare.com/ai-search-ga/" title="AI Search GA">S09</a> <a class="source-ref" href="https://developers.cloudflare.com/ai-search/platform/limits-pricing/" title="AI Search 限制与价格">S10</a></p>
+<h3>让每个结果带着回原处的路</h3>
+<p>自建索引时，留下来源 ID、来源版本、chunk ID、内容 hash、embedding 模型和索引版本。升级模型建立新索引代，避免将不同语义空间里的向量混在一起比较。<a class="source-ref" href="https://developers.cloudflare.com/vectorize/reference/client-api/" title="Vectorize Client API">S64</a></p>
+<p>读取身份决定允许查询的范围；候选返回后，再核对当前权限、撤回状态与版本，最后读取原文窗口。模型传来的 <code>owner_id</code> 不能替代服务器验证的身份。</p>
+<p>AI Search 的 metadata filter 有字段数量和索引长度限制，复杂权限不能只靠一个任意长的字符串表示。细粒度内容需要明确分区与返回前的核验。<a class="source-ref" href="https://developers.cloudflare.com/ai-search/platform/limits-pricing/" title="AI Search 限制与价格">S10</a></p>
+<h3>撤回不应该等待索引慢慢消失</h3>
+<p>内容撤回后，应用读取资格应立即变化；向量和派生缓存的清理可以成为后续可重试任务。更新时先准备新原件与索引，验证后再切当前版本，避免一半新、一半旧拼成一份材料。</p>
+<p>Vectorize mutation 已被接受，不代表所有查询马上可见。按状态和实际读回确认，比固定睡一秒钟更可靠。<a class="source-ref" href="https://developers.cloudflare.com/vectorize/reference/client-api/" title="Vectorize Client API">S64</a></p>
+<h3>记忆比搜索多了一层问题</h3>
+<p>搜索问“哪里可能有相关材料”；记忆还要问“谁说的、何时有效、后来有没有更正、适用于谁”。这些条件不会由 embedding 自动补齐。</p>
+<p>Cloudflare Agent Memory 当前仍是 private beta，与 AI Search 的 GA 分开看。取得接入前，不将它写成已可用依赖。<a class="source-ref" href="https://developers.cloudflare.com/agent-memory/" title="Agent Memory">S60</a></p>
+<p>自己的记忆设计可以先保留自动抽取建议与原始来源，让人查看当前有效内容。测试旧偏好变更、同名人物、上下文冲突和明确禁止召回，比只测几条事实问答更能看见问题。</p>
+</section><section class="chapter" id="chapter-08"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">08</span><span class="chapter-type">MODELS</span></div><h2>模型、路由与三种缓存</h2></header>
+<h3>先弄清谁在回答、谁在计费</h3>
+<p>Workers AI 提供模型推理；AI Gateway 组织经过它的调用、凭据、观测与路由。通过 binding 或受控凭据，可以减少应用直接持有 provider key；Gateway 的访问资格本身仍是敏感能力。<a class="source-ref" href="https://developers.cloudflare.com/workers-ai/platform/pricing/" title="Workers AI 价格">S41</a> <a class="source-ref" href="https://developers.cloudflare.com/workers/runtime-apis/bindings/" title="Workers Bindings">S45</a> <a class="source-ref" href="https://developers.cloudflare.com/ai-gateway/reference/pricing/" title="AI Gateway 价格与日志">S15</a></p>
+<p>先记录模型、时间、结果、token 和费用。确实需要正文调试时，再限定内容和保留期。首次创建 Gateway 在 2026-09-24 或之后的账户走新的 Workers Logs 规则；Unified Billing 充值另收 5%。<a class="source-ref" href="https://developers.cloudflare.com/ai-gateway/reference/pricing/" title="AI Gateway 价格与日志">S15</a></p>
+<h3>小判断可以比较三款模型，不必先换平台</h3>
+<p>Clef、Clef-flash 与 Jev 都可以从 Cloudflare 接入，但前两款是 CF 托管模型，Jev 是第三方 TypeSafe 模型。先挑一个明确判断：例如下一步读标题、读原文，还是材料不足。模型只提建议，程序按照允许的操作集合执行。<a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef/" title="Clef 模型卡">S17</a> <a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef-flash/" title="Clef-flash 模型卡">S18</a> <a class="source-ref" href="https://developers.cloudflare.com/ai/models/typesafe/jev/" title="Jev：Cloudflare 第三方模型目录">S73</a></p>
+<p>用同一份材料和题目比较，记录实际响应版本、错误、延迟与计费输入。第一轮不要同时换模型、换平台、改题目，否则不知道变化从哪里来。下一轮固定 Jev，再比较原厂、CF 或已有 Gateway，才是在比较接入路线。<a class="source-ref" href="https://docs.typesafe.ai/models" title="TypeSafe：Jev 版本、价格与上下文预算">S74</a> <a class="source-ref" href="https://openrouter.ai/docs/guides/community/jev" title="OpenRouter：Jev 的两种接口">S76</a> <a class="source-ref" href="https://developers.cloudflare.com/ai-gateway/usage/rest-api/" title="Cloudflare AI Gateway：统一 REST API">S79</a></p>
+<p>有限输出免去了文字解析，却不会自动消除误判。Jev 文档说明 confidence 从概率分布计算而来；两个模型都返回 0.9，不证明它们在你的材料上有相同正确率。阈值应用单独的验证集合校准，数值、日期和权限规则能直接计算的部分交给代码。<a class="source-ref" href="https://docs.typesafe.ai/confidence" title="TypeSafe：confidence 的含义">S77</a> <a class="source-ref" href="https://docs.typesafe.ai/model-jaggedness/jev-1.13" title="TypeSafe：Jev 1.13 已知能力边界">S78</a></p>
+<p>完整比较与可离线检查的请求形状，分别在 <code>comparisons/clef-vs-jev.md</code> 和 <code>examples/decision-routing/</code>。这些材料没有冒充真实推理验收。</p>
+<h3>“缓存命中”究竟复用了什么</h3>
+<table class="keep-table">
+<thead>
+<tr>
+<th>类型</th>
+<th>复用的东西</th>
+<th>需要确认</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>完整回答缓存</td>
+<td>上一次的整份输出</td>
+<td>内容与权限变化后是否仍有效</td>
+</tr>
+<tr>
+<td>Provider prompt cache</td>
+<td>可复用的输入前缀计算</td>
+<td>命中条件由模型与提供商决定</td>
+</tr>
+<tr>
+<td>应用结果缓存</td>
+<td>自己计算的结构化结果</td>
+<td>key 是否带了用户、版本与配置</td>
+</tr>
+</tbody>
+</table>
+<p>三者不能从同一个 <code>HIT</code>／<code>MISS</code> 推断。尤其是有新消息、实时状态或权限变化的对话，旧答案即使便宜，也可能已经不适用。</p>
+<h3>允许换模型的任务，再试 AutoRouter</h3>
+<p>AutoRouter 可在限定模型池中选择；beta 路由本身免费，推理照常计费。适合先放在可重试、错误可检测的小任务上，并记录实际命中模型。<a class="source-ref" href="https://blog.cloudflare.com/auto-router/" title="AutoRouter 发布">S13</a></p>
+<p>User Insights 帮助查看流经 Gateway 的归属与成本，异常标记不自动阻止调用。它不能代替本地、订阅、直接 API 等其他使用记录。<a class="source-ref" href="https://developers.cloudflare.com/ai-gateway/observability/user-insights/" title="AI Gateway User Insights">S14</a></p>
+<h3>有限选择可以单独试 Clef</h3>
+<p>Clef 系列适合分类、筛选和下一步建议，不一定要为一个小判断生成长解释。先准备正例、反例与无法判断项，让模型只提出建议，再看误判代价是否可接受。概率仍需在自己的材料上校准。<a class="source-ref" href="https://blog.cloudflare.com/clef-decision-models/" title="Clef 与强化学习平台发布">S16</a> <a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef/" title="Clef 模型卡">S17</a> <a class="source-ref" href="https://developers.cloudflare.com/workers-ai/models/clef-flash/" title="Clef-flash 模型卡">S18</a></p>
+</section><section class="chapter" id="chapter-09"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">09</span><span class="chapter-type">WORKSPACE</span></div><h2>给机一间临时工作室</h2></header>
+<h3>不同运行层，负责不同的事情</h3>
+<p>普通 API、字段变换与轻量计算可以留在 Worker。需要系统包、原生程序或完整 Linux 时再用 Containers。Agents SDK 提供身份、状态、连接与执行能力；它不是另一台 Linux 机器。<a class="source-ref" href="https://developers.cloudflare.com/agents/" title="Agents SDK">S58</a> <a class="source-ref" href="https://developers.cloudflare.com/sandbox/" title="Sandbox SDK">S59</a></p>
+<p>一次任务最好带着明确输入进入：哪个版本、允许做什么、预算多少、成果保存在哪里、怎样取消。临时执行者得到这次任务的能力，不必持有长期管理账户的钥匙。</p>
+<h3>1.0 要重新看生命周期</h3>
+<p>Sandbox 1.0 由应用自己的 Durable Object 控制 <code>ctx.container</code>。命令使用参数数组，每次指定工作目录和环境；新镜像未必含有旧镜像的全部工具，旧进程也不会因为 Worker 更新就自动替换。<a class="source-ref" href="https://developers.cloudflare.com/sandbox/sdk/migrate/changes-in-1-0/" title="Sandbox SDK 1.0 迁移差异">S72</a></p>
+<p>网络能力同样需要按新版文档设置。将长期凭据留在控制层，只在获准请求上使用，比把它们写进镜像更易限制。配置后仍要测试实际允许与拒绝的访问。<a class="source-ref" href="https://developers.cloudflare.com/sandbox/sdk/migrate/changes-in-1-0/" title="Sandbox SDK 1.0 迁移差异">S72</a></p>
+<h3>做一次完整的小实验</h3>
+<p>选一个没有私人凭据的公开仓库版本，装好固定依赖，先跑确定性的检查。然后保存文件快照，从这份基线分出两个环境，各做一个小修改，交回补丁与结果。</p>
+<p>快照只保存文件，不保存运行中程序，绑定镜像版本，当前 30 天保留期会在恢复时刷新。建立基线前清理不应被复制的材料与凭据。<a class="source-ref" href="https://developers.cloudflare.com/containers/guides/snapshots/" title="Containers 文件系统快照">S05</a></p>
+<p>需要历史的文件可用 Artifacts 保存，大型媒体可用对象存储。完成后关闭，再恢复一次：文件能否回来，旧任务有没有被误重跑，成果是否仍可读？这些才是“可恢复”的具体含义。<a class="source-ref" href="https://blog.cloudflare.com/next-git-platform-on-cloudflare/" title="Artifacts 公开测试发布">S07</a></p>
+<h3>停下来也是任务的一部分</h3>
+<p>Containers 的 CPU 按实际活跃使用计，内存和磁盘按配置及运行时长计。执行两分钟、多等十分钟，不能仍按两分钟预算。停止容器也不会撤销已经发出的外部请求。<a class="source-ref" href="https://developers.cloudflare.com/containers/platform/pricing/" title="Containers 价格">S06</a></p>
+<p>10 月的 DO pending-I/O 更新可保护部分等待操作，期间仍计时长费用；它不代替持久任务恢复。<a class="source-ref" href="https://developers.cloudflare.com/changelog/post/2026-10-01-pending-io-keep-alive/" title="Durable Objects pending I/O 保活">S70</a></p>
+<p>Cloudflare OS 则适合观察更完整的文件、工具与工作空间。当前自部署源码和托管候补是两种状态，研究 Gatekeeper、导出与升级即可，不必立即承载关键工作。<a class="source-ref" href="https://blog.cloudflare.com/managed-cloudflare-os/" title="Cloudflare OS 托管候补">S20</a></p>
+</section><section class="chapter" id="chapter-10"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">10</span><span class="chapter-type">RELEASE</span></div><h2>发布以后，真的用一遍</h2></header>
+<h3>检查哪一版，就发布哪一版</h3>
+<p>生产发布保留一条明确负责的路径：可以是 GitHub Actions，也可以是 Workers Builds；另一边提供检查或预览。这样不容易出现两个系统同时发布，或检查的是 A、上线的却是 B。</p>
+<p>Workers Builds 当前 Paid 包含每月 6,000 分钟、6 并发，单次限 20 分钟；设备专属和不同操作系统的测试，仍放在对应环境。<a class="source-ref" href="https://developers.cloudflare.com/workers/ci-cd/builds/limits-and-pricing/" title="Workers Builds 限制与价格">S35</a> <a class="source-ref" href="https://developers.cloudflare.com/workers/ci-cd/builds/" title="Workers Builds">S65</a></p>
+<h3>预览也会使用真实资源</h3>
+<p>DO 与 Containers 当前支持部分预览自动隔离，其他资源要逐项看绑定。D1、R2、KV、队列、Vectorize 指向同一目标时，换一个 URL 并不会得到另一份数据。<a class="source-ref" href="https://developers.cloudflare.com/workers/previews/resources/" title="Workers 预览资源隔离">S63</a></p>
+<p>外部 PR 用合成数据和独立测试身份，避免直接取得生产 token。测试结束也要清理预览文件、队列与临时资源。</p>
+<h3>从进入到离开，而不只看首页</h3>
+<p>Browser Run 可用于固定视口下的页面读取和操作。一个有用的检查过程是：进入、执行主要动作、保存、刷新、重开、取消，再故意触发一次错误。桌面与窄屏、键盘与触控都要考虑。<a class="source-ref" href="https://developers.cloudflare.com/browser-run/pricing/" title="Browser Run 价格">S36</a></p>
+<p>截图证明某一刻画面是什么样；导出后重新打开，才知道保存是否成立。两种证据都重要，不能互相替代。</p>
+<p>Kitesurf 可以用于独立浏览实验，但不能代替最终目标浏览器。登录任务可以使用获准会话，没必要把整份个人浏览器资料交给临时环境；发布、支付等动作仍须有具体授权。<a class="source-ref" href="https://blog.cloudflare.com/kitesurf-update/" title="Kitesurf 更新">S19</a></p>
+</section><section class="chapter" id="chapter-11"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">11</span><span class="chapter-type">OBSERVABILITY</span></div><h2>留下够用的记录</h2></header>
+<h3>总耗时不够解释问题</h3>
+<p>一个搜索用了十二秒，可能慢在 embedding、索引、权限核验或生成。一次任务等了很久，也可能主要在排队，而不是执行。把时间分到阶段，才能知道值得改哪一段。</p>
+<p>日常记录可以保持小：请求 ID、部署版本、动作、阶段、耗时、结果与重试次数。完整正文和堆栈按需要另行控制，不必每条请求都存下来。</p>
+<h3>给 Issues 一个无害的测试错误</h3>
+<p>Workers Issues 当前公开 beta 能关联失败、版本与源码材料，配置后只处理新流量。把开关写进项目配置，先制造一个没有敏感内容的错误，确认聚合和上下文，再连接 webhook 或修复工具。<a class="source-ref" href="https://blog.cloudflare.com/real-time-issue-detection/" title="Workers Issues 发布">S11</a> <a class="source-ref" href="https://developers.cloudflare.com/workers/observability/issues/" title="Workers Issues 文档">S12</a></p>
+<p>第一步只生成调查与候选修复，也已经能减少维护劳动。Workers 看不到的本机、离线和外部路径，仍需自己的记录。</p>
+<h3>通知应该让人知道做什么</h3>
+<p>“CPU 有点高”不一定需要打断人；“任务队列已经超过可接受等待时间”更接近一个动作。为持续错误、积压、结果未知、成本变化和索引迟迟未就绪选择少量通知，并写清该看哪份材料。</p>
+</section><section class="chapter" id="chapter-12"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">12</span><span class="chapter-type">ECONOMICS</span></div><h2>算清持续成本</h2></header>
+<h3>先按单位，再按美元</h3>
+<p>Workers Paid 最低每账户每月 $5，多项目共享包含量；R2、浏览器、模型、容器和日志各自计量，Zero Trust 也是另一种计划。启用 Paid 不等于取得所有企业功能。<a class="source-ref" href="https://developers.cloudflare.com/workers/platform/pricing/" title="Workers 价格">S34</a> <a class="source-ref" href="https://developers.cloudflare.com/r2/pricing/" title="R2 价格">S38</a> <a class="source-ref" href="https://developers.cloudflare.com/workers-ai/platform/pricing/" title="Workers AI 价格">S41</a> <a class="source-ref" href="https://www.cloudflare.com/plans/zero-trust-services/" title="Zero Trust 计划">S67</a></p>
+<table class="keep-table">
+<thead>
+<tr>
+<th>使用形态</th>
+<th>首先计量</th>
+<th>容易漏掉</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>网站与少量 API</td>
+<td>动态请求、CPU、构建</td>
+<td>日志和重复构建</td>
+</tr>
+<tr>
+<td>资料库与检索</td>
+<td>摄取、存储、查询、模型</td>
+<td>重复分块、生成、旧索引</td>
+</tr>
+<tr>
+<td>临时工作台</td>
+<td>总运行时间、规格、模型</td>
+<td>空闲、失败重试、产物保留</td>
+</tr>
+</tbody>
+</table>
+<p>D1 计行，不只看 SQL 次数；R2 计对象操作；向量需要乘维度；队列还会因重试增加操作量；容器的空闲内存仍在运行时间里。这些单位比“每月应该只花几美元”更有用。<a class="source-ref" href="https://developers.cloudflare.com/containers/platform/pricing/" title="Containers 价格">S06</a> <a class="source-ref" href="https://developers.cloudflare.com/d1/platform/pricing/" title="D1 价格">S37</a> <a class="source-ref" href="https://developers.cloudflare.com/r2/pricing/" title="R2 价格">S38</a> <a class="source-ref" href="https://developers.cloudflare.com/queues/platform/pricing/" title="Queues 价格">S39</a> <a class="source-ref" href="https://developers.cloudflare.com/vectorize/platform/pricing/" title="Vectorize 价格">S40</a></p>
+<h3>给每次实验记一笔小账</h3>
+<p>记录输入规模、次数、实际运行时间、资源与保留产物。先合并账户下的总用量，扣除一次共享包含量，再按项目分配观察。小规模便宜，不保证索引全量重建或重试风暴也便宜。</p>
+<p>设定可以执行的停止条件：任务截止时间、最大并发、模型调用数、数据保留期。账单通知提醒趋势，不是全账户硬封顶。</p>
+<h3>免费也有三种含义</h3>
+<p>免费计划可能在达到上限后停止；Paid 包含量之外可能继续计费；beta 免费可能有未来起算日。Artifacts 的来源存在 10 月 14／15 日一天冲突，AI Search 新计费自 11 月 1 日开始，要把核验日与生效日同时留下。<a class="source-ref" href="https://blog.cloudflare.com/next-git-platform-on-cloudflare/" title="Artifacts 公开测试发布">S07</a> <a class="source-ref" href="https://developers.cloudflare.com/artifacts/platform/pricing/" title="Artifacts 价格">S08</a> <a class="source-ref" href="https://developers.cloudflare.com/ai-search/platform/limits-pricing/" title="AI Search 限制与价格">S10</a></p>
+<p>普通 KV 与 KV Instant 也不能混看。后者面向特殊读重型负载，写入、删除、列举每次 $0.10，存储每 MB·月 $100，不适合作为普通个人状态库的默认选项。<a class="source-ref" href="https://developers.cloudflare.com/kv/platform/pricing/" title="KV 价格">S42</a> <a class="source-ref" href="https://blog.cloudflare.com/workers-kv-instant/" title="KV Instant 私测与价格">S25</a></p>
+</section><section class="chapter" id="chapter-13"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">13</span><span class="chapter-type">RECOVERY</span></div><h2>坏了、恢复、暂时不用</h2></header>
+<h3>沿着请求走，不同时改所有东西</h3>
+<table class="compact">
+<thead>
+<tr>
+<th>看到的现象</th>
+<th>先看这里</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>域名在不同设备解析不同</td>
+<td>DNS、代理、解析器与权威记录</td>
+</tr>
+<tr>
+<td>302 到登录页</td>
+<td>Access 的应用与路径</td>
+</tr>
+<tr>
+<td>403／401</td>
+<td>响应来自边缘还是应用，再查对应身份</td>
+</tr>
+<tr>
+<td>404</td>
+<td>hostname、路由、ingress 与对象是否存在</td>
+</tr>
+<tr>
+<td>429</td>
+<td>配额、限流与重试方式</td>
+</tr>
+<tr>
+<td>5xx／超时</td>
+<td>请求 ID、各阶段耗时、依赖健康</td>
+</tr>
+<tr>
+<td>页面仍是旧版</td>
+<td>实际部署、路由与浏览器缓存</td>
+</tr>
+<tr>
+<td>任务有记录却没结果</td>
+<td>outbox、领取状态、租约与未知结果</td>
+</tr>
+<tr>
+<td>容器文件消失</td>
+<td>生命周期、镜像、快照与持久成果</td>
+</tr>
+</tbody>
+</table>
+<p>状态码是线索，不是诊断。一次只验证一个原因，恢复后重新测拒绝路径，避免“能打开了”掩盖权限被顺手放宽。</p>
+<h3>让恢复目标具体一点</h3>
+<p>例如“把测试资料集合恢复到指定版本，不重新执行历史外部任务”。保留当前状态与备份身份，再验证记录、文件 hash、权限和待处理工作。恢复中遇到未知结果，就留下等待核对状态，不把它改成成功或未发生。</p>
+<h3>停用有一个顺序</h3>
+<p>先关闭新入口和自动触发，再处理执行中的任务；保存成果、撤销凭据，检查容器、浏览器会话、预览、队列和临时对象。最后按需要删除资源，或保留只读内容。</p>
+<p>同时检查域名是否仍指向废弃服务，备份能否在不依赖原服务时读取，外部模型和日志是否还有保留设置。一项应用停止访问，不一定意味着所有关联费用都停止。</p>
+</section><section class="chapter" id="chapter-14"><header class="chapter-head"><div class="chapter-meta"><span class="chapter-number">14</span><span class="chapter-type">EDITION NOTES</span></div><h2>继续维护这份手册</h2></header>
+<h3>保留问题，更新做法</h3>
+<p>历史教程提供了入口、身份、数据、任务和执行的分层。本期修正了几处会影响实施的地方：队列登记不等于任务完成；调用者标签不证明身份；快照不保存进程；Preview 不证明数据隔离。</p>
+<p>平台状态则更新到本期快照：Sandbox 1.0 路线、AI Search GA 与新计费、Gateway 按首次创建日区分的日志规则、Cloudflare OS 托管候补。完整修订映射在仓库的 <code>editorial/archive-revision-map.md</code>。<a class="source-ref" href="https://developers.cloudflare.com/sandbox/sdk/migrate/changes-in-1-0/" title="Sandbox SDK 1.0 迁移差异">S72</a> <a class="source-ref" href="https://blog.cloudflare.com/ai-search-ga/" title="AI Search GA">S09</a> <a class="source-ref" href="https://developers.cloudflare.com/ai-search/platform/limits-pricing/" title="AI Search 限制与价格">S10</a> <a class="source-ref" href="https://developers.cloudflare.com/ai-gateway/reference/pricing/" title="AI Gateway 价格与日志">S15</a> <a class="source-ref" href="https://blog.cloudflare.com/managed-cloudflare-os/" title="Cloudflare OS 托管候补">S20</a></p>
+<h3>两种读者，不必挤在同一页</h3>
+<p>报告与本手册先让人理解用途、过程和取舍。实施参考保存精确字段、源码、命令、状态转移与失败检查；它可以更直接地给 agent 使用，却不能把文档当作部署授权。两层共用来源登记和例子，不各自维护一份互相漂移的事实。</p>
+<table class="keep-table">
+<thead>
+<tr>
+<th>需要什么</th>
+<th>仓库入口</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>本期产品变化</td>
+<td><code>reports/2026-10-02.md</code></td>
+</tr>
+<tr>
+<td>人的阅读版</td>
+<td><code>guides/handbook.md</code></td>
+</tr>
+<tr>
+<td>实施细节、完整代码和状态约束</td>
+<td><code>reference/implementation.md</code></td>
+</tr>
+<tr>
+<td>离线示例与测试</td>
+<td><code>examples/</code>、<code>tests/</code></td>
+</tr>
+<tr>
+<td>来源、日期与变化记录</td>
+<td><code>catalog/</code>、<code>editorial/</code></td>
+</tr>
+</tbody>
+</table>
+<p>这里的检查分为资料与示例的本地验证、实际云端验证两类。本包包含前者，不包含账户登录、部署、迁移或模型实测。新的实践结果应按自己的输入、版本和范围补充，不无声地改写旧期判断。</p>
+
+</section><section class="sources" id="sources"><h2>来源索引</h2><p class="source-note">本次重新核对决策模型、接入路径与价格；其他发布条目沿用 2026-10-02 原版来源记录。资料核验不等于账户或模型实测。</p><div class="source-list"><div class="source-col"><div class="source-entry" id="S02"><span class="source-id">S02</span><a href="https://blog.cloudflare.com/cloudflare-cf-cli-launch/">cf CLI 发布</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S03"><span class="source-id">S03</span><a href="https://developers.cloudflare.com/cf/">cf CLI 文档</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S05"><span class="source-id">S05</span><a href="https://developers.cloudflare.com/containers/guides/snapshots/">Containers 文件系统快照</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S06"><span class="source-id">S06</span><a href="https://developers.cloudflare.com/containers/platform/pricing/">Containers 价格</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S07"><span class="source-id">S07</span><a href="https://blog.cloudflare.com/next-git-platform-on-cloudflare/">Artifacts 公开测试发布</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S08"><span class="source-id">S08</span><a href="https://developers.cloudflare.com/artifacts/platform/pricing/">Artifacts 价格</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S09"><span class="source-id">S09</span><a href="https://blog.cloudflare.com/ai-search-ga/">AI Search GA</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S10"><span class="source-id">S10</span><a href="https://developers.cloudflare.com/ai-search/platform/limits-pricing/">AI Search 限制与价格</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S11"><span class="source-id">S11</span><a href="https://blog.cloudflare.com/real-time-issue-detection/">Workers Issues 发布</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S12"><span class="source-id">S12</span><a href="https://developers.cloudflare.com/workers/observability/issues/">Workers Issues 文档</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S13"><span class="source-id">S13</span><a href="https://blog.cloudflare.com/auto-router/">AutoRouter 发布</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S14"><span class="source-id">S14</span><a href="https://developers.cloudflare.com/ai-gateway/observability/user-insights/">AI Gateway User Insights</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S15"><span class="source-id">S15</span><a href="https://developers.cloudflare.com/ai-gateway/reference/pricing/">AI Gateway 价格与日志</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S16"><span class="source-id">S16</span><a href="https://blog.cloudflare.com/clef-decision-models/">Clef 与强化学习平台发布</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S17"><span class="source-id">S17</span><a href="https://developers.cloudflare.com/workers-ai/models/clef/">Clef 模型卡</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S18"><span class="source-id">S18</span><a href="https://developers.cloudflare.com/workers-ai/models/clef-flash/">Clef-flash 模型卡</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S19"><span class="source-id">S19</span><a href="https://blog.cloudflare.com/kitesurf-update/">Kitesurf 更新</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S20"><span class="source-id">S20</span><a href="https://blog.cloudflare.com/managed-cloudflare-os/">Cloudflare OS 托管候补</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S25"><span class="source-id">S25</span><a href="https://blog.cloudflare.com/workers-kv-instant/">KV Instant 私测与价格</a><small>blog.cloudflare.com</small></div><div class="source-entry" id="S34"><span class="source-id">S34</span><a href="https://developers.cloudflare.com/workers/platform/pricing/">Workers 价格</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S35"><span class="source-id">S35</span><a href="https://developers.cloudflare.com/workers/ci-cd/builds/limits-and-pricing/">Workers Builds 限制与价格</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S36"><span class="source-id">S36</span><a href="https://developers.cloudflare.com/browser-run/pricing/">Browser Run 价格</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S37"><span class="source-id">S37</span><a href="https://developers.cloudflare.com/d1/platform/pricing/">D1 价格</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S38"><span class="source-id">S38</span><a href="https://developers.cloudflare.com/r2/pricing/">R2 价格</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S39"><span class="source-id">S39</span><a href="https://developers.cloudflare.com/queues/platform/pricing/">Queues 价格</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S40"><span class="source-id">S40</span><a href="https://developers.cloudflare.com/vectorize/platform/pricing/">Vectorize 价格</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S41"><span class="source-id">S41</span><a href="https://developers.cloudflare.com/workers-ai/platform/pricing/">Workers AI 价格</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S42"><span class="source-id">S42</span><a href="https://developers.cloudflare.com/kv/platform/pricing/">KV 价格</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S44"><span class="source-id">S44</span><a href="https://developers.cloudflare.com/workflows/reference/pricing/">Workflows 价格</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S45"><span class="source-id">S45</span><a href="https://developers.cloudflare.com/workers/runtime-apis/bindings/">Workers Bindings</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S46"><span class="source-id">S46</span><a href="https://developers.cloudflare.com/workers/static-assets/">Workers Static Assets</a><small>developers.cloudflare.com</small></div></div><div class="source-col"><div class="source-entry" id="S47"><span class="source-id">S47</span><a href="https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/">Cloudflare Tunnel</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S48"><span class="source-id">S48</span><a href="https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/validating-json/">Access JWT 验证</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S49"><span class="source-id">S49</span><a href="https://developers.cloudflare.com/cloudflare-one/access-controls/service-credentials/service-tokens/">Access Service Tokens</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S50"><span class="source-id">S50</span><a href="https://developers.cloudflare.com/d1/reference/time-travel/">D1 Time Travel</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S51"><span class="source-id">S51</span><a href="https://developers.cloudflare.com/d1/best-practices/import-export-data/">D1 数据导出</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S52"><span class="source-id">S52</span><a href="https://developers.cloudflare.com/r2/buckets/object-lifecycles/">R2 对象生命周期</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S53"><span class="source-id">S53</span><a href="https://developers.cloudflare.com/queues/configuration/batching-retries/">Queues 重试与批处理</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S54"><span class="source-id">S54</span><a href="https://developers.cloudflare.com/queues/configuration/dead-letter-queues/">Queues 死信队列</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S55"><span class="source-id">S55</span><a href="https://developers.cloudflare.com/workflows/build/rules-of-workflows/">Workflows 执行规则</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S56"><span class="source-id">S56</span><a href="https://developers.cloudflare.com/workers/configuration/cron-triggers/">Cron Triggers</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S57"><span class="source-id">S57</span><a href="https://developers.cloudflare.com/workers/runtime-apis/bindings/service-bindings/">Service Bindings</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S58"><span class="source-id">S58</span><a href="https://developers.cloudflare.com/agents/">Agents SDK</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S59"><span class="source-id">S59</span><a href="https://developers.cloudflare.com/sandbox/">Sandbox SDK</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S60"><span class="source-id">S60</span><a href="https://developers.cloudflare.com/agent-memory/">Agent Memory</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S61"><span class="source-id">S61</span><a href="https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-mesh/">Cloudflare Mesh</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S62"><span class="source-id">S62</span><a href="https://developers.cloudflare.com/cloudflare-one/team-and-resources/devices/cloudflare-one-client/configure/route-traffic/split-tunnels/">Split Tunnels</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S63"><span class="source-id">S63</span><a href="https://developers.cloudflare.com/workers/previews/resources/">Workers 预览资源隔离</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S64"><span class="source-id">S64</span><a href="https://developers.cloudflare.com/vectorize/reference/client-api/">Vectorize Client API</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S65"><span class="source-id">S65</span><a href="https://developers.cloudflare.com/workers/ci-cd/builds/">Workers Builds</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S66"><span class="source-id">S66</span><a href="https://developers.cloudflare.com/workers/get-started/guide/">Workers 入门</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S67"><span class="source-id">S67</span><a href="https://www.cloudflare.com/plans/zero-trust-services/">Zero Trust 计划</a><small>www.cloudflare.com</small></div><div class="source-entry" id="S70"><span class="source-id">S70</span><a href="https://developers.cloudflare.com/changelog/post/2026-10-01-pending-io-keep-alive/">Durable Objects pending I/O 保活</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S71"><span class="source-id">S71</span><a href="https://developers.cloudflare.com/changelog/post/2026-10-01-workers-oauth-provider-1x/">Workers OAuth Provider v1</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S72"><span class="source-id">S72</span><a href="https://developers.cloudflare.com/sandbox/sdk/migrate/changes-in-1-0/">Sandbox SDK 1.0 迁移差异</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S73"><span class="source-id">S73</span><a href="https://developers.cloudflare.com/ai/models/typesafe/jev/">Jev：Cloudflare 第三方模型目录</a><small>developers.cloudflare.com</small></div><div class="source-entry" id="S74"><span class="source-id">S74</span><a href="https://docs.typesafe.ai/models">TypeSafe：Jev 版本、价格与上下文预算</a><small>docs.typesafe.ai</small></div><div class="source-entry" id="S76"><span class="source-id">S76</span><a href="https://openrouter.ai/docs/guides/community/jev">OpenRouter：Jev 的两种接口</a><small>openrouter.ai</small></div><div class="source-entry" id="S77"><span class="source-id">S77</span><a href="https://docs.typesafe.ai/confidence">TypeSafe：confidence 的含义</a><small>docs.typesafe.ai</small></div><div class="source-entry" id="S78"><span class="source-id">S78</span><a href="https://docs.typesafe.ai/model-jaggedness/jev-1.13">TypeSafe：Jev 1.13 已知能力边界</a><small>docs.typesafe.ai</small></div><div class="source-entry" id="S79"><span class="source-id">S79</span><a href="https://developers.cloudflare.com/ai-gateway/usage/rest-api/">Cloudflare AI Gateway：统一 REST API</a><small>developers.cloudflare.com</small></div></div></div></section><section class="colophon" id="colophon"><div class="closing-title">关于这一版</div><p class="smallprint">面向个人使用的独立参考资料，不是 Cloudflare 官方出版物。产品事实保留来源，场景与判断属于编辑分析。本次未进行账户操作或云端部署。</p><div class="author-line">GitHub · <a href="https://github.com/IndelibleVivi">github.com/IndelibleVivi</a></div><div class="signature">made by Faye &amp; Cove</div></section></main></body></html>

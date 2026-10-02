@@ -1,0 +1,23 @@
+{
+  "schema": "fieldbook.example/1",
+  "id": "example.health-worker",
+  "default_mode": "offline",
+  "network_required": false,
+  "credentials_required": false,
+  "live_supported": false,
+  "run_from": "repository-root",
+  "check_command": [
+    "node",
+    "--test",
+    "examples/health-worker/worker.test.mjs"
+  ],
+  "input_kind": "synthetic",
+  "observation_scope": [
+    "GET /health",
+    "unknown path",
+    "method checks"
+  ],
+  "cloud_resources_created": [],
+  "teardown": "not applicable: offline checks create no cloud resources",
+  "evidence_notice": "Passing these checks does not prove service availability or model quality."
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "architecture",
+    "title": "架构：材料、编辑源与阅读出口",
+    "source": "diagrams/src/architecture.mmd",
+    "output": "assets/diagrams/architecture.svg"
+  },
+  {
+    "id": "change-impact",
+    "title": "更新影响：相关，不等于依赖",
+    "source": "diagrams/src/change-impact.mmd",
+    "output": "assets/diagrams/change-impact.svg"
+  },
+  {
+    "id": "content-lifecycle",
+    "title": "内容生命周期：修订不抹掉上一版",
+    "source": "diagrams/src/content-lifecycle.mmd",
+    "output": "assets/diagrams/content-lifecycle.svg"
+  },
+  {
+    "id": "publication",
+    "title": "出版流程：源码向产物流动",
+    "source": "diagrams/src/publication.mmd",
+    "output": "assets/diagrams/publication.svg"
+  },
+  {
+    "id": "example-lifecycle",
+    "title": "实验生命周期：运行完还要收得回来",
+    "source": "diagrams/src/example-lifecycle.mmd",
+    "output": "assets/diagrams/example-lifecycle.svg"
+  }
+]

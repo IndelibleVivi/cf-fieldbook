@@ -1,0 +1,101 @@
+#!/usr/bin/env python3
+"""Readable catalog projections. Only explicit `sync` edits maintained Markdown."""
+from __future__ import annotations
+
+import argparse
+import importlib.util
+import json
+from pathlib import Path
+import re
+
+ROOT = Path(__file__).resolve().parents[1]
+PAGE_BLOCKS = {'services/decision-models.md': {'cf-routes'},
+               'comparisons/clef-vs-jev.md': {'all-routes', 'costs', 'contexts'},
+               'guides/handbook.md': {'cf-routes'}}
+PAGES = tuple(PAGE_BLOCKS)
+BLOCK = re.compile(r'<!-- facts: ([a-z-]+) -->\n.*?<!-- /facts -->', re.S)
+
+
+def cell(value: object) -> str:
+    return str(value).replace('|', '\\|').replace('\n', ' ')
+
+
+def tables(root: Path) -> dict[str, str]:
+    routes = json.loads((root / 'catalog/decision-routes.json').read_text())['routes']
+    sources = {s['id']: s for s in json.loads((root / 'catalog/sources.json').read_text())}
+    spec = importlib.util.spec_from_file_location('fieldbook_costs', root / 'examples/decision-routing/payloads.py')
+    costs = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(costs)
+
+    def source(row):
+        return ' '.join(f"[{s}]({sources[s]['url']})" for s in row['sources'])
+
+    def route(row):
+        return cell(f"{row['gateway'] or row['model_author'] + ' 原厂'} → {row['model']}")
+
+    def price(row):
+        value = row['input_usd_per_million']
+        return cell(value if value is not None else '未知；目录显示 ' + row.get('display_price', '未提供'))
+
+    def route_table(rows):
+        lines = ['| 路线（接入 → 模型） | 模型选择器 | 输入 USD / 百万 token | 来源 |', '|---|---|---:|---|']
+        for row in rows:
+            lines.append(f"| {route(row)} | `{cell(row['selector'])}` | {price(row)} | {source(row)} |")
+        return '\n'.join(lines)
+
+    cf = [row for row in routes if row['id'].startswith('cf-')]
+    estimate = ['| 路线 | 输入用量假设 | 模型输入费用 |', '|---|---|---:|']
+    for row in cf:
+        value = row['input_usd_per_million']
+        amount = f"${costs.input_cost(50_000_000, value):.2f}" if value is not None else '未知，不能计算'
+        tokenizer = row.get('tokenizer') or '未核实'
+        estimate.append(f"| {route(row)} | 50,000,000 计费 token；tokenizer：{cell(tokenizer)} | {amount} |")
+    contexts = ['| 路线 | 此入口的上下文说明 | 来源 |', '|---|---|---|']
+    for row in routes:
+        contexts.append(f"| {route(row)} | {cell(row['context'])} | {source(row)} |")
+    return {'cf-routes': route_table(cf), 'all-routes': route_table(routes),
+            'costs': '\n'.join(estimate), 'contexts': '\n'.join(contexts)}
+
+
+def project_markdown(root: Path, relative_path: str) -> str:
+    path = (root / relative_path).resolve()
+    if not path.is_relative_to(root.resolve()):
+        raise ValueError('Markdown path escapes root')
+    text = path.read_text(encoding='utf-8')
+    # Edition reports own their frozen text and source definitions, including prices.
+    if relative_path not in PAGES:
+        return text
+    markers = [m[1] for m in BLOCK.finditer(text)]
+    if set(markers) != PAGE_BLOCKS[relative_path] or len(markers) != len(set(markers)):
+        raise ValueError(f'missing, duplicate or unknown fact block in {relative_path}')
+    blocks = tables(root)
+    return BLOCK.sub(lambda m: f'<!-- facts: {m[1]} -->\n{blocks[m[1]]}\n<!-- /facts -->', text)
+
+
+def sync(root: Path, *, check: bool) -> list[str]:
+    changed = []
+    for relative in PAGES:
+        target = root / relative
+        projected = project_markdown(root, relative)
+        if target.read_text(encoding='utf-8') != projected:
+            changed.append(relative)
+            if not check:
+                target.write_text(projected, encoding='utf-8')
+    return changed
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('command', choices=['check', 'sync'])
+    parser.add_argument('--root', type=Path, default=ROOT)
+    args = parser.parse_args()
+    changed = sync(args.root, check=args.command == 'check')
+    if changed:
+        print(('DRIFT: ' if args.command == 'check' else 'Updated: ') + ', '.join(changed))
+    else:
+        print('PASS: maintained fact blocks match catalog; historical reports untouched.')
+    return int(bool(changed) and args.command == 'check')
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

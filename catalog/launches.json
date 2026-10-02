@@ -1,0 +1,353 @@
+[
+  {
+    "id": "cf-cli",
+    "name": "cf CLI",
+    "status": "public_beta",
+    "access": "无需迁移现有项目即可研究",
+    "announced_on": null,
+    "verified_on": "2026-10-02",
+    "sources": [
+      "S02",
+      "S03"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "cf GA 日期与 Wrangler 至少 18 个月维护期的实际起点"
+  },
+  {
+    "id": "issues",
+    "name": "Workers Issues",
+    "status": "public_beta",
+    "access": "所有 Workers 账户；启用后处理新流量",
+    "announced_on": null,
+    "verified_on": "2026-10-02",
+    "sources": [
+      "S11",
+      "S12"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核查开放条件与文档是否发生实质变化"
+  },
+  {
+    "id": "containers",
+    "name": "Containers 新接口与快照",
+    "status": "public_beta",
+    "access": "Workers Paid；快照需相应调度策略",
+    "announced_on": "2026-09-30",
+    "verified_on": "2026-10-02",
+    "sources": [
+      "S04",
+      "S05",
+      "S06"
+    ],
+    "effective_events": [
+      {
+        "kind": "legacy_maintenance_target",
+        "date": "2026-12-31"
+      }
+    ],
+    "conflicts": [],
+    "next_check": "核查开放条件与文档是否发生实质变化"
+  },
+  {
+    "id": "sandbox",
+    "name": "Sandbox SDK 1.0",
+    "status": "released_sdk",
+    "access": "执行面与 SDK 状态分别判断",
+    "announced_on": null,
+    "verified_on": "2026-10-02",
+    "sources": [
+      "S59",
+      "S72"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核查开放条件与文档是否发生实质变化"
+  },
+  {
+    "id": "artifacts",
+    "name": "Artifacts",
+    "status": "public_beta",
+    "access": "Workers Paid",
+    "announced_on": null,
+    "verified_on": "2026-10-02",
+    "sources": [
+      "S07",
+      "S08"
+    ],
+    "effective_events": [
+      {
+        "kind": "billing_start",
+        "date": null,
+        "candidate_dates": [
+          "2026-10-14",
+          "2026-10-15"
+        ]
+      }
+    ],
+    "conflicts": [
+      {
+        "topic": "billing_start",
+        "claims": [
+          {
+            "date": "2026-10-14",
+            "source": "S08"
+          },
+          {
+            "date": "2026-10-15",
+            "source": "S07"
+          }
+        ]
+      }
+    ],
+    "next_check": "向官方价格文档及账户账单核实起算日冲突"
+  },
+  {
+    "id": "ai-search",
+    "name": "AI Search",
+    "status": "ga",
+    "access": "账号额度与模型条件分别检查",
+    "announced_on": "2026-10-01",
+    "verified_on": "2026-10-02",
+    "sources": [
+      "S09",
+      "S10"
+    ],
+    "effective_events": [
+      {
+        "kind": "billing_start",
+        "date": "2026-11-01"
+      }
+    ],
+    "conflicts": [],
+    "next_check": "11 月新账单与内部/额外模型费用归属"
+  },
+  {
+    "id": "clef",
+    "name": "Clef / Clef-flash",
+    "status": "available_models",
+    "access": "Workers AI；设计合作另行申请",
+    "announced_on": null,
+    "verified_on": "2026-10-02",
+    "sources": [
+      "S16",
+      "S17",
+      "S18"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核查开放条件与文档是否发生实质变化"
+  },
+  {
+    "id": "autorouter",
+    "name": "AutoRouter",
+    "status": "beta",
+    "access": "AI Gateway，推理另计",
+    "announced_on": null,
+    "verified_on": "2026-10-02",
+    "sources": [
+      "S13"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核查开放条件与文档是否发生实质变化"
+  },
+  {
+    "id": "insights",
+    "name": "User Insights",
+    "status": "available",
+    "access": "仅观测经过 Gateway 的请求",
+    "announced_on": null,
+    "verified_on": "2026-10-02",
+    "sources": [
+      "S14"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核查开放条件与文档是否发生实质变化"
+  },
+  {
+    "id": "kitesurf",
+    "name": "Kitesurf 更新",
+    "status": "beta",
+    "access": "Playground / 终端，兼容范围发展中",
+    "announced_on": "2026-09-28",
+    "verified_on": "2026-10-02",
+    "sources": [
+      "S19"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核查开放条件与文档是否发生实质变化"
+  },
+  {
+    "id": "cfos",
+    "name": "Cloudflare OS 托管版",
+    "status": "waitlist",
+    "access": "自部署源码与托管候补分开",
+    "announced_on": "2026-10-01",
+    "verified_on": "2026-10-02",
+    "sources": [
+      "S20"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核查开放条件与文档是否发生实质变化"
+  },
+  {
+    "id": "emdash",
+    "name": "EmDash 1.0 / Build",
+    "status": "mixed",
+    "access": "CMS 稳定版；Build alpha",
+    "announced_on": null,
+    "verified_on": "2026-10-02",
+    "sources": [
+      "S21"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核查开放条件与文档是否发生实质变化"
+  },
+  {
+    "id": "k2",
+    "name": "K2",
+    "status": "public_beta",
+    "access": "Workers Paid；当前账户存储上限 10 GB",
+    "announced_on": null,
+    "verified_on": "2026-10-02",
+    "sources": [
+      "S22",
+      "S23"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核查开放条件与文档是否发生实质变化"
+  },
+  {
+    "id": "basin",
+    "name": "Basin",
+    "status": "ga",
+    "access": "实际部件分别计量",
+    "announced_on": null,
+    "verified_on": "2026-10-02",
+    "sources": [
+      "S24"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核查开放条件与文档是否发生实质变化"
+  },
+  {
+    "id": "kv-instant",
+    "name": "KV Instant",
+    "status": "private_beta",
+    "access": "申请；针对很少写、极多读的配置",
+    "announced_on": null,
+    "verified_on": "2026-10-02",
+    "sources": [
+      "S25"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核查开放条件与文档是否发生实质变化"
+  },
+  {
+    "id": "rust",
+    "name": "Rust / Emscripten",
+    "status": "experimental_preview",
+    "access": "实验补丁与示例",
+    "announced_on": "2026-09-28",
+    "verified_on": "2026-10-02",
+    "sources": [
+      "S26"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核查开放条件与文档是否发生实质变化"
+  },
+  {
+    "id": "forge",
+    "name": "Forge",
+    "status": "open_source",
+    "access": "工具链研究，不是自动部署权限",
+    "announced_on": null,
+    "verified_on": "2026-10-02",
+    "sources": [
+      "S27"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核查开放条件与文档是否发生实质变化"
+  },
+  {
+    "id": "vinext",
+    "name": "Vinext 1.0",
+    "status": "released",
+    "access": "先检查应用兼容性",
+    "announced_on": "2026-09-28",
+    "verified_on": "2026-10-02",
+    "sources": [
+      "S28"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核查开放条件与文档是否发生实质变化"
+  },
+  {
+    "id": "threat-signals",
+    "name": "Threat Signals 免费层",
+    "status": "available",
+    "access": "安全情报用途，不是通用 RSS 阅读器",
+    "announced_on": null,
+    "verified_on": "2026-10-02",
+    "sources": [
+      "S29"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核查开放条件与文档是否发生实质变化"
+  },
+  {
+    "id": "monetization",
+    "name": "Monetization Gateway",
+    "status": "closed_beta",
+    "access": "符合条件的美国卖家",
+    "announced_on": null,
+    "verified_on": "2026-10-02",
+    "sources": [
+      "S30"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核查开放条件与文档是否发生实质变化"
+  },
+  {
+    "id": "do-io",
+    "name": "DO pending I/O 保活",
+    "status": "available",
+    "access": "兼容日期或相应 flag",
+    "announced_on": "2026-10-01",
+    "verified_on": "2026-10-02",
+    "sources": [
+      "S70"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核查开放条件与文档是否发生实质变化"
+  },
+  {
+    "id": "oauth-v1",
+    "name": "Workers OAuth Provider v1",
+    "status": "released",
+    "access": "授权服务与资源服务边界需实际验证",
+    "announced_on": "2026-10-01",
+    "verified_on": "2026-10-02",
+    "sources": [
+      "S71"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核查开放条件与文档是否发生实质变化"
+  }
+]

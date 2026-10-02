@@ -1,0 +1,17 @@
+flowchart TB
+  accTitle: 一项精确数据改变后，哪些资料需要复核
+  accDescr: 决策路线数据直接影响服务说明、专题比较与离线例子；旧报告进入勘误候选而不被自动回写。related 链接只帮助发现，不参与依赖影响闭包。
+  A[上游变更信号]:::source --> B[编辑者确认变化与生效范围]:::gate
+  B --> C[精确记录<br/>data.decision-routes]:::content
+  C -->|依赖| D[当前服务说明]:::content
+  C -->|依赖| E[当前专题比较]:::content
+  C -->|依赖| F[相关请求与算术例子]:::content
+  D --> G[当前资料复核候选]:::output
+  E --> G
+  F --> G
+  C -->|历史引用| H[冻结报告<br/>只检查是否需要勘误]:::gate
+  E -. 相关链接，不自动传播 .-> I[用途与其他阅读]:::source
+  classDef source fill:#FFFFFF,stroke:#A4BEC6,color:#183544,stroke-width:1px
+  classDef content fill:#EFF9FB,stroke:#007F93,color:#183544,stroke-width:1.3px
+  classDef gate fill:#FFF4EC,stroke:#BE4B13,color:#183544,stroke-width:1.3px
+  classDef output fill:#FFFFFF,stroke:#007F93,color:#183544,stroke-width:1.8px
