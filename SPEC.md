@@ -6,7 +6,7 @@
 
 ## 01 名字：一本能继续使用的 Fieldbook
 
-本地项目名 **CF Fieldbook**，仓库 slug **`cf-fieldbook`**，中文说明 **Cloudflare 用途、选择与实践的持续参考**。
+项目名 **CF Fieldbook**，仓库 slug **`cf-fieldbook`**，中文说明 **Cloudflare 用途、选择与实践的持续参考**。
 
 CF 明确对象，Fieldbook 允许几种不同时间尺度的材料放在一起：当下的服务解释、可复用的实践、带日期的观察、会被新证据修正的比较。它比“News”更耐久，比“Docs”更有作者判断，也不会像“Toolkit”那样暗示这是一个统一运行时或一键安装器。
 

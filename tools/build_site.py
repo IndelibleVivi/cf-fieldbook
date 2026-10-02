@@ -22,7 +22,7 @@ from content import project_markdown
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_DOCS = (
-    'README.md', 'SPEC.md', 'CONTRIBUTING.md', 'LICENSE-STATUS.md', 'LICENSE-DOCUMENTATION.md', 'docs/architecture.md',
+    'README.md', 'CHANGELOG.md', 'SPEC.md', 'CONTRIBUTING.md', 'LICENSE-STATUS.md', 'LICENSE-DOCUMENTATION.md', 'docs/architecture.md',
     'docs/lifecycle.md', 'docs/publication.md', 'docs/content-design.md',
     'docs/migration-r3.md', 'docs/current-state.md', 'docs/reading-site.md', 'examples/README.md',
     'diagrams/README.md', 'templates/practice-example.md', 'templates/release-card.md',
