@@ -2,12 +2,18 @@
 
 一次消息被接收，只能说明任务已登记，不能说明工作完成。这个 SQLite 小模型让读者看见 worker 中断、租约到期、重新领取与迟到结果的状态变化。它使用合成输入、注入的整数时钟和临时数据库；没有网络、凭据或真实外部动作。
 
+阅读站提供[任务恢复机制观察台](https://indeliblevivi.github.io/cf-fieldbook/examples/job-state/demo.html)：选择五个合成场景，逐秒调节模拟时钟，或用上一步、下一步、事件节点、播放、暂停与重置回看。任务状态、generation、租约与操作返回值来自构建时实际执行的同一 Jobs 模型；浏览器只选择记录帧，不重新实现状态机，也不执行云端操作。每次切换场景会暂停原回放，回放到终点自动停止。关闭 JavaScript 后仍可阅读模型生成的完整步骤概览；仓库 Markdown 阅读者可以运行下面的终端演示。
+
+五个场景依次观察正常完成、worker 中断后租约内拒绝与边界接管、旧 generation 迟到提交被拒、外部响应丢失后 `uncertain` 停止自动领取，以及**外部成功、`uncertain` 落盘前崩溃**的未解决窗口。观察台在最后一种情况下显示本地任务成为 `done`，合成外部动作却发生两次；这是模型限制的反例，不是自动恢复安全性的证明。模拟时钟只改变观看位置；没有发生新操作的秒数保留最近一次返回值并明确标记该操作的时间。
+
 在仓库根目录运行：
 
 ```bash
 python3 examples/job-state/demo.py
 python3 -m unittest discover -s tests -p 'test_job_recovery.py' -v
 python3 -m unittest discover -s tests -p 'test_examples.py' -v
+python3 -m unittest discover -s tests -p 'test_recovery_demo.py' -v
+node --test tests/recovery.test.cjs
 ```
 
 演示直接打印模型返回值。开头的 `('pending', 0)` 表示**被登记 ≠ 完成**；worker A 在 generation 1 领取后退出，`t=10` 仍不能并发领取。`t=30` 租约到期后，worker B 拿到 generation 2。A 的迟到 `finish` 返回 `False`，B 的完成返回 `True`。之后重复投递也拿不到已完成任务。

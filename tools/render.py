@@ -80,6 +80,29 @@ def tag(soup,name,attrs=None,text=None):
     return out
 
 
+def glossary_for(text):
+    """Only definitions linked by this manuscript become its frozen appendix."""
+    keys=list(dict.fromkeys(re.findall(r'\]\(\.\./docs/glossary\.md#([\w-]+)\)',text)))
+    if not keys:return []
+    source=(ROOT/'docs/glossary.md').read_text(encoding='utf-8')
+    definitions={}
+    for match in re.finditer(r'^## ([\w-]+) / (.+)\n\n([^\n]+)',source,re.M):
+        label=f'{match[1]} / {match[2]}'
+        ident=re.sub(r'[^\w\s-]', '', label.lower()).replace(' ', '-')
+        definitions[ident]=(label,match[3])
+    return [(key,*definitions[key]) for key in keys]
+
+
+def markdown_with_glossary(text,definitions):
+    if not definitions:return text
+    for key,_,_ in definitions:
+        text=text.replace(f'../docs/glossary.md#{key}',f'#{key}')
+    text=text.replace('](../docs/glossary.md)','](#术语小词表)')
+    appendix='\n## 术语小词表\n\n'+ '\n\n'.join(
+        f'### {label}\n\n{definition}' for key,label,definition in definitions)+'\n'
+    return text.replace('<!-- SOURCES -->',appendix+'\n<!-- SOURCES -->',1)
+
+
 def render_one(cfg,sources,dist,edition,formats):
     text=project_markdown(ROOT,cfg['path'])
     if cfg['path'].startswith('reports/'):
@@ -89,8 +112,9 @@ def render_one(cfg,sources,dist,edition,formats):
         if used-sources.keys():raise ValueError('Historical report is missing source definitions')
     else:
         text=update_sources(ROOT/cfg['path'],sources,text)
+    definitions=glossary_for(text)
     if 'md' in formats:
-        (dist/(cfg['stem']+'.md')).write_text(text,encoding='utf-8')
+        (dist/(cfg['stem']+'.md')).write_text(markdown_with_glossary(text,definitions),encoding='utf-8')
     match=re.match(r'^---\n(.*?)\n---\n(.*)$',text,re.S)
     if not match:raise ValueError('Missing YAML frontmatter')
     meta,body=yaml.safe_load(match[1]),match[2]
@@ -112,6 +136,11 @@ def render_one(cfg,sources,dist,edition,formats):
             break
     for a in soup.find_all('a'):
         if re.fullmatch(r'S\d{2,3}',a.get_text()):a['class']=['source-ref']
+        href=a.get('href','')
+        if href.startswith('../docs/glossary.md#'):
+            a['href']='#glossary-'+href.split('#',1)[1]
+        elif href == '../docs/glossary.md' and definitions:
+            a['href']='#glossary'
     # SVGs add a second visual way in, without removing the adjacent MD table.
     for comment in list(soup.find_all(string=lambda t:isinstance(t,Comment))):
         m=re.search(r'figure:\s*([\w-]+)',str(comment))
@@ -144,6 +173,14 @@ def render_one(cfg,sources,dist,edition,formats):
             header.append(strip);header.append(tag(content,'h2',{},title));section.append(header)
         else:section.append(node.extract())
     used=sorted(set(re.findall(r'\[(S\d{2,3})\]',corebody)))
+    if definitions:
+        glossary=tag(content,'section',{'class':'chapter','id':'glossary'})
+        glossary.append(tag(content,'h2',text='术语小词表'))
+        for key,label,definition in definitions:
+            glossary.append(tag(content,'h3',{'id':'glossary-'+key},label))
+            rendered=BeautifulSoup(MarkdownIt('commonmark').render(definition),'html.parser')
+            glossary.append(rendered.p)
+        main.append(glossary)
     bibliography=tag(content,'section',{'class':'sources','id':'sources'})
     bibliography.append(tag(content,'h2',{},'来源索引'))
     bibliography.append(tag(content,'p',{'class':'source-note'},'本版沿用来源记录中的核验日期与范围；重新构建不代表重新核验。资料核验不等于账户或模型实测。'))
@@ -173,6 +210,7 @@ def render_one(cfg,sources,dist,edition,formats):
     toc='<nav class="toc" id="contents" aria-label="目录"><div class="eyebrow">CONTENTS / READING PATH</div><h2>从这里翻开</h2><p class="toc-intro">'+cfg['toc']+'</p><ol>'
     for ident,title,number in heads:
         toc+=f'<li><a href="#{ident}"><span class="toc-no">{number}</span>{html.escape(title)}</a></li>'
+    if definitions:toc+='<li><a href="#glossary"><span class="toc-no">G</span>术语小词表</a></li>'
     toc+='<li><a href="#sources"><span class="toc-no">S</span>来源索引与署名</a></li></ol><p class="toc-foot">来源编号可点击。开放状态与生效日期按资料截止日记录；实施代码与详细状态约束另放仓库的技术参考。</p></nav>'
     css=(ROOT/'styles/report.css').read_text()
     final=f'''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(meta['title'])} · Faye &amp; Cove</title><meta name="author" content="Faye &amp; Cove"><meta name="description" content="{html.escape(meta['subtitle'])}"><style>{css}</style></head><body class="{cfg['kind']}"><div class="document-name">{cfg['short']}</div>{cover}<div class="screen-nav"><b>{cfg['short']}</b><span><a href="#contents">目录</a><a href="#sources">来源</a><a href="{cfg['partner']}">相关读物</a></span></div>{toc}{content}</body></html>'''

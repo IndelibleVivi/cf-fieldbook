@@ -4,7 +4,7 @@
 
 ## 本地环境
 
-Python 3.11+ 用于维护与出版，Node.js 20+ 用于 health Worker 的离线测试。创建项目内虚拟环境，避免修改系统 Python：
+Python 3.11+ 用于维护与出版，Node.js 20+ 用于 health Worker 和阅读交互的离线测试。创建项目内虚拟环境，避免修改系统 Python：
 
 ```sh
 python3 -m venv .venv
@@ -36,9 +36,12 @@ python3 tools/check.py
 python3 tools/content.py check
 .venv/bin/python -m unittest discover -s tests -v
 node --test examples/health-worker/worker.test.mjs
+node --test tests/*.test.cjs
 ```
 
-这些检查默认不登录、不调用模型、不创建云资源。页面变化后看桌面与手机真实渲染；图示变化后查看 SVG；出版变更按 [出版流程](docs/publication.md) 检查冻结版次。
+这些检查默认不登录、不调用模型 API、不创建云资源。搜索回归使用实际生成的小节索引，构建后运行 `node --test tests/*.test.cjs`；页面变化后看桌面与手机真实渲染、真实问法跳转、释义的 Escape／焦点返回和无 JavaScript 阅读。恢复演示还要验证场景切换、时间、播放与重置。图示变化后查看 SVG；出版变更按 [出版流程](docs/publication.md) 检查冻结版次。
+
+词条定义只改 `docs/glossary.md` 的对应首段，网页与冻结版次自行读取。恢复演示数据由 `tools/recovery_demo.py` 调用现有 `Jobs` 模型生成；不要在 JavaScript 或说明文字里另写一份状态判断。读者可以直接使用[离线恢复工单](templates/job-recovery-task.md)。入口路线与任务状态的手机图由 `python3 tools/figures.py` 同源生成，改后同时复看横版与窄版。
 
 ## 提交内容与证据
 

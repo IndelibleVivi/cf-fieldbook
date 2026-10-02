@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 # Explicit input owners; not .env, private state, old output, dependencies or git metadata.
 INPUT_DIRS = ('reports', 'guides', 'comparisons', 'services', 'use-cases', 'reference',
               'catalog', 'examples', 'assets', 'styles', 'tools', 'diagrams')
+READER_DEPENDENCIES = ('docs/glossary.md', 'templates/job-recovery-task.md')
 SUFFIXES = {'.md', '.json', '.mjs', '.js', '.py', '.svg', '.css', '.mmd'}
 FORMATS = {'md', 'html', 'pdf'}
 
@@ -35,7 +36,8 @@ def location(root: Path, ident: str) -> Path:
 
 
 def included(root: Path) -> list[Path]:
-    files = [root / name for name in ('package.json', 'package-lock.json', 'requirements-render.txt')]
+    files = [root / name for name in ('package.json', 'package-lock.json', 'requirements-render.txt',
+                                     *READER_DEPENDENCIES)]
     for name in INPUT_DIRS:
         for path in sorted((root / name).rglob('*')):
             if path.is_file() and path.suffix in SUFFIXES and '__pycache__' not in path.parts:

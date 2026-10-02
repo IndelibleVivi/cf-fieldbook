@@ -5,6 +5,8 @@ import shutil
 import sys
 import tempfile
 import unittest
+from urllib.parse import unquote
+from bs4 import BeautifulSoup
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'tools'))
@@ -93,6 +95,27 @@ class PublicationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'inventory changed'):
             editions.build(self.root, 'cache-check', ['html'])
         self.assertFalse((target / 'outputs').exists())
+
+    def test_glossary_is_frozen_and_embedded_in_portable_reading_outputs(self):
+        target = editions.freeze(self.root, 'glossary-test')
+        self.assertTrue((target / 'inputs/docs/glossary.md').is_file())
+        self.assertTrue((target / 'inputs/templates/job-recovery-task.md').is_file())
+        (self.root / 'docs/glossary.md').write_text('LIVE_GLOSSARY_SENTINEL')
+        output = editions.build(self.root, 'glossary-test', ['md', 'html'])
+        html = next(output.glob('cf-practical*.html')).read_text()
+        md = next(output.glob('cf-practical*.md')).read_text()
+        soup = BeautifulSoup(html, 'html.parser')
+        glossary_links = [unquote(a['href'])[1:] for a in soup.select('a[href^="#glossary-"]')]
+        self.assertIn('glossary-binding--资源绑定', glossary_links)
+        for ident in glossary_links:
+            self.assertIsNotNone(soup.find(id=ident), ident)
+        self.assertIn('它决定程序能访问什么资源', html)
+        self.assertIn('](#binding--资源绑定)', md)
+        self.assertIn('### binding / 资源绑定', md)
+        self.assertIn('](#术语小词表)', md)
+        self.assertIsNotNone(soup.find(id='glossary'))
+        self.assertNotIn('LIVE_GLOSSARY_SENTINEL', html + md)
+        self.assertNotIn('../docs/glossary.md', html + md)
 
     def test_duplicate_or_mutated_edition_is_rejected(self):
         with self.assertRaises(ValueError):

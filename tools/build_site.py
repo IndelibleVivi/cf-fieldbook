@@ -15,7 +15,7 @@ import shutil
 from urllib.parse import quote, unquote, urlsplit, urlunsplit
 from xml.etree import ElementTree
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString
 from markdown_it import MarkdownIt
 import yaml
 
@@ -25,9 +25,22 @@ ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_DOCS = (
     'README.md', 'CHANGELOG.md', 'SPEC.md', 'CONTRIBUTING.md', 'LICENSE-STATUS.md', 'LICENSE-DOCUMENTATION.md', 'docs/architecture.md',
     'docs/lifecycle.md', 'docs/publication.md', 'docs/content-design.md',
-    'docs/migration-r3.md', 'docs/current-state.md', 'docs/reading-site.md', 'docs/provenance.md', 'examples/README.md',
-    'diagrams/README.md', 'templates/practice-example.md', 'templates/release-card.md',
+    'docs/migration-r3.md', 'docs/current-state.md', 'docs/reading-site.md', 'docs/provenance.md', 'docs/glossary.md', 'examples/README.md',
+    'diagrams/README.md', 'templates/practice-example.md', 'templates/release-card.md', 'templates/job-recovery-task.md',
 )
+PUBLIC_REPOSITORY_PATHS = {
+    'AGENTS.md', '.github/workflows/check.yml', 'requirements-render.txt', 'requirements-design.txt',
+    'package.json', 'package-lock.json',
+    *(f'tools/{name}.py' for name in ('build_site', 'content', 'editions', 'render', 'figures', 'fieldbook', 'check', 'render_diagrams', 'recovery_demo')),
+    *(f'tests/{name}.py' for name in ('test_examples', 'test_fieldbook', 'test_job_recovery', 'test_decision_example', 'test_site', 'test_publication')),
+    'tests/site-search.test.cjs',
+}
+REPOSITORY_URL = 'https://github.com/IndelibleVivi/cf-fieldbook/blob/main/'
+PUBLIC_SITE_URL = 'https://indeliblevivi.github.io/cf-fieldbook/'
+SITE_ASSETS = {'styles/site.css', 'styles/site.js', 'styles/search.js', 'assets/motifs/cat-sunrise.svg',
+               'assets/motifs/edge-route.svg', 'assets/motifs/favicon.svg'}
+LINK_LABELS = {'internal': '站内阅读', 'term': '词义，可就地展开或打开词表', 'repository': '本项目公开源码，前往 GitHub',
+               'source': '外部来源，离开本站', 'attachment': '附件；下载或打开文件'}
 READER_PREFIXES = {'services', 'comparisons', 'use-cases', 'guides', 'reference', 'reports', 'examples'}
 EXAMPLE_FILES = {
     'decision-routing': ('payloads.py', 'example.meta.json'),
@@ -113,7 +126,49 @@ class Site:
         self.texts = {p: self.page_markdown(p) for p in self.paths}
         self.titles = {p: source_title(t, p) for p, t in self.texts.items()}
         self.search = []
+        self.directory_items = []
         self.md = MarkdownIt('commonmark', {'html': False}).enable('table')
+        self.terms = self.glossary_terms()
+
+    def demo_available(self) -> bool:
+        return self.entries.get('examples/job-state/README.md', {}).get('status') == 'current'
+
+    def glossary_terms(self) -> dict:
+        if 'docs/glossary.md' not in self.texts:
+            return {}
+        soup = BeautifulSoup(self.md.render(split_frontmatter(self.texts['docs/glossary.md'])[1]), 'html.parser')
+        terms = {}
+        for heading in soup.find_all('h2'):
+            paragraph = heading.find_next_sibling()
+            if paragraph and paragraph.name == 'p':
+                terms[heading_id(heading.get_text())] = {'title': heading.get_text(), 'definition': paragraph.get_text(' ', strip=True)}
+        return terms
+
+    def index_content(self, soup: BeautifulSoup, page: str, title: str, kind: str, status: str = 'current') -> None:
+        """Index each h2/h3's own body, with its parent heading as context."""
+        if status == 'withdrawn':
+            return
+        clean = BeautifulSoup(str(soup), 'html.parser')
+        for node in clean.select('script, .heading-link'):
+            node.decompose()
+        section, parent, chunks = '', '', []
+        anchor = ''
+        def emit():
+            text = ' '.join(chunks).strip()
+            if text or section:
+                self.search.append({'title': title, 'section': section, 'context': parent,
+                                    'url': page + ('#' + quote(anchor, safe='-') if anchor else ''),
+                                    'kind': kind, 'status': status, 'text': text})
+        for node in clean.descendants:
+            if getattr(node, 'name', None) in {'h2', 'h3'}:
+                emit()
+                section, anchor = node.get_text(' ', strip=True), node.get('id', '')
+                if node.name == 'h2':
+                    parent = section
+                chunks = []
+            elif isinstance(node, NavigableString) and not node.find_parent(['h2', 'h3', 'script', 'button', 'select', 'nav']):
+                chunks.append(str(node).strip())
+        emit()
 
     def select_attachments(self) -> set[str]:
         selected = {'LICENSE', 'catalog/sources.json', 'catalog/launches.json', 'catalog/decision-routes.json',
@@ -121,6 +176,7 @@ class Site:
         for diagram in self.diagrams:
             selected.update((diagram['source'], diagram['output']))
         selected.update(f'assets/{key}.svg' for key in FIGCAP)
+        selected.update(('assets/two-routes-mobile.svg', 'assets/task-state-mobile.svg'))
         for name, filenames in EXAMPLE_FILES.items():
             path = f'examples/{name}/README.md'
             # Executable bytes are distributed only for catalog-current examples.
@@ -166,29 +222,59 @@ class Site:
         return '<nav class="global-nav" aria-label="全站导航">' + ''.join(
             f'<a href="{escape(self.url(page, href))}">{label}</a>' for href, label in items) + '</nav>'
 
-    def frame(self, page: str, title: str, body: str, css_class: str = '') -> str:
+    def frame(self, page: str, title: str, body: str, css_class: str = '', *, extra_styles: tuple = (), extra_scripts: tuple = ()) -> str:
         u = lambda target: escape(self.url(page, target))
         canonical = self.canonical(page)
         canonical_tag = f'<link rel="canonical" href="{escape(canonical)}">' if canonical else ''
         source_path = str(Path(page).with_suffix('.md'))
         noindex = not self.base_url or page == '404.html' or self.entries.get(source_path, {}).get('status') == 'withdrawn'
         robots_tag = '<meta name="robots" content="noindex">' if noindex else ''
-        return f'''<!doctype html>
+        extras = ''.join(f'<link rel="stylesheet" href="{u(p)}">' for p in extra_styles)
+        extras += ''.join(f'<script defer src="{u(p)}"></script>' for p in extra_scripts)
+        legend = '<details class="link-legend"><summary>链接图例</summary><ul>' + ''.join(
+            f'<li id="link-{kind}"><span class="link-symbol" data-link-kind="{kind}"></span>{label}</li>' for kind, label in LINK_LABELS.items()) + '</ul></details>'
+        term_data = json.dumps(self.terms, ensure_ascii=False).replace('<', '\\u003c')
+        dialog = f'''<dialog id="term-dialog" aria-labelledby="term-title"><div class="term-dialog-head"><p class="eyebrow">术语 / FIELD NOTES</p><button type="button" id="term-close" aria-label="关闭词义">关闭 ×</button></div><h2 id="term-title"></h2><p id="term-definition"></p><a id="term-full-link" href="{u('docs/glossary.html')}">在词表中继续阅读</a></dialog><script id="term-data" type="application/json">{term_data}</script>''' if self.terms else ''
+        document = f'''<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{escape(title)} · CF Fieldbook</title><meta name="author" content="Faye &amp; Cove">
 <meta name="description" content="CF Fieldbook 是 Faye &amp; Cove 的独立参考资料：从用途理解服务，比较路线，阅读可以检查的实践与来源。">
 {canonical_tag}{robots_tag}<link rel="icon" href="{u('assets/motifs/favicon.svg')}" type="image/svg+xml">
-<link rel="stylesheet" href="{u('styles/site.css')}"><script defer src="{u('styles/site.js')}"></script></head>
+<link rel="stylesheet" href="{u('styles/site.css')}">{extras}<script defer src="{u('styles/site.js')}"></script></head>
 <body class="{css_class}"><a class="skip-link" href="#main">跳到正文</a>
 <header class="site-header"><a class="wordmark" href="{u('index.html')}"><strong>CF Fieldbook<span class="wordmark-dot">.</span></strong><span>用途 · 选择 · 实践</span></a>{self.nav(page)}</header>
+<div class="reading-legend">{legend}</div>
 {body}
-<footer class="site-footer"><img src="{u('assets/motifs/cat-sunrise.svg')}" width="96" height="64" alt="" aria-hidden="true"><div><p>Faye &amp; Cove 的独立参考 · 非 Cloudflare 官方出版物，未获 Cloudflare 背书。</p><p><a href="https://github.com/IndelibleVivi">https://github.com/IndelibleVivi</a> · <a href="{u('LICENSE-STATUS.html')}">许可状态</a></p><p class="trademark">Cloudflare® 是 Cloudflare, Inc. 的注册商标。</p><p class="signature">made by Faye &amp; Cove</p></div><a class="back-top" href="#main">回到页首 ↑</a></footer></body></html>'''
+{dialog}<footer class="site-footer"><img src="{u('assets/motifs/cat-sunrise.svg')}" width="96" height="64" alt="" aria-hidden="true"><div><p>Faye &amp; Cove 的独立参考 · 非 Cloudflare 官方出版物，未获 Cloudflare 背书。</p><p><a href="https://github.com/IndelibleVivi">https://github.com/IndelibleVivi</a> · <a href="{u('LICENSE-STATUS.html')}">许可状态</a></p><p class="trademark">Cloudflare® 是 Cloudflare, Inc. 的注册商标。</p><p class="signature">made by Faye &amp; Cove</p></div><a class="back-top" href="#main">回到页首 ↑</a></footer></body></html>'''
+        soup = BeautifulSoup(document, 'html.parser')
+        for link in soup.find_all('a', href=True):
+            href = link['href']
+            parsed = urlsplit(href)
+            if link.get('download') is not None or (not parsed.scheme and parsed.path and Path(parsed.path).suffix not in {'.html', ''}):
+                kind = 'attachment'
+            elif href.startswith(REPOSITORY_URL) or href.startswith('https://github.com/IndelibleVivi/cf-fieldbook/'):
+                kind = 'repository'
+            elif parsed.scheme or parsed.netloc:
+                kind = 'source'
+            elif parsed.path.endswith('docs/glossary.html') and unquote(parsed.fragment) in self.terms:
+                kind = 'term'
+                link['data-term'] = unquote(parsed.fragment)
+            else:
+                kind = 'internal'
+            link['data-link-kind'] = kind
+            link['aria-describedby'] = 'link-' + kind
+            if kind == 'attachment':
+                link['data-attachment-action'] = 'download' if link.has_attr('download') else 'open'
+        return str(soup)
 
-    def rewrite(self, soup: BeautifulSoup, path: str) -> None:
+    def rewrite(self, soup: BeautifulSoup, path: str, *, figures: bool = True) -> None:
         page = str(Path(path).with_suffix('.html'))
         for node in soup.find_all(['a', 'img']):
             key = 'href' if node.name == 'a' else 'src'
             value = node.get(key, '')
+            # Links authored for the published reader also work offline and respect lifecycle.
+            if node.name == 'a' and value.startswith(PUBLIC_SITE_URL):
+                value = relative_url(path, value[len(PUBLIC_SITE_URL):] or 'index.html')
             parsed = urlsplit(value)
             if parsed.scheme or parsed.netloc or value.startswith('#'):
                 if node.name == 'img' and (parsed.scheme or parsed.netloc):
@@ -201,10 +287,15 @@ class Site:
             if not target.is_relative_to(self.root):
                 raise ValueError(f'Link escapes repository: {path}: {value}')
             rel = target.relative_to(self.root).as_posix()
-            if rel in self.paths:
-                node[key] = self.url(page, str(Path(rel).with_suffix('.html'))) + (f'#{parsed.fragment}' if parsed.fragment else '')
-            elif rel in self.attachments:
+            markdown_target = str(Path(rel).with_suffix('.md')) if rel.endswith('.html') else rel
+            if rel in {'index.html', 'directory.html', 'products.html', 'sources.html'} or (rel == 'examples/job-state/demo.html' and self.demo_available()):
                 node[key] = self.url(page, rel) + (f'#{parsed.fragment}' if parsed.fragment else '')
+            elif markdown_target in self.paths:
+                node[key] = self.url(page, str(Path(markdown_target).with_suffix('.html'))) + (f'#{parsed.fragment}' if parsed.fragment else '')
+            elif rel in self.attachments or rel in SITE_ASSETS:
+                node[key] = self.url(page, rel) + (f'#{parsed.fragment}' if parsed.fragment else '')
+            elif node.name == 'a' and rel in PUBLIC_REPOSITORY_PATHS:
+                node[key] = REPOSITORY_URL + quote(rel, safe='/') + (f'#{parsed.fragment}' if parsed.fragment else '')
             elif node.name == 'img':
                 raise ValueError(f'Image is outside public allowlist: {path}: {value}')
             else:
@@ -215,6 +306,8 @@ class Site:
         for table in list(soup.find_all('table')):
             wrapper = soup.new_tag('div', attrs={'class': 'table-scroll', 'tabindex': '0', 'aria-label': '可横向滚动的表格'})
             table.wrap(wrapper)
+        if not figures:
+            return
         for img in list(soup.find_all('img')):
             if img.parent.name == 'p' and len(img.parent.contents) == 1:
                 img.parent.unwrap()
@@ -222,6 +315,14 @@ class Site:
             scroll = soup.new_tag('div', attrs={'class': 'diagram-scroll', 'tabindex': '0', 'aria-label': '可横向滚动的图示'})
             img.wrap(scroll)
             scroll.wrap(figure)
+            original = str(img['src'])
+            basename = Path(urlsplit(original).path).stem
+            mobile_path = f'assets/{basename}-mobile.svg'
+            if basename in {'two-routes', 'task-state'} and mobile_path in self.attachments:
+                picture = soup.new_tag('picture', attrs={'class': 'responsive-figure'})
+                img.wrap(picture)
+                source = soup.new_tag('source', attrs={'media': '(max-width: 1100px)', 'srcset': self.url(page, mobile_path)})
+                picture.insert(0, source)
             if '/diagrams/' in str(img['src']):
                 img['class'] = ['technical-diagram']
                 # The generated viewBox sets a readable per-diagram display width.
@@ -236,6 +337,11 @@ class Site:
             link = soup.new_tag('a', href=img['src'])
             link.string = '打开全尺寸 SVG'
             caption.append(link)
+            if basename in {'two-routes', 'task-state'} and mobile_path in self.attachments:
+                caption.append(' · ')
+                mobile_link = soup.new_tag('a', href=self.url(page, mobile_path), attrs={'class': 'mobile-figure-link'})
+                mobile_link.string = '打开纵版 SVG'
+                caption.append(mobile_link)
             figure.append(caption)
 
     def render_content(self, path: str) -> tuple[str, list[tuple[str, str]], str]:
@@ -254,6 +360,22 @@ class Site:
         for ident in sorted(missing):
             body += f'\n[{ident}]: {source_by_id[ident]["url"]}\n'
         soup = BeautifulSoup(self.md.render(body), 'html.parser')
+        # Only the authored question/answer prefix pair is enhanced; arbitrary HTML stays disabled.
+        for block in soup.find_all('blockquote'):
+            paragraphs = block.find_all('p', recursive=False)
+            if not paragraphs or not paragraphs[0].find('strong') or not paragraphs[0].strong.get_text().startswith('想一想：'):
+                continue
+            answer = next((p for p in paragraphs[1:] if p.find('strong') and p.strong.get_text().startswith('答案：')), None)
+            if answer:
+                block['class'] = ['understanding-question']
+                details = soup.new_tag('details', attrs={'class': 'understanding-answer'})
+                summary = soup.new_tag('summary')
+                summary.string = '展开答案与解释'
+                details.append(summary)
+                answer_nodes = [answer, *list(answer.next_siblings)]
+                for node in answer_nodes:
+                    details.append(node.extract())
+                block.append(details)
         h1 = soup.find('h1')
         if h1:
             h1.decompose()
@@ -293,7 +415,7 @@ class Site:
             status = '历史报告 · ' + Path(path).stem + ' 资料快照'
         text = f"{status} · 记录核验日期 {review.get('checked_on', '未登记')}"
         scope = review.get('scope', '未登记核验范围')
-        return f'<aside class="evidence-note"><strong>{escape(text)}</strong><p>{escape(scope)}。来源记录的日期与范围适用于本文；来源核对不等于账户或云端实测。</p></aside>'
+        return f'<details class="evidence-note"><summary>{escape(text)} · 核验范围</summary><p>{escape(scope)}。来源记录的日期与范围适用于本文；来源核对不等于账户或云端实测。</p></details>'
 
     def reader(self, path: str) -> str:
         page = str(Path(path).with_suffix('.html'))
@@ -305,10 +427,12 @@ class Site:
         files = ''
         if entry.get('kind') == 'example' and entry.get('status') == 'current':
             related = sorted(p for p in self.attachments if Path(p).parent == Path(path).parent)
-            files = '<section class="example-downloads"><h2>例子附件</h2><p>在自己的本地环境检查；本站没有运行或部署入口。</p><ul>' + ''.join(
+            demo_link = '<p><a href="demo.html">逐步观察：任务恢复演示 →</a>（离线模型事件回放）</p>' if path == 'examples/job-state/README.md' and self.demo_available() else ''
+            files = '<section class="example-downloads"><h2>例子附件</h2>' + demo_link + '<p>在自己的本地环境检查；本站不调用云端服务或部署例子。</p><ul>' + ''.join(
                 f'<li><a download href="{escape(self.url(page, p))}">{escape(Path(p).name)} ↓</a></li>' for p in related) + '</ul></section>'
-        self.search.append({'title': self.titles[path], 'url': page, 'kind': kind,
-                            'text': plain, 'status': entry.get('status', 'current')})
+        status = entry.get('status', 'current')
+        self.directory_items.append({'title': self.titles[path], 'url': page, 'kind': kind, 'status': status})
+        self.index_content(BeautifulSoup(content, 'html.parser'), page, self.titles[path], kind, status)
         body = f'''<main id="main" class="reader-layout"><aside class="contents"><a class="contents-home" href="{escape(self.url(page, 'directory.html'))}">← 全部资料</a><details open><summary>本页目录</summary><ol>{toc}</ol></details><div class="reader-tools">{download}<a href="{escape(self.url(page, 'sources.html'))}">查阅来源索引 ↗</a></div></aside>
 <article class="article"><header class="article-header"><p class="eyebrow">CF FIELDBOOK / {escape(kind)}</p><h1>{escape(self.titles[path])}</h1>{self.notice(path)}</header><div class="prose">{content}{files}</div><div class="reading-end"><a href="{escape(self.url(page, 'directory.html'))}">继续阅读：全部资料 →</a></div></article></main>'''
         return self.frame(page, self.titles[path], body, 'reader-page')
@@ -339,6 +463,8 @@ class Site:
 <section class="product-spread" aria-labelledby="products-heading"><div class="section-intro"><p class="eyebrow">PRODUCTS / READING PATHS</p><h2 id="products-heading">一个服务，<br>放在什么位置？</h2><p>入口、运行、数据与恢复，各回答不同的问题。沿着一条路径读，不必一次组合所有服务。</p><img class="edge-detail" src="assets/motifs/edge-route.svg" width="360" height="220" alt="" aria-hidden="true"></div><div><ul class="product-links">{self.product_links(compact=True)}</ul><a class="all-products" href="products.html">打开服务阅读索引 →</a></div></section>
 <section class="shelf"><div><p class="eyebrow">READ · INSPECT · TAKE AWAY</p><h2>沿着解释，找到依据。</h2><p>读懂一个做法，再看完整代码与来源。<br>也可以带走 Markdown 和离线例子。</p></div><ul><li><a href="directory.html">全部资料与内容搜索 <span>→</span></a></li><li><a href="examples/README.html">三个离线例子 <span>→</span></a></li><li><a href="{escape(self.reading_url('reference/implementation.html'))}">实施参考：代码与恢复语义 <span>→</span></a></li><li><a href="diagrams/README.html">五张图：架构与资料生命周期 <span>→</span></a></li><li><a href="sources.html">来源与核验范围 <span>→</span></a></li></ul></section>
 <section class="edition-strip"><p class="eyebrow">DATES &amp; SOURCES</p><p>服务解释持续维护；报告保留各自日期。价格、开放条件和接口限制请结合正文的核验范围与来源阅读。</p><a href="sources.html">查阅来源索引 →</a></section></main>'''
+        if self.demo_available():
+            body = body.replace('<li><a href="examples/README.html">', '<li><a href="examples/job-state/demo.html">逐步观察任务恢复 <span>→</span></a></li><li><a href="examples/README.html">')
         return self.frame('index.html', '用途、选择与实践的持续参考', body, 'home-page')
 
     def products_page(self) -> str:
@@ -348,8 +474,25 @@ class Site:
         introduction = '<p>从入口到数据，从一次请求到可以恢复的任务。<br>这些阅读路径来自实践手册；选择与限制在相应章节展开。</p>' if readings else ''
         body = f'''<main id="main" class="products-page"><header class="page-title product-title"><div><p class="eyebrow">PRODUCT READING PATHS</p><h1>按问题，认识服务。</h1>{introduction}</div><img src="assets/motifs/edge-route.svg" width="360" height="220" alt="" aria-hidden="true"></header><div class="product-readings">{readings or unavailable}</div><div class="reading-end">{continuation}<a href="directory.html">全部资料与搜索 →</a></div></main>'''
         self.search.append({'title': '认识 Cloudflare 服务：产品阅读索引', 'url': 'products.html', 'kind': '服务',
-                            'text': ' '.join(' '.join(str(v) for v in row[:3]) for row in PRODUCT_READING) if readings else '服务阅读路径暂时不可用。请查阅其他资料。', 'status': 'current'})
+                            'section': '', 'context': '', 'text': ' '.join(' '.join(str(v) for v in row[:3]) for row in PRODUCT_READING) if readings else '服务阅读路径暂时不可用。请查阅其他资料。', 'status': 'current'})
+        self.directory_items.append({'title': '按问题认识服务', 'url': 'products.html', 'kind': '服务', 'status': 'current'})
         return self.frame('products.html', '按问题认识 Cloudflare 服务', body)
+
+    def recovery_demo(self) -> str:
+        from recovery_demo import page_body
+        page = 'examples/job-state/demo.html'
+        soup = BeautifulSoup(page_body(self.root), 'html.parser')
+        for heading in soup.find_all(['h2', 'h3']):
+            heading['id'] = heading.get('id') or heading_id(heading.get_text())
+        for main in soup.find_all('main'):
+            main.unwrap()
+        # The fragment contains authored relative links; apply the same public boundary.
+        self.rewrite(soup, page, figures=False)
+        searchable = soup.select_one('.recovery-page') or soup
+        self.index_content(searchable, page, '任务恢复演示', '例子')
+        self.directory_items.append({'title': '逐步观察：任务恢复演示', 'url': page, 'kind': '例子', 'status': 'current'})
+        return self.frame(page, '逐步观察任务恢复', '<main id="main">' + str(soup) + '</main>',
+                          'recovery-demo-page', extra_styles=('styles/recovery.css',), extra_scripts=('styles/recovery.js',))
 
     def not_found(self) -> str:
         u = lambda target: escape(self.url('404.html', target))
@@ -360,13 +503,13 @@ class Site:
         groups = []
         labels = ['用途', '手册', '服务', '比较', '实施参考', '例子', '带日期报告', '资料维护']
         for label in labels:
-            items = [item for item in self.search if item['kind'] == label]
+            items = [item for item in self.directory_items if item['kind'] == label]
             if items:
                 groups.append(f'<section class="directory-group"><h2>{label}</h2><ul>' + ''.join(
                     f'<li class="directory-item"><a href="{escape(item["url"])}">{escape(item["title"])}</a><span>{escape(STATUS_LABELS[item["status"]])}</span></li>' for item in items) + '</ul></section>')
         data = json.dumps(self.search, ensure_ascii=False).replace('<', '\\u003c')
         body = f'''<main id="main" class="directory"><header class="page-title"><p class="eyebrow">THE READING INDEX</p><h1>全部资料</h1><p>从一个词继续找，或按下面的阅读目录翻开。搜索只在你的浏览器内处理。</p></header><section class="search-box"><label for="search-input">搜索正文与标题</label><input id="search-input" type="search" placeholder="例如：任务、费用、Clef、租约" disabled><p id="search-status" role="status">启用 JavaScript 后可搜索；完整目录始终可读。</p><ol id="search-results" hidden></ol></section><div id="reading-directory">{''.join(groups)}</div><script id="search-data" type="application/json">{data}</script></main>'''
-        return self.frame('directory.html', '全部资料与搜索', body)
+        return self.frame('directory.html', '全部资料与搜索', body, extra_scripts=('styles/search.js',))
 
     def sources_page(self) -> str:
         rows = ''.join(f'<li id="{escape(s["id"])}"><span class="source-id">{escape(s["id"])}</span><div><a href="{escape(s["url"])}">{escape(s["title"])}</a><p>记录查阅日期 {escape(s.get("accessed", "未登记"))} · <code>{escape(s.get("verification_scope", "未登记"))}</code></p></div></li>' for s in self.sources)
@@ -378,18 +521,26 @@ class Site:
         def link(match):
             prefix, label, value = match.groups()
             parsed = urlsplit(value)
+            if value.startswith(PUBLIC_SITE_URL):
+                rel = urlsplit(value[len(PUBLIC_SITE_URL):]).path
+                if rel == 'examples/job-state/demo.html':
+                    return f'{prefix}[{label}]({relative_url(path, rel)})' if self.demo_available() else f'{label}（演示已停止分发）'
             if parsed.scheme or value.startswith('#'):
                 return match[0]
             target = (self.root / Path(path).parent / unquote(parsed.path)).resolve()
             if not target.is_relative_to(self.root):
                 raise ValueError(f'Link escapes repository: {path}: {value}')
             rel = target.relative_to(self.root).as_posix()
+            if rel == 'examples/job-state/demo.html' and self.demo_available():
+                return match[0]
             if rel in self.paths:
                 if self.entries.get(rel, {}).get('status') == 'withdrawn':
                     return f'{prefix}[{label}]({Path(parsed.path).with_suffix(".html")})'
                 return match[0]
             if rel in self.attachments:
                 return match[0]
+            if rel in PUBLIC_REPOSITORY_PATHS:
+                return f'{prefix}[{label}]({REPOSITORY_URL}{quote(rel, safe="/")})'
             return f'{label}（仓库文件，未随阅读站分发）'
         return re.sub(r'(!?)\[([^\]]+)\]\(([^)]+)\)', link, self.texts[path])
 
@@ -428,14 +579,21 @@ class Site:
                 self.write(path, self.download_markdown(path))
         self.write('index.html', self.home())
         self.write('products.html', self.products_page())
+        demo_pages = []
+        demo_assets = set()
+        if self.demo_available():
+            self.write('examples/job-state/demo.html', self.recovery_demo())
+            demo_pages = ['examples/job-state/demo.html']
+            demo_assets = {'styles/recovery.css', 'styles/recovery.js'}
         self.write('directory.html', self.directory())
+        self.write('search-index.json', json.dumps(self.search, ensure_ascii=False, indent=2) + '\n')
         self.write('sources.html', self.sources_page())
         self.write('404.html', self.not_found())
-        for path in sorted(self.attachments | {'styles/site.css', 'styles/site.js', 'assets/motifs/cat-sunrise.svg', 'assets/motifs/edge-route.svg', 'assets/motifs/favicon.svg'}):
+        for path in sorted(self.attachments | demo_assets | SITE_ASSETS):
             target = self.output / path
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(self.root / path, target)
-        html_pages = [str(Path(path).with_suffix('.html')) for path in self.paths] + ['index.html', 'products.html', 'directory.html', 'sources.html', '404.html']
+        html_pages = [str(Path(path).with_suffix('.html')) for path in self.paths] + demo_pages + ['index.html', 'products.html', 'directory.html', 'sources.html', '404.html']
         self.write_discovery(html_pages)
         manifest = {'schema': 'fieldbook.reading-site/1', 'state': 'static-build', 'base_url': self.base_url,
                     'pages': self.paths, 'html_pages': html_pages, 'attachments': sorted(self.attachments),

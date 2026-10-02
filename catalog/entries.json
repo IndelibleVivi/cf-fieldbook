@@ -1,6 +1,5 @@
 {
   "schema": "fieldbook.entries/1",
-  "publication_state": "local-candidate",
   "entries": [
     {
       "id": "data.sources",

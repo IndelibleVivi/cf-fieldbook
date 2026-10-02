@@ -10,16 +10,20 @@
 
 ## 从这里读
 
-| 阅读方向 | 入口 |
-|---|---|
-| 从一个用途开始 | [有限决策与下一步动作](use-cases/bounded-decision.md) · [任务中断与恢复](use-cases/recoverable-jobs.md) |
-| 认识一项服务 | [决策模型：Clef 与 Jev](services/decision-models.md) |
-| 本期变化 | [2026-10-02 新发布观察](reports/2026-10-02.md) |
-| 连起来理解基础设施 | [个人基础设施实践手册](guides/handbook.md) |
-| 比较模型与接入入口 | [Clef / Jev 专题](comparisons/clef-vs-jev.md) |
-| 查看代码与精确命令 | [三个离线例子](examples/README.md) · [实施参考](reference/implementation.md) |
+| 我现在想做什么 | 从这里开始 | 读完或运行后得到什么 |
+|---|---|---|
+| 给网页、API 或已有服务选入口 | [个人基础设施实践手册](guides/handbook.md) | 画清请求、身份、程序与数据的路径，再选择需要的服务 |
+| 理解任务为什么登记了却没完成 | [任务中断与恢复](use-cases/recoverable-jobs.md) | 看见租约恢复、迟到拒绝与未知结果，知道哪些动作不能盲目重试 |
+| 让模型建议下一步，而由程序控制执行 | [有限决策与下一步动作](use-cases/bounded-decision.md) | 区分模型建议、允许的动作与需要检验的误判 |
+| 比较 Clef、Jev 与接入路线 | [服务页](services/decision-models.md) · [Clef / Jev 专题](comparisons/clef-vs-jev.md) | 在同一任务下比较模型与供应路径，不把价格当作正确率 |
+| 判断本期产品变化是否影响自己 | [2026-10-02 新发布观察](reports/2026-10-02.md) | 找到带日期的变化、适用条件与原始来源 |
+| 运行例子，或把检查交给 agent | [三个离线例子](examples/README.md) · [恢复任务单](templates/job-recovery-task.md) | 用合成输入取得实际输出、失败证据与清理结果 |
+
+不熟悉的词可以先查[术语小词表](docs/glossary.md)。需要精确配置、命令或完整状态约束时，从对应例子进入[实施参考](reference/implementation.md)；阅读资料本身不授权账户操作。
 
 ## 先运行一个真实机制
+
+**[先体验任务恢复模拟 →](https://indeliblevivi.github.io/cf-fieldbook/examples/job-state/demo.html)** 在浏览器选择合成情景、推进或回放时间，观察领取代次、租约和任务状态的变化。它是静态阅读站上的交互教学，不连接云服务。
 
 只需 Python 3.11+，不登录、不联网、不调用模型：
 
@@ -28,6 +32,8 @@ python3 examples/job-state/demo.py
 ```
 
 演示会打印：任务登记后仍是 `pending`；worker 退出后，新的执行者等待租约到期再领取；旧 generation 的迟到完成被拒绝；外部响应丢失后进入 `uncertain`，重复领取不会自动重放。临时 SQLite 在结束时清理。它验证一个恢复机制，不是完整云端队列实现；[使用边界](examples/job-state/README.md)也明确列出没有解决的外部动作崩溃窗口。
+
+按[例子说明](examples/job-state/README.md)运行现有测试，可检查状态变化和重开数据库后的结果；[恢复任务单](templates/job-recovery-task.md)给出可直接交给 agent 的离线步骤。网页模拟、本地模型检查与实际云端恢复是三种不同证据，本仓库没有把前两者写成云端实测。
 
 ## 在本地阅读
 

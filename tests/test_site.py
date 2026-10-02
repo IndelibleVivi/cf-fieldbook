@@ -65,8 +65,8 @@ class ReadingSiteTests(unittest.TestCase):
     def test_all_generated_local_links_assets_and_anchors_exist(self):
         for page in self.output.rglob('*.html'):
             soup = BeautifulSoup(page.read_text(), 'html.parser')
-            for node in soup.find_all(['a', 'img', 'script', 'link']):
-                href = node.get('href', node.get('src', ''))
+            for node in soup.find_all(['a', 'img', 'script', 'link', 'source']):
+                href = node.get('href', node.get('src', node.get('srcset', '')))
                 if not href:
                     continue
                 parsed = urlsplit(href)
@@ -251,6 +251,87 @@ class ReadingSiteTests(unittest.TestCase):
                     for p in output.rglob('*'):
                         if p.is_file() and p.suffix in {'.html', '.md', '.json'}:
                             self.assertNotIn('PRIVATE_HANDBOOK_SENTINEL', p.read_text(), str(p))
+
+    def test_section_search_points_to_real_headings_and_omits_script_data(self):
+        index = json.loads((self.output / 'search-index.json').read_text())
+        self.assertGreater(len(index), len(self.manifest['pages']))
+        for item in index:
+            parsed = urlsplit(item['url'])
+            page = BeautifulSoup((self.output / parsed.path).read_text(), 'html.parser')
+            if parsed.fragment:
+                heading = page.find(id=unquote(parsed.fragment))
+                self.assertIsNotNone(heading, item['url'])
+                self.assertIn(heading.name, ['h2', 'h3'])
+            self.assertNotIn('"frames":', item['text'])
+            self.assertNotIn(item['status'], ['draft', 'withdrawn'])
+
+    def test_glossary_links_and_controlled_questions_are_progressive(self):
+        soup = BeautifulSoup((self.output / 'guides/handbook.html').read_text(), 'html.parser')
+        terms = json.loads(soup.find(id='term-data').string)
+        self.assertEqual(len(terms), 8)
+        glossary = BeautifulSoup((self.output / 'docs/glossary.html').read_text(), 'html.parser')
+        for anchor, term in terms.items():
+            self.assertIsNotNone(glossary.find(id=anchor))
+            self.assertTrue(term['definition'])
+        for link in soup.select('a[data-term]'):
+            self.assertTrue(link['href'].startswith('../docs/glossary.html#'))
+            self.assertEqual(link['data-link-kind'], 'term')
+            self.assertEqual(link['aria-describedby'], 'link-term')
+        questions = soup.select('blockquote.understanding-question')
+        self.assertEqual(len(questions), 3)
+        for question in questions:
+            self.assertIn('想一想：', question.find('p', recursive=False).get_text())
+            self.assertIn('答案：', question.select_one('details.understanding-answer').get_text())
+            self.assertFalse(question.details.has_attr('open'))
+        self.assertFalse(soup.select_one('.evidence-note').has_attr('open'))
+
+    def test_mobile_figures_and_link_destinations_are_explicit(self):
+        soup = BeautifulSoup((self.output / 'guides/handbook.html').read_text(), 'html.parser')
+        pictures = soup.select('picture.responsive-figure')
+        self.assertEqual(len(pictures), 2)
+        self.assertEqual({p.source['srcset'] for p in pictures}, {'../assets/two-routes-mobile.svg', '../assets/task-state-mobile.svg'})
+        self.assertTrue(all(p.source['media'] == '(max-width: 1100px)' for p in pictures))
+        for link in soup.select('a[data-link-kind]'):
+            self.assertIsNotNone(soup.find(id=link['aria-describedby']))
+        svg = soup.select_one('a[data-attachment-action=open]')
+        self.assertEqual(svg['data-link-kind'], 'attachment')
+        markdown = soup.select_one('.reader-tools a[download]')
+        self.assertEqual(markdown['data-attachment-action'], 'download')
+        readme = BeautifulSoup((self.output / 'README.html').read_text(), 'html.parser')
+        self.assertTrue(readme.select('a[data-link-kind=repository]'))
+
+    def test_safe_repo_links_are_real_without_general_path_fallback(self):
+        site = build_site.Site(self.root, self.root / '.build/link-test')
+        site.texts['README.md'] = '# Link test\n\n[Tool](tools/check.py) [Private](docs/private-note.md) [Code](examples/not-public/model.py)\n'
+        rendered, _, _ = site.render_content('README.md')
+        soup = BeautifulSoup(rendered, 'html.parser')
+        self.assertEqual(soup.a['href'], build_site.REPOSITORY_URL + 'tools/check.py')
+        self.assertEqual(len(soup.find_all('a')), 1)
+        self.assertEqual(len(soup.select('span.repository-ref')), 2)
+
+    def test_demo_is_current_only_and_rebuild_removes_frames_assets_and_links(self):
+        self.assertIn('examples/job-state/demo.html', self.manifest['html_pages'])
+        demo = BeautifulSoup((self.output / 'examples/job-state/demo.html').read_text(), 'html.parser')
+        self.assertEqual(len(json.loads(demo.find(id='recovery-data').string)), 5)
+        self.assertTrue(demo.find('script', src='../../styles/recovery.js'))
+        for status in ('draft', 'withdrawn', 'archived', 'superseded'):
+            with self.subTest(status=status), tempfile.TemporaryDirectory() as temp:
+                root = Path(temp) / 'fieldbook'
+                shutil.copytree(self.root, root, ignore=shutil.ignore_patterns('.build'))
+                output = root / '.build/site'
+                build_site.build_site(root)
+                catalog_path = root / 'catalog/entries.json'
+                catalog = json.loads(catalog_path.read_text())
+                next(e for e in catalog['entries'] if e['id'] == 'example.job-state')['status'] = status
+                catalog_path.write_text(json.dumps(catalog, ensure_ascii=False))
+                manifest = build_site.build_site(root, base_url='https://reader.example/project/')
+                self.assertNotIn('examples/job-state/demo.html', manifest['html_pages'])
+                for path in ('examples/job-state/demo.html', 'styles/recovery.css', 'styles/recovery.js'):
+                    self.assertFalse((output / path).exists())
+                for page in output.rglob('*.html'):
+                    soup = BeautifulSoup(page.read_text(), 'html.parser')
+                    self.assertIsNone(soup.find(id='recovery-data'))
+                    self.assertFalse(any('examples/job-state/demo.html' in a.get('href', '') or a.get('href') == 'demo.html' for a in soup.find_all('a')), page)
 
 
 if __name__ == '__main__':

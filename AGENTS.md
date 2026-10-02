@@ -7,8 +7,12 @@ CF Fieldbook 是独立的参考资料与离线例子仓库。先读 [README](REA
 - Markdown 拥有正文；`catalog/` 拥有精确跨页数据、来源和内容索引；`examples/` 拥有可执行行为。
 - `tools/content.py sync` 显式更新维护事实块，`check` 检测漂移。历史报告不读入当前事实。
 - `tools/build_site.py` 是唯一阅读站构建入口，只分发显式 allowlist。
+- `docs/glossary.md` 的词条首段拥有短释义；站点从它生成就地解释，冻结出版物嵌入当版所引用的定义。术语链接保留普通 Markdown 锚点。
+- `styles/search.js` 拥有本地问题别名与排序；索引来自实际正文小节。搜索目标必须有答案，不能用别名掩盖缺失内容。
+- `examples/job-state/model.py` 拥有恢复规则；`tools/recovery_demo.py` 执行模型生成合成场景，`styles/recovery.js` 只控制场景与播放。演示只随 current 例子分发，不增加云端执行。
 - `tools/editions.py freeze/build/check` 是三册出版入口，使用冻结输入内的 renderer；`.build/editions/` 是本地产物，`dist/` 是固定 r3 历史。
 - Mermaid 在 `diagrams/src/` 编辑，SVG 由工具生成；不要手改导出图。原创装饰在 `assets/motifs/`。
+- 阅读概念图由 `tools/figures.py` 显式生成；入口与任务状态的横／窄布局共用语义，不单改一份导出。
 
 ## Change boundaries
 
@@ -26,8 +30,9 @@ python3 tools/check.py
 python3 tools/content.py check
 .venv/bin/python -m unittest discover -s tests -v
 node --test examples/health-worker/worker.test.mjs
+node --test tests/*.test.cjs
 ```
 
-页面改动检查桌面和移动端实际渲染、导航、搜索与下载；图示改动重建并复看。构建不能改变编辑源。提交前检查 intended diff 与 staged paths。
+页面改动检查桌面和移动端实际渲染、导航、真实问法搜索、释义焦点返回与下载；演示改动还检查场景切换、时间／步骤、播放／暂停／重置及无 JavaScript 出口。图示改动重建并复看。构建不能改变编辑源。提交前检查 intended diff 与 staged paths。
 
 能力、命令或边界改变时更新 README 与相应指南；稳定维护合同改变时更新本文件；部署和出版事实更新 `docs/current-state.md` 与 CHANGELOG。内部工作接续留在 Git 外。

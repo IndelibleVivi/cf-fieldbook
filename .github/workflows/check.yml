@@ -39,6 +39,8 @@ jobs:
           python examples/job-state/demo.py
       - name: Build reader site
         run: python tools/build_site.py --base-url https://indeliblevivi.github.io/cf-fieldbook/
+      - name: Check reader search and interactions
+        run: FIELDBOOK_SEARCH_INDEX=.build/site/search-index.json node --test tests/*.test.cjs
       - name: Upload static site
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v5.0.0
