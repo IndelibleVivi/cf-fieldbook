@@ -413,7 +413,7 @@ D1 计行，不只看 SQL 次数；R2 计对象操作；向量需要乘维度；
 
 历史教程提供了入口、身份、数据、任务和执行的分层。本期修正了几处会影响实施的地方：队列登记不等于任务完成；调用者标签不证明身份；快照不保存进程；Preview 不证明数据隔离。
 
-平台状态则更新到本期快照：Sandbox 1.0 路线、AI Search GA 与新计费、Gateway 按首次创建日区分的日志规则、Cloudflare OS 托管候补。完整修订映射在仓库的 `editorial/archive-revision-map.md`。[S72] [S09] [S10] [S15] [S20]
+平台状态则更新到本期快照：Sandbox 1.0 路线、AI Search GA 与新计费、Gateway 按首次创建日区分的日志规则、Cloudflare OS 托管候补。历史资料的继承范围见[来源说明](../docs/provenance.md)。[S72] [S09] [S10] [S15] [S20]
 
 ### 两种读者，不必挤在同一页
 
@@ -425,7 +425,7 @@ D1 计行，不只看 SQL 次数；R2 计对象操作；向量需要乘维度；
 | 人的阅读版 | `guides/handbook.md` |
 | 实施细节、完整代码和状态约束 | `reference/implementation.md` |
 | 离线示例与测试 | `examples/`、`tests/` |
-| 来源、日期与变化记录 | `catalog/`、`editorial/` |
+| 来源、日期与变化记录 | `catalog/`、[来源说明](../docs/provenance.md) |
 
 这里的检查分为资料与示例的本地验证、实际云端验证两类。本包包含前者，不包含账户登录、部署、迁移或模型实测。新的实践结果应按自己的输入、版本和范围补充，不无声地改写旧期判断。
 

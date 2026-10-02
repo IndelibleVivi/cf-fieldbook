@@ -12,7 +12,8 @@ import os
 from pathlib import Path
 import re
 import shutil
-from urllib.parse import unquote, urlsplit
+from urllib.parse import quote, unquote, urlsplit, urlunsplit
+from xml.etree import ElementTree
 
 from bs4 import BeautifulSoup
 from markdown_it import MarkdownIt
@@ -24,7 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_DOCS = (
     'README.md', 'CHANGELOG.md', 'SPEC.md', 'CONTRIBUTING.md', 'LICENSE-STATUS.md', 'LICENSE-DOCUMENTATION.md', 'docs/architecture.md',
     'docs/lifecycle.md', 'docs/publication.md', 'docs/content-design.md',
-    'docs/migration-r3.md', 'docs/current-state.md', 'docs/reading-site.md', 'examples/README.md',
+    'docs/migration-r3.md', 'docs/current-state.md', 'docs/reading-site.md', 'docs/provenance.md', 'examples/README.md',
     'diagrams/README.md', 'templates/practice-example.md', 'templates/release-card.md',
 )
 READER_PREFIXES = {'services', 'comparisons', 'use-cases', 'guides', 'reference', 'reports', 'examples'}
@@ -43,6 +44,16 @@ FIGCAP = {
     'two-routes': '两种常见路线，不要求同时采用。Tunnel 不替原设备运行程序。',
     'task-state': '接收、执行与完成分开记录。示意主线；完整状态与失败分支见邻近正文。',
 }
+PRODUCT_READING = (
+    ('入口与程序', 'Workers · Static Assets', '先发布一个网页或小 API，读清请求、程序和绑定资源之间的关系。', 2, '新建边缘应用'),
+    ('访问与身份', 'Access · Tunnel', '已有本机或服务器应用时，分开考虑网络可达与使用权限。', 4, '访问已有服务'),
+    ('内容与数据', 'D1 · R2', '把原件、目录、版本与恢复安排放在各自合适的位置。', 5, '保存与恢复内容'),
+    ('任务与恢复', 'Queues · Workflows · Durable Objects', '理解接收、执行、完成和结果未知，再决定怎样重试。', 6, '处理异步任务'),
+    ('检索与原件', 'AI Search · Vectorize', '从一组真实问题比较检索路线，并让结果能回到原文。', 7, '找回需要的材料'),
+    ('模型与入口', 'Workers AI · AI Gateway', '分清模型、供应路径与判断成本；继续读 Clef / Jev 的比较。', 8, '选择模型调用路线'),
+    ('运行与退出', 'Containers · Sandbox', '需要系统包或完整 Linux 时，再考虑临时执行环境与退出。', 9, '安排临时执行环境'),
+    ('观察与维护', 'Workers Issues', '给错误留下版本与上下文，把一次失败变成可以调查的问题。', 11, '观察真实运行'),
+)
 
 
 def escape(value: object) -> str:
@@ -51,6 +62,22 @@ def escape(value: object) -> str:
 
 def relative_url(page: str, target: str) -> str:
     return Path(os.path.relpath(target, Path(page).parent)).as_posix()
+
+
+def normalize_base_url(value: str | None) -> str | None:
+    if not value:
+        return None
+    parsed = urlsplit(value)
+    if parsed.scheme not in {'https', 'http'} or not parsed.netloc or parsed.query or parsed.fragment:
+        raise ValueError('--base-url must be an absolute HTTP(S) site directory URL without query or fragment')
+    if parsed.username or parsed.password:
+        raise ValueError('--base-url must not contain credentials')
+    path = parsed.path.rstrip('/') + '/'
+    return urlunsplit((parsed.scheme, parsed.netloc, path, '', ''))
+
+
+def heading_id(label: str) -> str:
+    return re.sub(r'[^\w\s-]', '', label.lower()).replace(' ', '-')
 
 
 def public_entry(path: str) -> bool:
@@ -72,8 +99,9 @@ def source_title(text: str, path: str) -> str:
 
 
 class Site:
-    def __init__(self, root: Path, output: Path):
+    def __init__(self, root: Path, output: Path, base_url: str | None = None):
         self.root, self.output = root.resolve(), output.resolve()
+        self.base_url = normalize_base_url(base_url)
         catalog = json.loads((root / 'catalog/entries.json').read_text(encoding='utf-8'))
         self.entries = {e['path']: e for e in catalog['entries']}
         self.paths = [p for p in PUBLIC_DOCS if (root / p).is_file()]
@@ -107,25 +135,54 @@ class Site:
         return project_markdown(self.root, path)
 
     def url(self, page: str, target: str) -> str:
+        if page == '404.html':
+            # A host can serve 404.html at any missing depth. Relative paths would break.
+            prefix = urlsplit(self.base_url).path if self.base_url else '/'
+            return prefix + target
         return relative_url(page, target)
 
+    def canonical(self, page: str) -> str | None:
+        if not self.base_url or page == '404.html':
+            return None
+        return self.base_url + ('' if page == 'index.html' else quote(page, safe='/'))
+
+    def chapter_url(self, number: int) -> str:
+        body = split_frontmatter(self.texts['guides/handbook.md'])[1]
+        match = re.search(rf'^## ({number:02d} / .+)$', body, re.M)
+        if not match:
+            raise ValueError(f'Product reading path needs handbook chapter {number:02d}')
+        return 'guides/handbook.html#' + quote(heading_id(match[1]), safe='-')
+
+    def reading_url(self, page: str) -> str:
+        return page if str(Path(page).with_suffix('.md')) in self.paths else 'directory.html'
+
+    def starting_path(self) -> str:
+        status = self.entries.get('guides/handbook.md', {}).get('status')
+        return self.reading_url('guides/handbook.html') if status in {'current', 'withdrawn'} else 'directory.html'
+
     def nav(self, page: str) -> str:
-        items = [('guides/handbook.html', '从用途开始'), ('services/decision-models.html', '认识服务'),
-                 ('reports/2026-10-02.html', '本期变化'), ('directory.html', '目录 / 搜索')]
+        items = [(self.starting_path(), '从用途开始'), ('products.html', '认识服务'),
+                 (self.reading_url('reports/2026-10-02.html'), '本期变化'), ('directory.html', '目录 / 搜索')]
         return '<nav class="global-nav" aria-label="全站导航">' + ''.join(
             f'<a href="{escape(self.url(page, href))}">{label}</a>' for href, label in items) + '</nav>'
 
     def frame(self, page: str, title: str, body: str, css_class: str = '') -> str:
         u = lambda target: escape(self.url(page, target))
+        canonical = self.canonical(page)
+        canonical_tag = f'<link rel="canonical" href="{escape(canonical)}">' if canonical else ''
+        source_path = str(Path(page).with_suffix('.md'))
+        noindex = not self.base_url or page == '404.html' or self.entries.get(source_path, {}).get('status') == 'withdrawn'
+        robots_tag = '<meta name="robots" content="noindex">' if noindex else ''
         return f'''<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{escape(title)} · CF Fieldbook</title><meta name="author" content="Faye &amp; Cove">
-<meta name="description" content="Cloudflare 用途、选择与实践的持续参考。Faye &amp; Cove 的独立 Fieldbook。">
+<meta name="description" content="CF Fieldbook 是 Faye &amp; Cove 的独立参考资料：从用途理解服务，比较路线，阅读可以检查的实践与来源。">
+{canonical_tag}{robots_tag}<link rel="icon" href="{u('assets/motifs/favicon.svg')}" type="image/svg+xml">
 <link rel="stylesheet" href="{u('styles/site.css')}"><script defer src="{u('styles/site.js')}"></script></head>
 <body class="{css_class}"><a class="skip-link" href="#main">跳到正文</a>
 <header class="site-header"><a class="wordmark" href="{u('index.html')}"><strong>CF Fieldbook<span class="wordmark-dot">.</span></strong><span>用途 · 选择 · 实践</span></a>{self.nav(page)}</header>
 {body}
-<footer class="site-footer"><img src="{u('assets/motifs/cat-sunrise.svg')}" width="96" height="64" alt="" aria-hidden="true"><div><p>Faye &amp; Cove 的独立参考 · 本地阅读候选</p><p><a href="https://github.com/IndelibleVivi">https://github.com/IndelibleVivi</a> · <a href="{u('LICENSE-STATUS.html')}">许可状态</a></p><p class="signature">made by Faye &amp; Cove</p></div><a class="back-top" href="#main">回到页首 ↑</a></footer></body></html>'''
+<footer class="site-footer"><img src="{u('assets/motifs/cat-sunrise.svg')}" width="96" height="64" alt="" aria-hidden="true"><div><p>Faye &amp; Cove 的独立参考 · 非 Cloudflare 官方出版物，未获 Cloudflare 背书。</p><p><a href="https://github.com/IndelibleVivi">https://github.com/IndelibleVivi</a> · <a href="{u('LICENSE-STATUS.html')}">许可状态</a></p><p class="trademark">Cloudflare® 是 Cloudflare, Inc. 的注册商标。</p><p class="signature">made by Faye &amp; Cove</p></div><a class="back-top" href="#main">回到页首 ↑</a></footer></body></html>'''
 
     def rewrite(self, soup: BeautifulSoup, path: str) -> None:
         page = str(Path(path).with_suffix('.html'))
@@ -207,7 +264,7 @@ class Site:
         headings, seen = [], {}
         for heading in soup.find_all(['h2', 'h3', 'h4']):
             label = heading.get_text()
-            stem = re.sub(r'[^\w\s-]', '', label.lower()).replace(' ', '-')
+            stem = heading_id(label)
             seen[stem] = seen.get(stem, 0) + 1
             ident = stem + (f'-{seen[stem] - 1}' if seen[stem] > 1 else '')
             heading['id'] = ident
@@ -229,14 +286,14 @@ class Site:
     def notice(self, path: str) -> str:
         entry = self.entries.get(path)
         if not entry:
-            return '<p class="page-note">资料维护说明 · 设计目标与当前实现请按文中的状态说明区分。</p>'
+            return ''
         review = entry.get('review', {})
         status = STATUS_LABELS[entry['status']]
         if entry.get('track') == 'edition':
             status = '历史报告 · ' + Path(path).stem + ' 资料快照'
         text = f"{status} · 记录核验日期 {review.get('checked_on', '未登记')}"
         scope = review.get('scope', '未登记核验范围')
-        return f'<aside class="evidence-note"><strong>{escape(text)}</strong><p>{escape(scope)}。网站构建没有重新核验 Cloudflare 事实；本地测试与来源核对、云端实测分别记录。</p></aside>'
+        return f'<aside class="evidence-note"><strong>{escape(text)}</strong><p>{escape(scope)}。来源记录的日期与范围适用于本文；来源核对不等于账户或云端实测。</p></aside>'
 
     def reader(self, path: str) -> str:
         page = str(Path(path).with_suffix('.html'))
@@ -256,15 +313,48 @@ class Site:
 <article class="article"><header class="article-header"><p class="eyebrow">CF FIELDBOOK / {escape(kind)}</p><h1>{escape(self.titles[path])}</h1>{self.notice(path)}</header><div class="prose">{content}{files}</div><div class="reading-end"><a href="{escape(self.url(page, 'directory.html'))}">继续阅读：全部资料 →</a></div></article></main>'''
         return self.frame(page, self.titles[path], body, 'reader-page')
 
+    def product_links(self, *, compact: bool = False) -> str:
+        if self.entries.get('guides/handbook.md', {}).get('status') != 'current':
+            return ''
+        rows = []
+        for index, (category, names, description, chapter, action) in enumerate(PRODUCT_READING, 1):
+            target = self.chapter_url(chapter)
+            if compact:
+                rows.append(f'<li><a href="{escape(target)}"><span class="product-category">{escape(category)}</span><span>{escape(names)}</span><span class="product-arrow">↗</span></a></li>')
+            else:
+                supplement = ''
+                if chapter == 8 and 'comparisons/clef-vs-jev.md' in self.paths:
+                    supplement = '<a href="comparisons/clef-vs-jev.html">Clef / Jev 比较 →</a>'
+                if chapter == 6 and 'use-cases/recoverable-jobs.md' in self.paths:
+                    supplement = '<a href="use-cases/recoverable-jobs.html">任务恢复实践 →</a>'
+                rows.append(f'<section class="product-reading"><div class="product-heading"><span class="product-index">{index:02d}</span><p>{escape(category)}</p></div><div class="product-body"><h2><a href="{escape(target)}">{escape(names)}</a></h2><p>{escape(description)}</p><div class="product-actions"><a href="{escape(target)}">{escape(action)} ↗</a>{supplement}</div></div></section>')
+        return ''.join(rows)
+
     def home(self) -> str:
-        body = '''<main id="main" class="home"><section class="home-cover"><div class="cover-copy"><p class="eyebrow">AN INDEPENDENT CLOUDFLARE FIELDBOOK</p><h1>从手边的问题，<br>读到可检查的实践。</h1><p class="cover-deck">Cloudflare 用途、选择与实践的持续参考。<br>认识一项服务，也理解它应当放在哪里。</p><p class="cover-credit">Faye &amp; Cove <span>／</span> 2026.10</p></div><figure class="cover-art"><img src="assets/motifs/cat-sunrise.svg" alt="青色猫坐在书页般的地平线上，望向橙色日出" width="600" height="400"><figcaption>先看清问题，再决定下一步。</figcaption></figure></section>
+        body = f'''<main id="main" class="home"><section class="home-cover"><div class="cover-copy"><p class="eyebrow">AN INDEPENDENT FIELD GUIDE</p><h1>从手边的问题，<br>读到可检查的实践。</h1><p class="cover-deck">Cloudflare® 服务的用途、选择与实践。<br>认识一项服务，也理解它应当放在哪里。</p><p class="cover-credit">Faye &amp; Cove <span>／</span> 持续参考</p></div><figure class="cover-art"><img src="assets/motifs/cat-sunrise.svg" alt="青色猫坐在书页般的地平线上，望向橙色日出" width="600" height="400"><figcaption>先看清问题，再决定下一步。</figcaption></figure></section>
 <section class="entry-paths" aria-labelledby="entry-heading"><div class="section-intro"><p class="eyebrow">THREE WAYS IN</p><h2 id="entry-heading">从这里翻开</h2><p>不必先读完所有服务。<br>选一个与你现在有关的入口。</p></div><div class="path-list">
-<a class="path" href="guides/handbook.html"><span class="path-number">01</span><div><h3>从用途开始 <span>→</span></h3><p>发布网页、安全访问、保存内容、恢复任务。<br>从一件正在做的事情认识基础设施。</p></div></a>
-<a class="path" href="services/decision-models.html"><span class="path-number">02</span><div><h3>认识服务 <span>→</span></h3><p>先分清模型与接入路径，再比较限制与成本。<br>从 Clef / Jev 读一项具体选择。</p></div></a>
-<a class="path" href="reports/2026-10-02.html"><span class="path-number">03</span><div><h3>本期变化 <span>→</span></h3><p>2026-10-02 新发布观察。<br>保留当时的开放状态、时间与来源。</p></div></a></div></section>
-<section class="shelf"><div><p class="eyebrow">READ · INSPECT · TAKE AWAY</p><h2>沿着解释，找到依据。</h2><p>正文、精确记录和离线例子各有归属。<br>可以读，也可以带走 Markdown 与公开附件。</p></div><ul><li><a href="directory.html">全部资料与内容搜索 <span>→</span></a></li><li><a href="examples/README.html">三个离线例子 <span>→</span></a></li><li><a href="reference/implementation.html">实施参考：代码与恢复语义 <span>→</span></a></li><li><a href="diagrams/README.html">五张图：架构与资料生命周期 <span>→</span></a></li><li><a href="sources.html">来源与核验范围 <span>→</span></a></li></ul></section>
-<section class="edition-strip"><p class="eyebrow">A NOTE ON THIS READING</p><p>本地阅读候选，继承阅读版 r3 的正文与来源记录。本轮建站没有重新核验服务事实，没有调用模型或部署云端服务。历史报告是有日期的资料快照。</p><a href="docs/reading-site.html">阅读与构建说明 →</a></section></main>'''
+<a class="path" href="{escape(self.starting_path())}"><span class="path-number">01</span><div><h3>从用途开始 <span>→</span></h3><p>发布网页、安全访问、保存内容、恢复任务。<br>从一件正在做的事情认识基础设施。</p></div></a>
+<a class="path" href="products.html"><span class="path-number">02</span><div><h3>认识服务 <span>→</span></h3><p>从 Workers 到 R2，从 Tunnel 到 AI Gateway。<br>按正在解决的问题，找到相关章节。</p></div></a>
+<a class="path" href="{escape(self.reading_url('reports/2026-10-02.html'))}"><span class="path-number">03</span><div><h3>本期变化 <span>→</span></h3><p>2026-10-02 新发布观察。<br>回看当时的开放状态、时间与来源。</p></div></a></div></section>
+<section class="product-spread" aria-labelledby="products-heading"><div class="section-intro"><p class="eyebrow">PRODUCTS / READING PATHS</p><h2 id="products-heading">一个服务，<br>放在什么位置？</h2><p>入口、运行、数据与恢复，各回答不同的问题。沿着一条路径读，不必一次组合所有服务。</p><img class="edge-detail" src="assets/motifs/edge-route.svg" width="360" height="220" alt="" aria-hidden="true"></div><div><ul class="product-links">{self.product_links(compact=True)}</ul><a class="all-products" href="products.html">打开服务阅读索引 →</a></div></section>
+<section class="shelf"><div><p class="eyebrow">READ · INSPECT · TAKE AWAY</p><h2>沿着解释，找到依据。</h2><p>读懂一个做法，再看完整代码与来源。<br>也可以带走 Markdown 和离线例子。</p></div><ul><li><a href="directory.html">全部资料与内容搜索 <span>→</span></a></li><li><a href="examples/README.html">三个离线例子 <span>→</span></a></li><li><a href="{escape(self.reading_url('reference/implementation.html'))}">实施参考：代码与恢复语义 <span>→</span></a></li><li><a href="diagrams/README.html">五张图：架构与资料生命周期 <span>→</span></a></li><li><a href="sources.html">来源与核验范围 <span>→</span></a></li></ul></section>
+<section class="edition-strip"><p class="eyebrow">DATES &amp; SOURCES</p><p>服务解释持续维护；报告保留各自日期。价格、开放条件和接口限制请结合正文的核验范围与来源阅读。</p><a href="sources.html">查阅来源索引 →</a></section></main>'''
         return self.frame('index.html', '用途、选择与实践的持续参考', body, 'home-page')
+
+    def products_page(self) -> str:
+        readings = self.product_links()
+        unavailable = '<p class="product-unavailable">服务阅读路径暂时不可用。请从<a href="directory.html">全部资料与搜索</a>查找其他内容。</p>'
+        continuation = '<a href="guides/handbook.html">连续阅读：个人基础设施实践手册 →</a>' if readings else ''
+        introduction = '<p>从入口到数据，从一次请求到可以恢复的任务。<br>这些阅读路径来自实践手册；选择与限制在相应章节展开。</p>' if readings else ''
+        body = f'''<main id="main" class="products-page"><header class="page-title product-title"><div><p class="eyebrow">PRODUCT READING PATHS</p><h1>按问题，认识服务。</h1>{introduction}</div><img src="assets/motifs/edge-route.svg" width="360" height="220" alt="" aria-hidden="true"></header><div class="product-readings">{readings or unavailable}</div><div class="reading-end">{continuation}<a href="directory.html">全部资料与搜索 →</a></div></main>'''
+        self.search.append({'title': '认识 Cloudflare 服务：产品阅读索引', 'url': 'products.html', 'kind': '服务',
+                            'text': ' '.join(' '.join(str(v) for v in row[:3]) for row in PRODUCT_READING) if readings else '服务阅读路径暂时不可用。请查阅其他资料。', 'status': 'current'})
+        return self.frame('products.html', '按问题认识 Cloudflare 服务', body)
+
+    def not_found(self) -> str:
+        u = lambda target: escape(self.url('404.html', target))
+        body = f'''<main id="main" class="not-found"><p class="eyebrow">404 / PAGE NOT FOUND</p><div class="not-found-layout"><div><h1>这一页，没有找到。</h1><p>地址可能有误，或资料已经移动。<br>从阅读目录继续找，也可以回到首页重新翻开。</p><div class="not-found-actions"><a href="{u('directory.html')}">打开目录与搜索 →</a><a href="{u('index.html')}">回到首页 →</a></div></div><img src="{u('assets/motifs/cat-sunrise.svg')}" width="600" height="400" alt=""></div></main>'''
+        return self.frame('404.html', '这一页没有找到', body, 'error-page')
 
     def directory(self) -> str:
         groups = []
@@ -280,7 +370,7 @@ class Site:
 
     def sources_page(self) -> str:
         rows = ''.join(f'<li id="{escape(s["id"])}"><span class="source-id">{escape(s["id"])}</span><div><a href="{escape(s["url"])}">{escape(s["title"])}</a><p>记录查阅日期 {escape(s.get("accessed", "未登记"))} · <code>{escape(s.get("verification_scope", "未登记"))}</code></p></div></li>' for s in self.sources)
-        body = f'''<main id="main" class="sources-page"><header class="page-title"><p class="eyebrow">SOURCES &amp; SCOPE</p><h1>来源与核验范围</h1><p>来源编号对应原记录。继承 r3 的 public document 核对，不构成本站的新事实核验、账户权限证明或云端实测。</p><p><a download href="catalog/sources.json">下载来源记录 JSON ↓</a></p></header><ol class="sources-list">{rows}</ol></main>'''
+        body = f'''<main id="main" class="sources-page"><header class="page-title"><p class="eyebrow">SOURCES &amp; SCOPE</p><h1>来源与核验范围</h1><p>来源编号对应正文引用。查阅日期与核验范围保留在各条记录中；来源核对不等于账户权限证明或云端实测。</p><p><a download href="catalog/sources.json">下载来源记录 JSON ↓</a></p></header><ol class="sources-list">{rows}</ol></main>'''
         return self.frame('sources.html', '来源与核验范围', body)
 
     def download_markdown(self, path: str) -> str:
@@ -308,6 +398,23 @@ class Site:
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(text, encoding='utf-8')
 
+    def write_discovery(self, pages: list[str]) -> None:
+        namespace = 'http://www.sitemaps.org/schemas/sitemap/0.9'
+        ElementTree.register_namespace('', namespace)
+        sitemap = ElementTree.Element(f'{{{namespace}}}urlset')
+        if self.base_url:
+            for page in pages:
+                source = str(Path(page).with_suffix('.md'))
+                if page == '404.html' or self.entries.get(source, {}).get('status') == 'withdrawn':
+                    continue
+                entry = ElementTree.SubElement(sitemap, f'{{{namespace}}}url')
+                ElementTree.SubElement(entry, f'{{{namespace}}}loc').text = self.canonical(page)
+        self.write('sitemap.xml', ElementTree.tostring(sitemap, encoding='unicode', xml_declaration=True) + '\n')
+        robots = 'User-agent: *\nDisallow: ' + ('\n' if self.base_url else '/\n')
+        if self.base_url:
+            robots += f'Sitemap: {self.base_url}sitemap.xml\n'
+        self.write('robots.txt', robots)
+
     def build(self) -> dict:
         # A clean generated output prevents withdrawn bytes surviving a rebuild.
         if self.output == self.root or not self.output.is_relative_to(self.root / '.build'):
@@ -320,29 +427,34 @@ class Site:
             if self.entries.get(path, {}).get('status') != 'withdrawn':
                 self.write(path, self.download_markdown(path))
         self.write('index.html', self.home())
+        self.write('products.html', self.products_page())
         self.write('directory.html', self.directory())
         self.write('sources.html', self.sources_page())
-        for path in sorted(self.attachments | {'styles/site.css', 'styles/site.js', 'assets/motifs/cat-sunrise.svg'}):
+        self.write('404.html', self.not_found())
+        for path in sorted(self.attachments | {'styles/site.css', 'styles/site.js', 'assets/motifs/cat-sunrise.svg', 'assets/motifs/edge-route.svg', 'assets/motifs/favicon.svg'}):
             target = self.output / path
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(self.root / path, target)
-        manifest = {'schema': 'fieldbook.reading-site/1', 'state': 'local-candidate',
-                    'pages': self.paths, 'attachments': sorted(self.attachments),
+        html_pages = [str(Path(path).with_suffix('.html')) for path in self.paths] + ['index.html', 'products.html', 'directory.html', 'sources.html', '404.html']
+        self.write_discovery(html_pages)
+        manifest = {'schema': 'fieldbook.reading-site/1', 'state': 'static-build', 'base_url': self.base_url,
+                    'pages': self.paths, 'html_pages': html_pages, 'attachments': sorted(self.attachments),
                     'notice': 'Read-only offline build; no new product fact verification or cloud execution.'}
         self.write('site-manifest.json', json.dumps(manifest, ensure_ascii=False, indent=2) + '\n')
         return manifest
 
 
-def build_site(root: Path = ROOT, output: Path | None = None) -> dict:
-    return Site(root, output or root / '.build/site').build()
+def build_site(root: Path = ROOT, output: Path | None = None, base_url: str | None = None) -> dict:
+    return Site(root, output or root / '.build/site', base_url).build()
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=ROOT / '.build/site')
+    parser.add_argument('--base-url', help='Public site directory URL, including a project subpath when applicable')
     args = parser.parse_args()
-    result = build_site(ROOT, args.output)
-    print(f'Built {len(result["pages"]) + 3} HTML reading pages at {args.output}')
+    result = build_site(ROOT, args.output, args.base_url)
+    print(f'Built {len(result["html_pages"])} HTML reading pages at {args.output}')
 
 
 if __name__ == '__main__':

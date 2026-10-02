@@ -69,8 +69,8 @@
       "title": "出版流程：源码向产物流动",
       "source": "diagrams/src/publication.mmd",
       "output": "assets/diagrams/publication.svg",
-      "source_sha256": "bb79c9a992f5b2d1ce0f6602993fa730985cdfd604c20107e2e4587c6456eb21",
-      "svg_sha256": "855a6adbb3e56ff0ca57f4450ac5b71b18a8c423ef4c1b8c38fcee1d0d11eaa9"
+      "source_sha256": "65f393efef0c3b4dd276c8eb2322d58c6a307e09f0a8bcbebd1ad7a347bcfbc4",
+      "svg_sha256": "cbb1439a91815871d7cb30e20d1ad56c25466b57ca38cb132bc7eb2d756dacfc"
     },
     {
       "id": "example-lifecycle",

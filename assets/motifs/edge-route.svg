@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 220" role="img" aria-labelledby="title desc">
+<title id="title">云与边缘的路径线稿</title><desc id="desc">通用云轮廓与几个通过细线连接的节点；这是阅读索引的原创装饰，不表示实际部署拓扑。</desc>
+<rect width="360" height="220" fill="#FFFFFF"/>
+<g fill="none" stroke="#D3E4E8" stroke-width="1">
+<path d="M28 43h304M28 179h304M62 24v172M298 24v172"/>
+<circle cx="177" cy="108" r="69" stroke-dasharray="2 7"/>
+</g>
+<g fill="none" stroke="#007F93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M62 108h51M242 108h56M177 144v34M100 50l36 29M255 50l-36 29"/>
+<path d="M138 124c-14 0-25-11-25-25 0-13 9-23 22-25 5-18 19-29 36-29 22 0 38 16 40 36h9c15 0 27 10 27 23s-10 24-24 24h-85z" fill="#EFF9FB"/>
+</g>
+<g fill="#FFFFFF" stroke="#007F93" stroke-width="1.5">
+<circle cx="62" cy="108" r="7"/><circle cx="298" cy="108" r="7"/><circle cx="177" cy="179" r="7"/>
+</g>
+<g fill="#BE4B13"><circle cx="100" cy="50" r="4"/><circle cx="255" cy="50" r="4"/></g>
+<path d="M162 109h25m-7-6 7 6-7 6" fill="none" stroke="#BE4B13" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M55 160h14M62 153v14M291 151h14M298 144v14" stroke="#D3E4E8" stroke-width="1"/>
+</svg>

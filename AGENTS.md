@@ -1,15 +1,33 @@
 # Working in CF Fieldbook
 
-本仓库是面向人和 agent 的参考资料与例子，不是作者的生产环境。公共源码为 https://github.com/IndelibleVivi/cf-fieldbook ，默认分支 main。先读 README；改架构读 SPEC；改内容生命周期读 docs/lifecycle.md；做出版读 docs/publication.md；视觉读 docs/content-design.md。
+CF Fieldbook 是独立的参考资料与离线例子仓库。先读 [README](README.md)；产品边界见 [SPEC](SPEC.md)，内容状态见 [生命周期](docs/lifecycle.md)，构建与发布见 [出版](docs/publication.md)和[阅读站](docs/reading-site.md)。
 
-正文在原有 Markdown；精确跨页数据在 catalog；算法/请求实现归 examples；Mermaid 归 diagrams/src。维护数据块由 tools/content.py sync 显式更新；三册出版唯一入口为 tools/editions.py freeze/build/check，冻结输入内的 renderer 是该版次的实现。阅读站唯一构建入口为 tools/build_site.py；不要恢复已退役的 design-reader 生成路径。不要给“机版”复制第二份结论，不手改导出的 SVG。
+## Canonical paths
 
-改变一项资料前查询 `python3 tools/fieldbook.py impact <id>`。这只是候选范围，related 不参与传播；历史报告只考虑勘误，不能自动回写。事实核验、代码测试、云端实测与作者接受分开记录。
+- Markdown 拥有正文；`catalog/` 拥有精确跨页数据、来源和内容索引；`examples/` 拥有可执行行为。
+- `tools/content.py sync` 显式更新维护事实块，`check` 检测漂移。历史报告不读入当前事实。
+- `tools/build_site.py` 是唯一阅读站构建入口，只分发显式 allowlist。
+- `tools/editions.py freeze/build/check` 是三册出版入口，使用冻结输入内的 renderer；`.build/editions/` 是本地产物，`dist/` 是固定 r3 历史。
+- Mermaid 在 `diagrams/src/` 编辑，SVG 由工具生成；不要手改导出图。原创装饰在 `assets/motifs/`。
 
-新增实践先写脱敏因果再构造合成输入。私人原始日志、拓扑、真实账号与凭据不进入仓库；ignore 不构成安全边界。例子默认不联网；云端执行必须另有明确预算、目标、清理与授权。
+## Change boundaries
 
-常规验证：`python3 tools/fieldbook.py check`、`python3 tools/check.py`、`python3 tools/content.py check`、`.venv/bin/python -m unittest discover -s tests -v`、`node --test examples/health-worker/worker.test.mjs`。新候选仅在 .build/editions，dist 是固定 r3 历史。改图后重建并复看；构建不能改变编辑源与核验日期。
+改变条目前查询 `python3 tools/fieldbook.py impact <id>`；结果是候选范围，`related` 不传播。不要自动重写历史报告或刷新事实核验日期。来源审阅、代码测试和云端实测分别记录。
 
-GitHub 账号以地址呈现；作者 Faye & Cove；文末签 made by Faye & Cove。当前许可为原创功能代码 SUL-1.0、原创正文/图形/出版物 CC BY-NC-SA 4.0；边界以 LICENSE-STATUS.md 为准。不得擅自改变许可、创建新的远端或公开部署；常规 commit/push 依用户授权执行，不把本地通过写成生产成功。
+例子默认离线。新增云端执行、付费调用、外部资源或账户变更需要该任务的明确授权。网站只发布静态阅读文件，不运行例子。未经授权不改变许可、远端或既有部署配置。
 
-完成报告写实际变化、观察与未完成项，不输出伪造验收记录。可由源码查清的事情先查源码；需要作者判断的是美术接受、许可与发布范围。实现变化须同步 README、相应 docs/运行命令与 current-state；私人 continuity 留在 Git 外。
+公共资料使用合成输入与可公开来源。凭据、私人原始日志、实际账号配置、内部讨论和工作接续不进入仓库或站点；`.gitignore` 不替代分发边界。原创代码与内容的许可划分以 [LICENSE-STATUS.md](LICENSE-STATUS.md) 为准。
+
+## Verification and docs
+
+```sh
+python3 tools/fieldbook.py check
+python3 tools/check.py
+python3 tools/content.py check
+.venv/bin/python -m unittest discover -s tests -v
+node --test examples/health-worker/worker.test.mjs
+```
+
+页面改动检查桌面和移动端实际渲染、导航、搜索与下载；图示改动重建并复看。构建不能改变编辑源。提交前检查 intended diff 与 staged paths。
+
+能力、命令或边界改变时更新 README 与相应指南；稳定维护合同改变时更新本文件；部署和出版事实更新 `docs/current-state.md` 与 CHANGELOG。内部工作接续留在 Git 外。

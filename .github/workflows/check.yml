@@ -1,8 +1,9 @@
-name: Offline checks
+name: Checks and Pages
 
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -37,4 +38,27 @@ jobs:
           node --test examples/health-worker/worker.test.mjs
           python examples/job-state/demo.py
       - name: Build reader site
-        run: python tools/build_site.py
+        run: python tools/build_site.py --base-url https://indeliblevivi.github.io/cf-fieldbook/
+      - name: Upload static site
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v5.0.0
+        with:
+          path: .build/site
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: content-and-examples
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy reader site
+        id: deployment
+        uses: actions/deploy-pages@v5.0.1

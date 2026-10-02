@@ -55,7 +55,7 @@ Markdown 保存解释；catalog 保存跨页复用的精确记录；源码保存
     "scope": "继承 r3 的官方来源核对；本次未再次核对",
     "next_review_on": "2026-10-16"
   },
-  "evidence": [{"kind": "prior-edition", "ref": "editorial/qa-r3.md"}]
+  "evidence": [{"kind": "prior-edition", "ref": "docs/provenance.md"}]
 }
 ```
 

@@ -1,16 +1,14 @@
 # 当前状态
 
-2026-10-02 · [CF Fieldbook](https://github.com/IndelibleVivi/cf-fieldbook) 已作为公开源仓库发布，默认分支为 `main`；尚未部署阅读站或创建版本 release。
+2026-10-02 · [公共源码](https://github.com/IndelibleVivi/cf-fieldbook)，默认分支 `main`。
 
-- 当前源码支持完整静态阅读站、目录与正文搜索、Markdown 下载、三条主阅读路径及公开例子附件。
-- Clef/Jev 路线、选择器、价格、上下文和费用估算在服务页、比较页、手册之间共源；其余解释仍由编辑者维护。全库逐字段事实登记尚未实施。
-- edition freeze 固定正文、数据、图、样式及渲染代码，生成三册 Markdown/HTML/PDF；旧 r3 出版物保留于 `dist/`。新版是本地排版候选，不表示全部事实重新核验。
-- 三个离线例子可运行。任务恢复例子新增中断、租约到期重领、迟到完成被拒绝和 uncertain 停止重试的确定性演示。没有云端实测结果。
-- 五张 Mermaid 图可由锁定依赖重建。当前 SVG 已用 Mermaid 11.17.2 重建；系统字体仍会影响跨平台几何。
-- 原创代码 SUL-1.0、原创内容 CC BY-NC-SA 4.0 已确定并写入仓库；第三方例外见许可范围说明。
-- 首次公开提交 `774b38b` 的 [GitHub Offline checks](https://github.com/IndelibleVivi/cf-fieldbook/actions/runs/37008748774) 已通过，覆盖 59 项 Python 测试、6 项 Node 测试、内容检查、恢复演示与阅读站构建。后续提交结果见仓库 Actions。
-- 没有部署阅读站、配置定时任务或执行云端实验。
+- 阅读站提供用途、服务与当期观察三条入口，包含产品索引、目录、全文搜索、Markdown 下载和公开例子附件。正式部署地址为 [CF Fieldbook](https://indeliblevivi.github.io/cf-fieldbook/)；首次部署待完成。
+- `Checks and Pages` 对提交运行离线检查，主分支通过后部署到 GitHub Pages。PR 只检查。构建与回退方法见[阅读站](reading-site.md)。
+- 决策模型的路线、选择器、价格、上下文和成本估算由 catalog 与例子实现共源；其余解释由 Markdown 维护。
+- 三个例子默认离线。任务恢复演示覆盖中断、租约接管、迟到完成与不确定结果；没有云端实测声明。
+- edition freeze 固定输入与渲染代码，生成三册 Markdown / HTML / PDF。`dist/` 保留固定 r3 历史出版物；新版 edition 尚未作为 Release 分发。
+- 五张 Mermaid 图由锁定依赖生成。当前引擎为 11.17.2，系统字体可能影响几何。
+- 来源核验范围见[来源说明](provenance.md)。网站构建和例子测试不更新事实核验日期。
+- 原创功能代码采用 SUL-1.0；原创内容采用 CC BY-NC-SA 4.0。第三方例外见[许可范围](../LICENSE-STATUS.md)。
 
-已继承的来源核验范围见 catalog 与 r3 QA 记录。构建日期、本地测试日期与来源核验日期分别记录。
-
-公开仓库与阅读站部署、版本 release 是不同状态。后两项尚未执行，常规内容更新不需要先实现云端 runner 或新闻爬虫。
+当前未提供云端例子 runner、定时来源监测或用户账号系统。最新构建和部署结果见[GitHub Actions](https://github.com/IndelibleVivi/cf-fieldbook/actions)。
