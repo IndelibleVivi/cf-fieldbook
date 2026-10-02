@@ -17,6 +17,7 @@ from xml.etree import ElementTree
 
 from bs4 import BeautifulSoup, NavigableString
 from markdown_it import MarkdownIt
+from markdown_it.token import Token
 import yaml
 
 from content import project_markdown
@@ -108,7 +109,59 @@ def split_frontmatter(text: str) -> tuple[dict, str]:
 def source_title(text: str, path: str) -> str:
     meta, body = split_frontmatter(text)
     heading = re.search(r'^#\s+(.+)$', body, re.M)
-    return heading[1] if heading else meta.get('title', Path(path).stem)
+    title = heading[1] if heading else meta.get('title', Path(path).stem)
+    return re.sub(r'\s*·\s*Faye\s*&\s*Cove\s*$', '', title)
+
+
+def reading_comment_inline(state, silent: bool) -> bool:
+    """Consume authoring comments at the Markdown boundary, after code parsing."""
+    if not state.src.startswith('<!--', state.pos):
+        return False
+    closing = state.src.find('-->', state.pos + 4, state.posMax)
+    if closing < 0:
+        return False
+    comment = state.src[state.pos + 4:closing].strip()
+    figure = re.fullmatch(r'figure:\s*([\w-]+)', comment)
+    if not silent and figure and figure[1] in FIGCAP:
+        token = state.push('image', 'img', 0)
+        token.attrSet('src', relative_url(state.env.get('source_path', 'README.md'), f'assets/{figure[1]}.svg'))
+        text = Token('text', '', 0)
+        text.content = FIGCAP[figure[1]]
+        token.children = [text]
+    state.pos = closing + 3
+    return True
+
+
+def reading_comment_block(state, start_line: int, end_line: int, silent: bool) -> bool:
+    """Remove standalone comments, including multiline notes, never indented code."""
+    if state.is_code_block(start_line):
+        return False
+    start = state.bMarks[start_line] + state.tShift[start_line]
+    if not state.src.startswith('<!--', start):
+        return False
+    for line in range(start_line, end_line):
+        ending = state.src.find('-->', start, state.eMarks[line])
+        if ending < 0:
+            continue
+        if state.src[ending + 3:state.eMarks[line]].strip():
+            return False
+        comment = state.src[start + 4:ending].strip()
+        figure = re.fullmatch(r'figure:\s*([\w-]+)', comment)
+        if figure and figure[1] in FIGCAP:
+            return False  # The ordinary paragraph's inline rule emits the public figure.
+        if not silent:
+            state.line = line + 1
+        return True
+    return False
+
+
+def chapter_markup(label: str, number_class: str, title_class: str, separator_class: str) -> str:
+    numbered = re.fullmatch(r'(\d{2}) / (.+)', label)
+    if numbered:
+        return (f'<span class="{number_class}">{escape(numbered[1])}</span>'
+                f'<span class="{separator_class}"> / </span>'
+                f'<span class="{title_class}">{escape(numbered[2])}</span>')
+    return f'<span class="{title_class}">{escape(label)}</span>'
 
 
 class Site:
@@ -127,7 +180,11 @@ class Site:
         self.titles = {p: source_title(t, p) for p, t in self.texts.items()}
         self.search = []
         self.directory_items = []
+        self.presentation = {}
         self.md = MarkdownIt('commonmark', {'html': False}).enable('table')
+        self.md.inline.ruler.before('html_inline', 'reading_comment', reading_comment_inline)
+        self.md.block.ruler.before('html_block', 'reading_comment', reading_comment_block,
+                                   {'alt': ['paragraph', 'reference', 'blockquote', 'list']})
         self.terms = self.glossary_terms()
 
     def demo_available(self) -> bool:
@@ -243,12 +300,13 @@ class Site:
 <link rel="stylesheet" href="{u('styles/site.css')}">{extras}<script defer src="{u('styles/site.js')}"></script></head>
 <body class="{css_class}"><a class="skip-link" href="#main">跳到正文</a>
 <header class="site-header"><a class="wordmark" href="{u('index.html')}"><strong>CF Fieldbook<span class="wordmark-dot">.</span></strong><span>用途 · 选择 · 实践</span></a>{self.nav(page)}</header>
-<div class="reading-legend">{legend}</div>
 {body}
-{dialog}<footer class="site-footer"><img src="{u('assets/motifs/cat-sunrise.svg')}" width="96" height="64" alt="" aria-hidden="true"><div><p>Faye &amp; Cove 的独立参考 · 非 Cloudflare 官方出版物，未获 Cloudflare 背书。</p><p><a href="https://github.com/IndelibleVivi">https://github.com/IndelibleVivi</a> · <a href="{u('LICENSE-STATUS.html')}">许可状态</a></p><p class="trademark">Cloudflare® 是 Cloudflare, Inc. 的注册商标。</p><p class="signature">made by Faye &amp; Cove</p></div><a class="back-top" href="#main">回到页首 ↑</a></footer></body></html>'''
+{dialog}<footer class="site-footer"><img src="{u('assets/motifs/cat-sunrise.svg')}" width="96" height="64" alt="" aria-hidden="true"><div><p>独立参考 · 非 Cloudflare 官方出版物，未获 Cloudflare 背书。</p><p><a href="https://github.com/IndelibleVivi">GitHub · IndelibleVivi</a> · <a href="{u('LICENSE-STATUS.html')}">许可状态</a></p><p class="trademark">Cloudflare® 是 Cloudflare, Inc. 的注册商标。</p><p class="signature">made by Faye &amp; Cove</p><div class="reading-legend">{legend}</div></div><a class="back-top" href="#main">回到页首 ↑</a></footer></body></html>'''
         soup = BeautifulSoup(document, 'html.parser')
         for link in soup.find_all('a', href=True):
             href = link['href']
+            if re.fullmatch(r'S\d{2,3}', link.get_text()):
+                link['class'] = list(dict.fromkeys([*link.get('class', []), 'source-ref']))
             parsed = urlsplit(href)
             if link.get('download') is not None or (not parsed.scheme and parsed.path and Path(parsed.path).suffix not in {'.html', ''}):
                 kind = 'attachment'
@@ -346,8 +404,6 @@ class Site:
 
     def render_content(self, path: str) -> tuple[str, list[tuple[str, str]], str]:
         meta, body = split_frontmatter(self.texts[path])
-        body = re.sub(r'<!--\s*figure:\s*([\w-]+)\s*-->', lambda m:
-                      f"\n![{FIGCAP[m[1]]}](../assets/{m[1]}.svg)\n" if m[1] in FIGCAP else '', body)
         # Source tokens may appear without link definitions in concise maintained pages.
         # The catalog supplies those missing definitions; existing edition definitions win.
         defined = set(re.findall(r'^\[(S\d{2,3})\]:', body, re.M))
@@ -359,7 +415,7 @@ class Site:
             raise ValueError(f'Unknown source references in {path}: {sorted(unknown)}')
         for ident in sorted(missing):
             body += f'\n[{ident}]: {source_by_id[ident]["url"]}\n'
-        soup = BeautifulSoup(self.md.render(body), 'html.parser')
+        soup = BeautifulSoup(self.md.render(body, {'source_path': path}), 'html.parser')
         # Only the authored question/answer prefix pair is enhanced; arbitrary HTML stays disabled.
         for block in soup.find_all('blockquote'):
             paragraphs = block.find_all('p', recursive=False)
@@ -379,9 +435,24 @@ class Site:
         h1 = soup.find('h1')
         if h1:
             h1.decompose()
-        # The shared footer owns the one author signature.
+        self.presentation[path] = {}
+        # Move only an exact opening edition/subtitle pair into the article header.
+        opening = soup.find('p')
+        if opening and opening.strong and opening.br and meta.get('subtitle'):
+            lines = [line.strip() for line in opening.get_text().splitlines() if line.strip()]
+            if len(lines) == 2:
+                subtitle = re.sub(r'\s*·\s*Faye\s*&\s*Cove\s*$', '', lines[1])
+                if subtitle == meta['subtitle'] and str(meta.get('edition', '')).startswith(lines[0]):
+                    self.presentation[path] = {'edition': lines[0], 'subtitle': subtitle}
+                    opening.decompose()
+        # Remove presentation signatures only; narrative and rights text remain authored.
         for p in list(soup.find_all('p')):
-            if 'made by Faye & Cove' in p.get_text() and 'GitHub' in p.get_text():
+            if p.find(['code', 'pre']):
+                continue
+            lines = [line.strip() for line in p.get_text().splitlines() if line.strip()]
+            signature_line = lambda line: bool(re.fullmatch(r'made by Faye\s*&\s*Cove', line, re.I))
+            github_line = lambda line: bool(re.fullmatch(r'(?:GitHub\s*[·:：]?\s*)?(?:https://)?github\.com/IndelibleVivi/?', line))
+            if lines and all(signature_line(line) or github_line(line) for line in lines):
                 p.decompose()
         headings, seen = [], {}
         for heading in soup.find_all(['h2', 'h3', 'h4']):
@@ -392,6 +463,10 @@ class Site:
             heading['id'] = ident
             if heading.name == 'h2':
                 headings.append((ident, label))
+                if re.fullmatch(r'\d{2} / .+', label):
+                    heading['class'] = [*heading.get('class', []), 'numbered-chapter']
+                    heading.clear()
+                    heading.append(BeautifulSoup(chapter_markup(label, 'chapter-number', 'chapter-title', 'chapter-separator'), 'html.parser'))
             anchor = soup.new_tag('a', attrs={'href': '#' + ident, 'class': 'heading-link', 'aria-label': '链接到：' + label})
             anchor.string = '#'
             heading.append(anchor)
@@ -422,7 +497,13 @@ class Site:
         content, headings, plain = self.render_content(path)
         entry = self.entries.get(path, {})
         kind = KIND_LABELS.get(entry.get('kind', 'doc'), '资料')
-        toc = ''.join(f'<li><a href="#{escape(ident)}">{escape(label)}</a></li>' for ident, label in headings)
+        toc = ''.join(f'<li><a href="#{escape(ident)}">{chapter_markup(label, "toc-number", "toc-label", "toc-separator")}</a></li>' for ident, label in headings)
+        presentation = self.presentation[path]
+        title = escape(self.titles[path])
+        if title.startswith('Cloudflare '):
+            title = '<span class="title-prefix">Cloudflare </span>' + title[len('Cloudflare '):]
+        deck = f'<p class="article-deck">{escape(presentation["subtitle"])}</p>' if presentation.get('subtitle') else ''
+        edition = f'<p class="edition-line">{escape(presentation["edition"])}</p>' if presentation.get('edition') else ''
         download = '' if entry.get('status') == 'withdrawn' else f'<a download href="{escape(self.url(page, path))}">下载 Markdown ↓</a>'
         files = ''
         if entry.get('kind') == 'example' and entry.get('status') == 'current':
@@ -434,7 +515,7 @@ class Site:
         self.directory_items.append({'title': self.titles[path], 'url': page, 'kind': kind, 'status': status})
         self.index_content(BeautifulSoup(content, 'html.parser'), page, self.titles[path], kind, status)
         body = f'''<main id="main" class="reader-layout"><aside class="contents"><a class="contents-home" href="{escape(self.url(page, 'directory.html'))}">← 全部资料</a><details open><summary>本页目录</summary><ol>{toc}</ol></details><div class="reader-tools">{download}<a href="{escape(self.url(page, 'sources.html'))}">查阅来源索引 ↗</a></div></aside>
-<article class="article"><header class="article-header"><p class="eyebrow">CF FIELDBOOK / {escape(kind)}</p><h1>{escape(self.titles[path])}</h1>{self.notice(path)}</header><div class="prose">{content}{files}</div><div class="reading-end"><a href="{escape(self.url(page, 'directory.html'))}">继续阅读：全部资料 →</a></div></article></main>'''
+<article class="article"><header class="article-header"><p class="eyebrow">{escape(kind)}</p><h1>{title}</h1>{deck}{edition}{self.notice(path)}</header><div class="prose">{content}{files}</div><div class="reading-end"><a href="{escape(self.url(page, 'directory.html'))}">继续阅读：全部资料 →</a></div></article></main>'''
         return self.frame(page, self.titles[path], body, 'reader-page')
 
     def product_links(self, *, compact: bool = False) -> str:
@@ -455,7 +536,7 @@ class Site:
         return ''.join(rows)
 
     def home(self) -> str:
-        body = f'''<main id="main" class="home"><section class="home-cover"><div class="cover-copy"><p class="eyebrow">AN INDEPENDENT FIELD GUIDE</p><h1>从手边的问题，<br>读到可检查的实践。</h1><p class="cover-deck">Cloudflare® 服务的用途、选择与实践。<br>认识一项服务，也理解它应当放在哪里。</p><p class="cover-credit">Faye &amp; Cove <span>／</span> 持续参考</p></div><figure class="cover-art"><img src="assets/motifs/cat-sunrise.svg" alt="青色猫坐在书页般的地平线上，望向橙色日出" width="600" height="400"><figcaption>先看清问题，再决定下一步。</figcaption></figure></section>
+        body = f'''<main id="main" class="home"><section class="home-cover"><div class="cover-copy"><p class="eyebrow">AN INDEPENDENT FIELD GUIDE</p><h1>从手边的问题，<br>读到可检查的实践。</h1><p class="cover-deck">Cloudflare® 服务的用途、选择与实践。<br>认识一项服务，也理解它应当放在哪里。</p><p class="cover-credit">持续参考</p></div><figure class="cover-art"><img src="assets/motifs/cat-sunrise.svg" alt="青色猫坐在书页般的地平线上，望向橙色日出" width="600" height="400"><figcaption>先看清问题，再决定下一步。</figcaption></figure></section>
 <section class="entry-paths" aria-labelledby="entry-heading"><div class="section-intro"><p class="eyebrow">THREE WAYS IN</p><h2 id="entry-heading">从这里翻开</h2><p>不必先读完所有服务。<br>选一个与你现在有关的入口。</p></div><div class="path-list">
 <a class="path" href="{escape(self.starting_path())}"><span class="path-number">01</span><div><h3>从用途开始 <span>→</span></h3><p>发布网页、安全访问、保存内容、恢复任务。<br>从一件正在做的事情认识基础设施。</p></div></a>
 <a class="path" href="products.html"><span class="path-number">02</span><div><h3>认识服务 <span>→</span></h3><p>从 Workers 到 R2，从 Tunnel 到 AI Gateway。<br>按正在解决的问题，找到相关章节。</p></div></a>

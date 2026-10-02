@@ -1,8 +1,32 @@
 /* Reading interactions are local; no requests or storage. */
 (() => {
   'use strict';
-  const mobile = window.matchMedia('(max-width: 720px)');
+  const mobile = window.matchMedia('(max-width: 760px)');
   for (const contents of document.querySelectorAll('.contents details')) contents.open = !mobile.matches;
+
+  const chapters = [...document.querySelectorAll('.contents a[href^="#"]')].map(link => ({
+    link, heading: document.getElementById(decodeURIComponent(link.hash.slice(1))),
+  })).filter(item => item.heading);
+  if (chapters.length) {
+    let scheduled = false;
+    const locateChapter = () => {
+      let current = chapters[0];
+      for (const chapter of chapters) {
+        if (chapter.heading.getBoundingClientRect().top <= 130) current = chapter;
+        else break;
+      }
+      for (const chapter of chapters) {
+        if (chapter === current) chapter.link.setAttribute('aria-current', 'location');
+        else chapter.link.removeAttribute('aria-current');
+      }
+      scheduled = false;
+    };
+    window.addEventListener('scroll', () => {
+      if (!scheduled) { scheduled = true; window.requestAnimationFrame(locateChapter); }
+    }, { passive: true });
+    window.addEventListener('hashchange', locateChapter);
+    window.requestAnimationFrame(locateChapter);
+  }
 
   // The demo's static model transcript is normally replaced by the replay. Search links
   // to its authored heading must still reveal the transcript and land on readable content.

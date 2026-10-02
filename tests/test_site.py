@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 import shutil
 import sys
@@ -152,6 +153,125 @@ class ReadingSiteTests(unittest.TestCase):
         rendered, _, _ = site.render_content(report)
         soup = BeautifulSoup(rendered, 'html.parser')
         self.assertEqual(soup.a['href'], 'https://example.invalid/historical-original')
+
+    def test_real_authoring_comments_do_not_leak_into_body_or_search(self):
+        index = json.loads((self.output / 'search-index.json').read_text())
+        for path in ('guides/handbook.html', 'reports/2026-10-02.html'):
+            soup = BeautifulSoup((self.output / path).read_text(), 'html.parser')
+            for marker in ('<!-- facts:', '<!-- /facts -->', '<!-- SOURCES -->', '<!-- figure:'):
+                self.assertNotIn(marker, soup.select_one('.prose').get_text())
+                for item in index:
+                    if item['url'].split('#')[0] == path:
+                        self.assertNotIn(marker, item['text'])
+        # Presentation filtering does not alter either maintained MD downloads or frozen reports.
+        for path in ('guides/handbook.md', 'reports/2026-10-02.md'):
+            self.assertIn('<!-- SOURCES -->', (self.output / path).read_text())
+
+    def test_comment_filter_preserves_code_and_never_enables_raw_html(self):
+        site = build_site.Site(self.root, self.root / '.build/comment-test')
+        site.texts['README.md'] = '''# Markup
+
+<!-- facts: cf-routes -->
+Text <!-- hidden inline note --> stays.
+<!-- /facts -->
+<!-- SOURCES -->
+<!-- multiline
+
+authoring note -->
+
+```html
+<!-- facts: cf-routes -->
+<!-- figure: workspace -->
+<script>example()</script>
+cat < input > output
+```
+
+    <!-- SOURCES -->
+    echo a > result
+
+`<!-- SOURCES -->` and `<value>`.
+
+<script>alert(1)</script>
+<aside>plain HTML example</aside>
+
+<!-- figure: workspace -->
+'''
+        rendered, _, _ = site.render_content('README.md')
+        soup = BeautifulSoup(rendered, 'html.parser')
+        self.assertFalse(site.md.options['html'])
+        self.assertFalse(soup.find_all(['script', 'aside']))
+        code = [node.get_text() for node in soup.find_all('code')]
+        self.assertTrue(any('<!-- figure: workspace -->' in text and 'cat < input > output' in text for text in code))
+        self.assertTrue(any('<!-- SOURCES -->' in text and 'echo a > result' in text for text in code))
+        self.assertIn('<!-- SOURCES -->', code)
+        self.assertIn('<value>', code)
+        for node in soup.find_all(['pre', 'code']):
+            node.decompose()
+        self.assertNotIn('<!--', soup.get_text())
+        self.assertIn('Text  stays.', soup.get_text())
+        self.assertIn('<script>alert(1)</script>', soup.get_text())
+        self.assertIn('<aside>plain HTML example</aside>', soup.get_text())
+        self.assertEqual(len(soup.find_all('img')), 1)
+        self.assertEqual(soup.img['src'], 'assets/workspace.svg')
+
+    def test_shared_footer_owns_signature_and_opening_metadata_is_semantic(self):
+        for path in ('guides/handbook.html', 'reports/2026-10-02.html'):
+            soup = BeautifulSoup((self.output / path).read_text(), 'html.parser')
+            self.assertEqual(soup.body.get_text().count('Faye & Cove'), 1)
+            self.assertEqual(soup.select_one('.site-footer .signature').get_text(), 'made by Faye & Cove')
+            self.assertIsNotNone(soup.select_one('.site-footer .link-legend'))
+            self.assertFalse(soup.select('body > .reading-legend'))
+            self.assertNotIn('CF FIELDBOOK', soup.select_one('.article-header .eyebrow').get_text())
+            self.assertNotIn('Faye & Cove', soup.select_one('.article-deck').get_text())
+            self.assertTrue(soup.select_one('.edition-line').get_text().startswith('2026.10'))
+            self.assertFalse(soup.select_one('.prose').find('p').strong)
+            profile = soup.select_one('.site-footer a[href="https://github.com/IndelibleVivi"]')
+            self.assertEqual(profile.get_text(), 'GitHub · IndelibleVivi')
+            for link in soup.select('.prose a'):
+                if re.fullmatch(r'S\d{2,3}', link.get_text()):
+                    self.assertIn('source-ref', link.get('class', []))
+
+    def test_signature_filter_retains_narrative_and_rights_statements(self):
+        site = build_site.Site(self.root, self.root / '.build/signature-test')
+        site.texts['README.md'] = '''# A title · Faye & Cove
+
+Faye & Cove retain the copyright to these diagrams.
+
+The phrase made by Faye & Cove identifies the authors; GitHub is a source host.
+
+`made by Faye & Cove`
+
+*made by Faye & Cove*
+
+GitHub · [https://github.com/IndelibleVivi](https://github.com/IndelibleVivi)
+'''
+        rendered, _, _ = site.render_content('README.md')
+        text = BeautifulSoup(rendered, 'html.parser').get_text()
+        self.assertIn('Faye & Cove retain the copyright', text)
+        self.assertIn('The phrase made by Faye & Cove', text)
+        self.assertEqual(text.count('made by Faye & Cove'), 2)  # Narrative plus literal code.
+        self.assertNotIn('https://github.com/IndelibleVivi', text)
+        self.assertEqual(build_site.source_title(site.texts['README.md'], 'README.md'), 'A title')
+
+    def test_numbered_chapter_markup_preserves_old_ids_and_search_labels(self):
+        site = build_site.Site(self.root, self.root / '.build/heading-test')
+        for path in ('guides/handbook.md', 'reports/2026-10-02.md'):
+            page = str(Path(path).with_suffix('.html'))
+            soup = BeautifulSoup((self.output / page).read_text(), 'html.parser')
+            labels = re.findall(r'^## (\d{2} / .+)$', build_site.split_frontmatter(site.texts[path])[1], re.M)
+            for label in labels:
+                heading = soup.find(id=build_site.heading_id(label))
+                self.assertIn('numbered-chapter', heading['class'])
+                self.assertEqual(heading.select_one('.chapter-number').get_text(), label[:2])
+                self.assertEqual(heading.select_one('.chapter-separator').get_text(), ' / ')
+                self.assertEqual(heading.select_one('.chapter-title').get_text(), label[5:])
+                toc = soup.select_one(f'.contents a[href="#{heading["id"]}"]')
+                self.assertEqual(toc.get_text(), label)
+                self.assertEqual(toc.select_one('.toc-separator').get_text(), ' / ')
+            for link in soup.select('.contents ol a'):
+                self.assertIsNotNone(link.select_one('.toc-label'))
+        index = json.loads((self.output / 'search-index.json').read_text())
+        self.assertTrue(any(item['section'] == '08 / 模型、路由与三种缓存' for item in index))
 
     def test_archived_example_has_no_execution_attachment(self):
         with tempfile.TemporaryDirectory() as temp:
