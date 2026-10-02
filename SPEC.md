@@ -1,7 +1,7 @@
 # CF Fieldbook · 仓库设计
 
 设计版本：2026-10-02 / fieldbook-local-1  
-状态：CF Fieldbook 本地实现与候选出版；正式许可与公开发布仍待作者决定。  
+状态：CF Fieldbook 持续编辑源；分层许可已确定，远端与出版状态见 docs/current-state.md。  
 作者：Faye & Cove
 
 ## 01 名字：一本能继续使用的 Fieldbook
@@ -169,7 +169,7 @@ Markdown、数据和源码经过检查后，生成 GitHub 可读文档、网页�
 
 保留三个离线例子，并扩展任务恢复的中断、接管、迟到写入与 uncertain 演示。它们证明合成输入下的本地行为，没有云端成功声明。维护命令见 [贡献说明](CONTRIBUTING.md)，读者体验见 [阅读站](docs/reading-site.md)。
 
-未创建 GitHub 仓库、未选择正式许可、未启用定时任务、未执行云端实验。旧 PDF 是继承产物，新 edition 是本地候选；变化后的当前状态由 [状态页](docs/current-state.md) 维护。
+已采用原创代码 SUL-1.0 与原创内容 CC BY-NC-SA 4.0；未启用定时任务、未执行云端实验。旧 PDF 是继承产物，新 edition 是本地候选；变化后的当前状态由 [状态页](docs/current-state.md) 维护。
 
 ---
 

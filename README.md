@@ -62,11 +62,11 @@ Node.js 20+ 用于 Worker 测试；Mermaid 只在修改图示时需要安装。[
 
 ## 状态与边界
 
-当前是可继续编辑的本地候选仓库；具体实现、验证和未启用能力见[当前状态](docs/current-state.md)。CF 内容继承 2026-10-02 阅读版 r3 的来源记录；局部工程验证不能代表全篇事实重新核验。旧三册 Markdown / HTML / PDF 固定保留在 `dist/`，用于历史阅读；新构建进入 `.build/`，不覆盖旧版。
+这是持续编辑的 source-available 参考仓库；具体实现、验证和未启用能力见[当前状态](docs/current-state.md)。CF 内容继承 2026-10-02 阅读版 r3 的来源记录；局部工程验证不能代表全篇事实重新核验。旧三册 Markdown / HTML / PDF 固定保留在 `dist/`，用于历史阅读；新构建进入 `.build/`，不覆盖旧版。
 
 公共例子使用合成输入，没有账号凭据或真实运行数据。私人聊天、工作记录和原始 exports 不属于本仓库。云端实验、定期上游监控、网站部署和 release 均不由本地检查自动启用。
 
-许可尚待作者选择，见[许可状态](LICENSE-STATUS.md)。公开可见、作者署名与复用授权分别处理；第三方产品、引用与依赖保留各自的权利。
+原创功能代码采用 [SUL-1.0](LICENSE)；原创正文、出版物、独立图形和资料编排采用 [CC BY-NC-SA 4.0](LICENSE-DOCUMENTATION.md)。这是一份 source-available 项目，不是无商业使用限制的 OSI 开源软件；具体路径与第三方例外见[许可与权利范围](LICENSE-STATUS.md)。
 
 [项目规格](SPEC.md) · [架构](docs/architecture.md) · [生命周期](docs/lifecycle.md) · [内容设计](docs/content-design.md) · [AGENTS](AGENTS.md)
 

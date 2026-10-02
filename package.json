@@ -5,5 +5,6 @@
   "description": "An independent, locally buildable Cloudflare reference and publication source.",
   "devDependencies": {
     "mermaid": "11.17.2"
-  }
+  },
+  "license": "SEE LICENSE IN LICENSE-STATUS.md"
 }

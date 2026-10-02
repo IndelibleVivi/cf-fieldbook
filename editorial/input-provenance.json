@@ -4,7 +4,7 @@
   "new_work": "fieldbook-local-1: static reader, shared decision facts, frozen publication candidates, synthetic recovery demo; inherited source review dates",
   "preserved_publications": "dist/ are inherited r3 bytes",
   "source_cutoff": "2026-10-02",
-  "name_status": "CF Fieldbook used locally; public release not approved",
-  "remote_created": false,
-  "live_cloud_run": false
+  "name_status": "CF Fieldbook; public source publication approved",
+  "live_cloud_run": false,
+  "publication_state_owner": "docs/current-state.md"
 }

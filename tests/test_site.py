@@ -27,7 +27,7 @@ class ReadingSiteTests(unittest.TestCase):
         for directory in ('catalog', 'services', 'comparisons', 'use-cases', 'guides',
                           'reference', 'reports', 'examples', 'diagrams', 'assets', 'styles', 'templates'):
             shutil.copytree(ROOT / directory, cls.root / directory)
-        for path in build_site.PUBLIC_DOCS:
+        for path in (*build_site.PUBLIC_DOCS, 'LICENSE'):
             if (ROOT / path).is_file():
                 destination = cls.root / path
                 destination.parent.mkdir(parents=True, exist_ok=True)
@@ -43,6 +43,13 @@ class ReadingSiteTests(unittest.TestCase):
     def test_build_leaves_editing_sources_unchanged(self):
         for path, value in self.before.items():
             self.assertEqual((self.root / path).read_bytes(), value, str(path))
+
+    def test_download_bundle_keeps_software_and_content_license_notices(self):
+        self.assertEqual((self.output / 'LICENSE').read_bytes(), (ROOT / 'LICENSE').read_bytes())
+        for name in ('LICENSE-STATUS.md', 'LICENSE-DOCUMENTATION.md'):
+            self.assertTrue((self.output / name).is_file())
+        self.assertIn('SUL-1.0', (self.output / 'LICENSE-STATUS.html').read_text())
+        self.assertIn('CC BY-NC-SA 4.0', (self.output / 'LICENSE-DOCUMENTATION.html').read_text())
 
     def test_home_has_three_real_reading_paths(self):
         soup = BeautifulSoup((self.output / 'index.html').read_text(), 'html.parser')
