@@ -14,6 +14,7 @@ CF Fieldbook 是独立的参考资料与离线例子仓库。先读 [README](REA
 - `tools/editions.py freeze/build/check` 是三册出版入口，使用冻结输入内的 renderer；`.build/editions/` 是本地产物，`dist/` 是固定 r3 历史。
 - Mermaid 在 `diagrams/src/` 编辑，SVG 由工具生成；不要手改导出图。原创装饰在 `assets/motifs/`。
 - 阅读概念图由 `tools/figures.py` 显式生成；入口与任务状态的横／窄布局共用语义，不单改一份导出。
+- README 的 `assets/motifs/repository-banner.svg` 也由 `tools/figures.py` 生成，复用 `cat-sunrise.svg`；调整标题排布改生成函数，调整猫与日出改原母题。
 
 ## Change boundaries
 

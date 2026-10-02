@@ -1,6 +1,7 @@
 """Local editorial SVGs. No remote assets, logos, font files or account data."""
 from pathlib import Path
 from html import escape
+from xml.etree import ElementTree
 
 C='#10B3CA'; O='#FF7A2A'; INK='#183B46'; LINE='#C6E4E9'; PALE='#ECF9FB'; DARK='#087086'; MUTED='#58717A'
 
@@ -128,8 +129,35 @@ def task_state_mobile():
 FIGS={'workspace':workspace,'runtime-cost':runtime_cost,'two-routes':two_routes,'task-state':task_state}
 MOBILE_FIGS={'two-routes-mobile':two_routes_mobile,'task-state-mobile':task_state_mobile}
 
+def repository_banner(root:Path):
+    """Compose the README masthead from the same cat artwork used by the site."""
+    namespace='http://www.w3.org/2000/svg'
+    ElementTree.register_namespace('',namespace)
+    motif=ElementTree.fromstring((root/'assets/motifs/cat-sunrise.svg').read_text())
+    for node in list(motif):
+        if node.tag in {f'{{{namespace}}}title',f'{{{namespace}}}desc'}:
+            motif.remove(node)
+    motif.attrib={'x':'642','y':'12','width':'600','height':'400','viewBox':'0 0 600 400'}
+    artwork=ElementTree.tostring(motif,encoding='unicode')
+    return f'''<svg xmlns="{namespace}" width="1280" height="420" viewBox="0 0 1280 420" role="img" aria-labelledby="title desc">
+<title id="title">CF Fieldbook</title>
+<desc id="desc">Cloudflare 用途、选择与实践。青色猫坐在展开的书页上，望向橙色日出，云与细线连接其间。</desc>
+<rect width="1280" height="420" fill="#FFFFFF"/>
+<g id="wordmark" fill="#183544" font-family="Arial, Helvetica, sans-serif" font-weight="600">
+<text x="72" y="132" font-size="92" letter-spacing="-3">CF</text>
+<text x="68" y="230" font-size="92" letter-spacing="-3">Fieldbook</text>
+</g>
+<text x="74" y="292" fill="#566872" font-family="PingFang SC, Microsoft YaHei, sans-serif" font-size="30">Cloudflare 用途、选择与实践</text>
+<path d="M74 335H510" fill="none" stroke="#D3E4E8" stroke-width="2"/>
+<path d="M74 335H142" fill="none" stroke="#007F93" stroke-width="2"/>
+<circle cx="522" cy="335" r="4" fill="#BE4B13"/>
+{artwork}
+</svg>
+'''
+
 def write_all(root:Path):
     dest=root/'assets';dest.mkdir(exist_ok=True)
     for name,fun in (FIGS | MOBILE_FIGS).items():(dest/f'{name}.svg').write_text(fun(),encoding='utf-8')
+    (dest/'motifs/repository-banner.svg').write_text(repository_banner(root),encoding='utf-8')
 
 if __name__=='__main__':write_all(Path(__file__).resolve().parents[1])

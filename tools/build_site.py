@@ -39,7 +39,8 @@ PUBLIC_REPOSITORY_PATHS = {
 REPOSITORY_URL = 'https://github.com/IndelibleVivi/cf-fieldbook/blob/main/'
 PUBLIC_SITE_URL = 'https://indeliblevivi.github.io/cf-fieldbook/'
 SITE_ASSETS = {'styles/site.css', 'styles/site.js', 'styles/search.js', 'assets/motifs/cat-sunrise.svg',
-               'assets/motifs/edge-route.svg', 'assets/motifs/reading-pages.svg', 'assets/motifs/field-notes.svg', 'assets/motifs/favicon.svg'}
+               'assets/motifs/edge-route.svg', 'assets/motifs/reading-pages.svg', 'assets/motifs/field-notes.svg', 'assets/motifs/favicon.svg',
+               'assets/motifs/repository-banner.svg'}
 LINK_LABELS = {'internal': '站内阅读', 'term': '词义，可就地展开或打开词表', 'repository': '本项目公开源码，前往 GitHub',
                'source': '外部来源，离开本站', 'attachment': '附件；下载或打开文件'}
 READER_PREFIXES = {'services', 'comparisons', 'use-cases', 'guides', 'reference', 'reports', 'examples', 'practice'}
@@ -367,6 +368,8 @@ class Site:
         if not figures:
             return
         for img in list(soup.find_all('img')):
+            if '/motifs/' in str(img['src']):
+                continue
             if img.parent.name == 'p' and len(img.parent.contents) == 1:
                 img.parent.unwrap()
             figure = soup.new_tag('figure')

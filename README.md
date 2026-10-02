@@ -1,5 +1,7 @@
 # CF Fieldbook
 
+[![CF Fieldbook：青猫、日出与展开的书页](assets/motifs/repository-banner.svg)](https://indeliblevivi.github.io/cf-fieldbook/)
+
 **Cloudflare® 服务的用途、选择与实践参考。**
 
 从手边的问题出发，认识相关服务，读实际系统遇到的故障与取舍，再运行一个能检查的小例子。面向个人开发者、独立创作者与协作 agent；这是 Faye & Cove 编辑的独立参考，不是 Cloudflare 官方文档或一键部署平台。
