@@ -1,0 +1,33 @@
+{
+  "schema": "fieldbook.example/1",
+  "id": "example.reading-shelf",
+  "default_mode": "offline",
+  "network_required": false,
+  "credentials_required": false,
+  "live_supported": false,
+  "run_from": "repository-root",
+  "run_command": [
+    "python3",
+    "-m",
+    "http.server",
+    "8768",
+    "--bind",
+    "127.0.0.1",
+    "--directory",
+    "examples/reading-shelf"
+  ],
+  "check_command": [
+    "python3",
+    "-c",
+    "import pathlib; assert all((pathlib.Path('examples/reading-shelf')/f).is_file() for f in ['index.html','materials/welcome.md','materials/notes.md','materials/checklist.md'])"
+  ],
+  "input_kind": "synthetic",
+  "observation_scope": [
+    "offline reading",
+    "download without a server",
+    "portable relative links"
+  ],
+  "cloud_resources_created": [],
+  "teardown": "not applicable: offline files create no cloud resources",
+  "evidence_notice": "Passing this check does not prove service availability or model quality."
+}

@@ -1,4 +1,4 @@
-# 五张图，五个问题
+# 六张图，六个问题
 
 这些是同一份设计的分视图，不是截图、图片生成或互不相干的手绘示意。每张图由本目录 `.mmd` 通过 Mermaid 渲染，正文中另有等价说明。候选架构不等于所有目标机制已经实现。
 
@@ -8,6 +8,7 @@
 | 更新影响 | 依赖、相关、历史勘误 | [Mermaid](src/change-impact.mmd) | [SVG](../assets/diagrams/change-impact.svg) |
 | 内容生命周期 | 修订、取代、归档、撤下 | [Mermaid](src/content-lifecycle.mmd) | [SVG](../assets/diagrams/content-lifecycle.svg) |
 | 出版 | 只读构建、版次与勘误 | [Mermaid](src/publication.mmd) | [SVG](../assets/diagrams/publication.svg) |
+| 资料架更新与撤下 | 新原件、当前指针、读取资格与后续清理；是扩展设计 | [Mermaid](src/reading-shelf.mmd) | [SVG](../assets/diagrams/reading-shelf.svg) |
 | 示例执行 | 离线默认、云端授权、清理 | [Mermaid](src/example-lifecycle.mmd) | [SVG](../assets/diagrams/example-lifecycle.svg) |
 
 青色边框表示编辑对象或阅读输出，橙色表示核查/判断位置，浅灰表示外部材料或历史路径。所有状态仍有文字；虚线表示旁路或辅助关系，含义由边上的标签决定。图不使用产品商标、猫脸节点或背景纹样。
@@ -32,4 +33,4 @@ npm ci --ignore-scripts
 
 ## 阅读尺度
 
-架构图为横向概览；另外几张以纵向流程为主。网页为宽图保留局部横向滚动，旁边提供完整解释；打印时按实际图宽分配页面。不要把五张拼成一页后再要求读者放大猜文字。
+架构图为横向概览；另外几张以纵向流程为主。网页为宽图保留局部横向滚动，旁边提供完整解释；打印时按实际图宽分配页面。不要把六张拼成一页后再要求读者放大猜文字。

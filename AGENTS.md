@@ -5,13 +5,17 @@ CF Fieldbook 是独立的参考资料与离线例子仓库。先读 [README](REA
 ## Canonical paths
 
 - Markdown 拥有正文；`catalog/` 拥有精确跨页数据、来源和内容索引；`examples/` 拥有可执行行为。
+- `catalog/publications.json` 拥有三部作品的编排与阅读入口，`tools/publications.py` 共用读取。Markdown 的 `chapter` 标记是稳定身份，章节编号只表示顺序；改名或重排须保持旧网页锚点。报告身份来自所选条目与正文日期，不写死 renderer 日期。
 - `practice/` 拥有匿名重构的历史案例，catalog 的 `practice` 条目把它们纳入阅读、搜索与撤下规则。历史观察与编辑时查阅的官方机制分别注明；私人原始证据、项目身份与实际配置留在仓库外，不记为新的云端执行。
 - `tools/content.py sync` 显式更新维护事实块，`check` 检测漂移。历史报告不读入当前事实。
+- Observability 费用取 `catalog/observability-pricing.json`，生效日期归 `catalog/launches.json`；投影使用显式 as-of 或正文 source_cutoff，不用构建当天刷新事实。
 - `tools/build_site.py` 是唯一阅读站构建入口，只分发显式 allowlist。阅读呈现的注释过滤与单次署名不回写 Markdown；代码中的注释示例和权利声明须保留，不通过开启任意 HTML 来处理维护标记。
 - `docs/glossary.md` 的词条首段拥有短释义；站点从它生成就地解释，冻结出版物嵌入当版所引用的定义。术语链接保留普通 Markdown 锚点。
 - `styles/search.js` 拥有本地问题别名与排序；索引来自实际正文小节。搜索目标必须有答案，不能用别名掩盖缺失内容。
 - `examples/job-state/model.py` 拥有恢复规则；`tools/recovery_demo.py` 执行模型生成合成场景，`styles/recovery.js` 只控制场景与播放。演示只随 current 例子分发，不增加云端执行。
+- `examples/reading-shelf/materials/` 拥有三份合成原件；`build.py` 生成 `index.html`，不另行编辑生成正文。静态例子不包含手册扩展设计中的权限、数据库或索引。
 - `tools/editions.py freeze/build/check` 是三册出版入口，使用冻结输入内的 renderer；`.build/editions/` 是本地产物，`dist/` 是固定 r3 历史。
+- `tools/share_images.py` 从作品编排、日期与原创 SVG 生成 `assets/share/` PNG；普通站点构建只复制。作品身份、截止日或母题变化须重建并复看分享卡。
 - Mermaid 在 `diagrams/src/` 编辑，SVG 由工具生成；不要手改导出图。原创装饰在 `assets/motifs/`。
 - 阅读概念图由 `tools/figures.py` 显式生成；入口与任务状态的横／窄布局共用语义，不单改一份导出。
 - README 的 `assets/motifs/repository-banner.svg` 也由 `tools/figures.py` 生成，复用 `cat-sunrise.svg`；调整标题排布改生成函数，调整猫与日出改原母题。仅仓库 README 展示横幅，站点 HTML 投影省略，Markdown 下载保持原样。

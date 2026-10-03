@@ -6,7 +6,7 @@
 
 从手边的问题出发，认识相关服务，读实际系统遇到的故障与取舍，再运行一个能检查的小例子。面向个人开发者、独立创作者与协作 agent；这是 Faye & Cove 编辑的独立参考，不是 Cloudflare 官方文档或一键部署平台。
 
-[在线阅读](https://indeliblevivi.github.io/cf-fieldbook/) · [源码仓库](https://github.com/IndelibleVivi/cf-fieldbook) · [变更记录](CHANGELOG.md)
+[在线阅读](https://indeliblevivi.github.io/cf-fieldbook/) · [源码仓库](https://github.com/IndelibleVivi/cf-fieldbook) · [作品与版本](https://indeliblevivi.github.io/cf-fieldbook/publications.html) · [变更记录](CHANGELOG.md)
 
 正文以中文为主，Markdown 本身可以阅读；静态网站提供目录、来源跳转和本地搜索。代码、来源和出版工具留在同一仓库，便于在判断改变时找到受影响的内容。
 
@@ -19,8 +19,9 @@
 | 理解任务为什么登记了却没完成 | [任务中断与恢复](use-cases/recoverable-jobs.md) | 看见租约恢复、迟到拒绝与未知结果，知道哪些动作不能盲目重试 |
 | 让模型建议下一步，而由程序控制执行 | [有限决策与下一步动作](use-cases/bounded-decision.md) | 区分模型建议、允许的动作与需要检验的误判 |
 | 比较 Clef、Jev 与接入路线 | [服务页](services/decision-models.md) · [Clef / Jev 专题](comparisons/clef-vs-jev.md) | 在同一任务下比较模型与供应路径，不把价格当作正确率 |
-| 判断本期产品变化是否影响自己 | [2026-10-02 新发布观察](reports/2026-10-02.md) | 找到带日期的变化、适用条件与原始来源 |
-| 运行例子，或把检查交给 agent | [三个离线例子](examples/README.md) · [恢复任务单](templates/job-recovery-task.md) | 用合成输入取得实际输出、失败证据与清理结果 |
+| 判断本期产品变化是否影响自己 | [2026-10-03 新发布观察](reports/2026-10-03.md) | 读观测、PiHarness、互联网搜索与临时分享，区分现在可用与未来计费 |
+| 先做完一个可读的小项目 | [三份文档的小资料架](examples/reading-shelf/README.md) | 直接阅读、下载合成文档，沿同一份材料继续理解权限、更新、任务与检索 |
+| 运行例子，或把检查交给 agent | [四个离线例子](examples/README.md) · [恢复任务单](templates/job-recovery-task.md) | 用合成输入取得实际输出、失败证据与清理结果 |
 
 不熟悉的词可以先查[术语小词表](docs/glossary.md)。需要精确配置、命令或完整状态约束时，从对应例子进入[实施参考](reference/implementation.md)。
 
@@ -55,9 +56,9 @@ python3 -m http.server 8767 --bind 127.0.0.1 --directory .build/site
 
 ![来源与重新构造的实践进入 Markdown、事实登记和示例代码；检查后生成阅读网站和版本化出版物，私人运行环境留在仓库外。](assets/diagrams/architecture.svg)
 
-[Mermaid 源码](diagrams/src/architecture.mmd) · [全部五张图](diagrams/README.md)
+[Mermaid 源码](diagrams/src/architecture.mmd) · [全部六张图](diagrams/README.md)
 
-解释归 Markdown，跨页精确数据归 `catalog/`，执行行为归 `examples/`。网站与 PDF 读取这些来源；事实核验、代码测试和云端实测分别记录。服务页持续维护，带截止日期的报告保留当时判断。后来的改价不自动回写历史报告。
+解释归 Markdown，跨页精确数据归 `catalog/`，执行行为归 `examples/`。三部作品的源条目、封面、章节类型与服务阅读入口归 `catalog/publications.json`；稳定章节 ID 与可见编号分开维护。网站与 PDF 读取这些来源；事实核验、代码测试和云端实测分别记录。服务页持续维护，带截止日期的报告保留当时判断。后来的改价不自动回写历史报告。
 
 ```sh
 python3 tools/fieldbook.py impact data.decision-routes

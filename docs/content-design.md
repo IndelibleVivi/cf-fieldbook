@@ -28,7 +28,7 @@ PDF 正文建议 10.5–11.5pt，图中文字在实际版面中不低于约 9.5p
 
 ## 色彩 token
 
-下表为阅读站的 CSS token；技术图与冻结出版物保留各自源文件中的配色，网站改版不回写历史出版物。
+下表为冷白主题的主要 CSS token；暖纸主题的完整值见 `styles/fieldbook-tokens.json`，主题选择只存在读者浏览器。技术图与冻结出版物保留各自源文件中的配色，网站改版不回写历史出版物。
 
 | 角色 | 值 | 使用方式 |
 |---|---|---|
@@ -79,4 +79,4 @@ Cloudflare 产品名称用于真实的服务阅读入口；云、边缘节点与
 
 README 横幅 `assets/motifs/repository-banner.svg` 将项目名与猫看日出排成横向题头；运行 `python3 tools/figures.py` 从原母题生成，避免独立复制维护猫的轮廓。横幅只在仓库 README 展示并链接到阅读站；网站已有独立题头，HTML 投影省略此图。下载的 README Markdown 和对应图片仍保留原样。
 
-`assets/motifs/cat-sunrise.svg` 是首页、页脚、404 与出版封面的原生装饰源；几何青猫、橙色半轮日出与书页细线构成全站母题。白底、清晰轮廓、细分隔线与少量青橙强调延伸到题头、章节、目录、表格和实践入口。主画增加轻云与细连接线，保留猫、日出和书页的原有轮廓。`reading-pages.svg` 用于文章与来源页，`field-notes.svg` 用于实践与目录页，`edge-route.svg` 用于服务索引；它们都是装饰，不声明部署拓扑。正文的四幅说明图及其中两幅的手机布局由 `tools/figures.py` 显式生成，五幅架构图由 Mermaid 生成；二者不在出版时回写。旧版封面随固定的 r3 出版物保留。
+`assets/motifs/cat-sunrise.svg` 是首页、页脚、404 与出版封面的原生装饰源；几何青猫、橙色半轮日出与书页细线构成全站母题。冷白默认与暖纸可选共享透明母题，清晰轮廓、细分隔线与少量青橙强调延伸到题头、章节、目录、表格和实践入口。主画增加轻云与细连接线，保留猫、日出和书页的原有轮廓。`reading-pages.svg` 用于手册与来源页，`field-notes.svg` 用于实践、观察与目录页，`edge-route.svg` 用于服务；比较、用例、例子、实施参考分别用 `weigh-routes.svg`、`launch-window.svg`、`task-loop.svg`、`ledger.svg`，篇尾用 `colophon.svg`；它们都是装饰，不声明部署拓扑。正文的四幅说明图及其中两幅的手机布局由 `tools/figures.py` 显式生成，六幅机制与架构图由 Mermaid 生成；二者不在出版时回写。旧版封面随固定的 r3 出版物保留。

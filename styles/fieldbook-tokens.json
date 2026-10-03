@@ -1,10 +1,24 @@
 {
-  "paper": "#FFFFFF",
-  "ink": "#183544",
-  "muted": "#566872",
-  "cyan": "#007F93",
-  "cyanLight": "#EFF9FB",
-  "orange": "#BE4B13",
-  "orangeLight": "#FFF4EC",
-  "line": "#D3E4E8"
+  "cold": {
+    "paper": "#FFFFFF",
+    "card": "#FFFFFF",
+    "ink": "#183544",
+    "muted": "#566872",
+    "cyan": "#007F93",
+    "cyanLight": "#EFF9FB",
+    "orange": "#BE4B13",
+    "orangeLight": "#FFF4EC",
+    "line": "#D3E4E8"
+  },
+  "warm": {
+    "paper": "#FAF6EF",
+    "card": "#FFFDF9",
+    "ink": "#21333C",
+    "muted": "#5D6C6E",
+    "cyan": "#0B7D8C",
+    "cyanLight": "#E9F4F2",
+    "orange": "#C14F14",
+    "orangeLight": "#FDF0E4",
+    "line": "#E6DCCB"
+  }
 }

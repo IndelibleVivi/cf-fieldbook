@@ -1,6 +1,28 @@
-/* Reading interactions are local; no requests or storage. */
+/* Reading interactions are local; no requests. The only storage is the reader's
+   own theme choice (localStorage key "fieldbook-theme"). */
 (() => {
   'use strict';
+  const themeToggle = document.querySelector('.theme-toggle');
+  if (themeToggle) {
+    const root = document.documentElement;
+    const themeLabel = themeToggle.querySelector('.theme-toggle-label');
+    const render = () => {
+      const warm = root.dataset.theme === 'warm';
+      themeToggle.setAttribute('aria-pressed', String(warm));
+      themeToggle.setAttribute('aria-label', warm ? '切换到冷白主题' : '切换到暖纸主题');
+      if (themeLabel) themeLabel.textContent = warm ? '冷白' : '暖阳';
+    };
+    themeToggle.addEventListener('click', () => {
+      const warm = root.dataset.theme !== 'warm';
+      if (warm) root.dataset.theme = 'warm'; else delete root.dataset.theme;
+      try {
+        if (warm) localStorage.setItem('fieldbook-theme', 'warm');
+        else localStorage.removeItem('fieldbook-theme');
+      } catch (_) { /* theme applies to this visit only */ }
+      render();
+    });
+    render();
+  }
   const mobile = window.matchMedia('(max-width: 760px)');
   for (const contents of document.querySelectorAll('.contents details')) contents.open = !mobile.matches;
 
@@ -96,7 +118,9 @@
     if (!query) { status.textContent = hint; return; }
     const found = api.search(data, query);
     status.textContent = found.length ? `找到 ${found.length} 个阅读小节。` : '没有找到匹配小节。试试更短的词，或清空搜索回到目录。';
-    for (const item of found) {
+    for (const items of api.group(found)) {
+      let sectionGroup;
+      for (const [index, item] of items.entries()) {
       const row = document.createElement('li'); row.className = 'search-result';
       const kind = document.createElement('span'); kind.className = 'result-kind';
       kind.textContent = item.kind + (item.status === 'archived' ? ' · 历史归档' : item.status === 'superseded' ? ' · 已有替代' : '');
@@ -112,7 +136,20 @@
       highlight(snippet, (first ? '…' : '') + excerpt + (first + 155 < item.text.length ? '…' : ''), item.terms);
       row.append(kind, link);
       if (item.text) row.append(snippet);
-      output.append(row);
+      if (index === 0) {
+        output.append(row);
+        if (items.length > 1) {
+          sectionGroup = document.createElement('details');
+          const summary = document.createElement('summary');
+          summary.textContent = `同篇还有 ${items.length - 1} 个相关小节`;
+          sectionGroup.append(summary);
+          row.append(sectionGroup);
+          const related = document.createElement("ul");
+          sectionGroup.append(related);
+          sectionGroup = related;
+        }
+      } else sectionGroup.append(row);
+      }
     }
   });
 })();

@@ -1,6 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="title desc">
 <title id="title">记录与连接</title><desc id="desc">错落的几页记录、青色连接线和橙色页签；实践阅读区的原创几何装饰，不表示系统拓扑。</desc>
-<rect width="320" height="200" fill="#fff"/>
 <g id="pages" stroke="#8FBBC5" stroke-width="1.2" stroke-linejoin="round">
 <path d="M53 48h93v115H53z" fill="#EFF9FB"/>
 <path d="M87 31h100v127H87z" fill="#fff"/>

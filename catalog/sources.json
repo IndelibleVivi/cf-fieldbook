@@ -758,5 +758,133 @@
     "accessed": "2026-10-03",
     "kind": "official_primary",
     "verification_scope": "practice_mechanism_document_consulted; historical_observations_are_separate; no_new_cloud_execution"
+  },
+  {
+    "id": "S98",
+    "title": "Cloudflare Observability 新平台发布",
+    "url": "https://blog.cloudflare.com/one-observability-platform/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S99",
+    "title": "Cloudflare Traces 发布",
+    "url": "https://blog.cloudflare.com/cloudflare-tracing/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S100",
+    "title": "Cloudflare Observability 价格",
+    "url": "https://developers.cloudflare.com/observability/pricing/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S101",
+    "title": "Cloudflare Traces 采样与传播配置",
+    "url": "https://developers.cloudflare.com/observability/traces/configuration/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S102",
+    "title": "SQL API 查询",
+    "url": "https://developers.cloudflare.com/analytics/sql-api/query-api/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S103",
+    "title": "SQL API 限制",
+    "url": "https://developers.cloudflare.com/analytics/sql-api/limits/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S104",
+    "title": "PiHarness 发布",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-02-pi-harness/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S105",
+    "title": "PiHarness 状态与 Lifecycle",
+    "url": "https://developers.cloudflare.com/agents/harnesses/pi/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S106",
+    "title": "Web Search API 发布",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-02-introducing-web-search-api/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S107",
+    "title": "Web Search API providers",
+    "url": "https://developers.cloudflare.com/web-search/providers/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S108",
+    "title": "Web Search API 调用与响应",
+    "url": "https://developers.cloudflare.com/web-search/how-to-use/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S109",
+    "title": "Protected Quick Tunnels 发布",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-02-protected-quick-tunnels/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S110",
+    "title": "Quick Tunnel 邮箱限制与开发边界",
+    "url": "https://developers.cloudflare.com/tunnel/get-started/quick-tunnels/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S111",
+    "title": "Workers Logs 迁移前计费",
+    "url": "https://developers.cloudflare.com/workers/platform/pricing/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S112",
+    "title": "R2 存储类别与价格",
+    "url": "https://developers.cloudflare.com/r2/pricing/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S113",
+    "title": "Workers 新项目脚手架",
+    "url": "https://developers.cloudflare.com/workers/get-started/guide/",
+    "accessed": "2026-10-03",
+    "kind": "official_primary",
+    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
   }
 ]

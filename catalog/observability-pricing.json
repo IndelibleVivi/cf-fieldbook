@@ -1,0 +1,22 @@
+{
+  "schema": "fieldbook.observability-pricing/1",
+  "launch_id": "observability-platform",
+  "as_of": "2026-10-03",
+  "current": {
+    "source": "S111",
+    "free_events_per_day": 200000,
+    "free_retention_days": 3,
+    "paid_events_per_month": 20000000,
+    "extra_usd_per_million": 0.6,
+    "paid_retention_days": 7
+  },
+  "announced": {
+    "source": "S100",
+    "free_ingestion_gb_per_day": 0.5,
+    "retention_days": 7,
+    "paid_ingestion_gb_per_cycle": 50,
+    "paid_storage_gb_month_per_cycle": 12,
+    "extra_ingestion_usd_per_gb": 0.25,
+    "extra_storage_usd_per_gb_month": 0.1
+  }
+}

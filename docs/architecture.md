@@ -18,12 +18,15 @@ Markdown 保存解释；catalog 保存跨页复用的精确记录；源码保存
 |---|---|---|---|
 | 比较结论、因果、解释 | guides / services / comparisons 等 Markdown | README、网页、PDF | 单独维护同义的“机版结论” |
 | 精确模型路线与价格 | catalog/decision-routes.json | 比较表、费用算术、示例输入检查 | 在渲染器里手写另一张价格表 |
+| 作品编排与章节类型 | catalog/publications.json；正文稳定 chapter 标记 | 网页入口与独立冻结版次 | renderer 按章序号／日期再存一份清单 |
 | 来源书目 | catalog/sources.json | 来源索引、核验记录 | 导出 HTML 的无来源数字 |
 | 内容身份与依赖 | catalog/entries.json | 导航、影响查询、到期队列 | frontmatter 另存一份同样依赖 |
 | 请求外壳、任务状态 | examples 内的源码 | 例子执行、引用或一致性测试 | 文内粘贴后独立修改的算法 |
 | 图的结构和文字 | diagrams/src/*.mmd | assets/diagrams/*.svg | 手工移动 SVG 节点后不更新源码 |
 | 装饰 | assets/motifs 独立 SVG | 封面、封底、少量细节 | 让装饰成为状态唯一编码 |
 | 私人运行与凭据 | 仓库外 | 明确获准的运行节点 | tracked .env、真实配置、原始运行日志 |
+
+Observability 费用由明确资料日期和公告生效事件生成；当前条款与已公布未来条款分开，构建时钟不替代核验日期。
 
 决策模型的精确表格已由 `tools/content.py` 共源到三个维护页；其他事实仍有正文编辑责任。只按真实共享与更新需要继续提取，不宣称全库字段已结构化。
 

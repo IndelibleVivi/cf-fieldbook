@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import re
 import sys
+
 from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,13 +29,15 @@ def validate(root: Path = ROOT) -> list[str]:
             date.fromisoformat(source['accessed'])
         except ValueError:
             errors.append(f"bad checked date: {source['id']}")
-    for name in ['reports/2026-10-02.md', 'guides/handbook.md', 'reference/implementation.md', 'comparisons/clef-vs-jev.md']:
+    for name in [*(p.relative_to(root).as_posix() for p in sorted((root / 'reports').glob('*.md'))), 'guides/handbook.md', 'reference/implementation.md', 'comparisons/clef-vs-jev.md', 'services/observability.md', 'services/search.md', 'services/agent-runtime.md', 'use-cases/temporary-sharing.md']:
         text = (root / name).read_text()
         refs = set(re.findall(r'\[(S\d{2,3})\]', text))
         if refs - ids:
             errors.append(f'{name}: missing source IDs {sorted(refs - ids)}')
-        if 'source_cutoff: 2026-10-02' not in text:
-            errors.append(f'{name}: source cutoff missing')
+        try:
+            date.fromisoformat(re.search(r'^source_cutoff: (\d{4}-\d{2}-\d{2})$', text, re.M)[1])
+        except (IndexError, KeyError, ValueError, TypeError):
+            errors.append(f'{name}: source cutoff missing or invalid')
         if '<!-- SOURCES -->' not in text:
             errors.append(f'{name}: source boundary missing')
         if any(marker in text for marker in ['', '~~~~~~~~~~~~~~~~', 'TODO', 'TBD']):

@@ -19,6 +19,8 @@ macOS 已安装 Homebrew Pango/GLib、却遇到 `cannot load library libgobject-
 
 正文解释归各自 Markdown；来源登记归 `catalog/sources.json`；决策模型路线与价格归 `catalog/decision-routes.json`；内容关系归 `catalog/entries.json`。请求外壳、任务状态等行为改 `examples/` 源码。图形结构改 `diagrams/src/*.mmd`，导出方法见 [图示说明](diagrams/README.md)。
 
+作品编排改 `catalog/publications.json`；章节身份用正文的稳定 `chapter` 标记，改标题、插章或重排不要改掉已发布的锚点。Observability 费用数值改 `catalog/observability-pricing.json`，未来计费日期归 `catalog/launches.json`；`tools/content.py` 根据 source_cutoff 或明确 as-of 生成对应时间的说明。报告新增为独立条目，历史报告不参与同步。资料架例子改三份 `materials/` 原件后，运行 `python3 examples/reading-shelf/build.py` 重建页面。
+
 先查一项变更影响哪里，再判断哪些候选真的需要修改：
 
 ```sh

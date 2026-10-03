@@ -1,10 +1,8 @@
 # 来源与历史版本
 
-`dist/` 保存 2026-10-02 阅读版 r3 的三册 Markdown、HTML 和 PDF，作为固定的历史出版物；当前 Markdown 与 catalog 持续维护，三个离线例子使用合成输入。
+`dist/` 保存 2026-10-02 阅读版 r3 的三册 Markdown、HTML 和 PDF，作为固定的历史出版物；当前 Markdown 与 catalog 持续维护，四个离线例子使用合成输入。
 
-## 参考材料与致谢
-
-一份由社区成员共享的 Markdown 教程为早期问题选择与组织提供了参考。感谢原分享者。该材料不是 Cloudflare 产品状态、接口、价格或云端执行结果的官方证据；现行资料的产品断言应结合各篇列出的公开来源及下述核验范围阅读。
+产品事实引用 Cloudflare 的公开官方资料；第三方模型引用其原厂或供应入口，浏览器与协议行为引用对应维护方。编辑分析与匿名历史观察另标证据范围，不以私人资料作为产品证据。
 
 ## 来源核验范围
 
@@ -13,6 +11,8 @@ r3 重新核对来源 S16–S18，并补充 S73–S83，重点覆盖 Clef / Jev�
 各来源的链接与读取日期见 [来源索引](../catalog/sources.json)；每篇维护内容的状态、核验范围与依赖见 [内容索引](../catalog/entries.json)。构建时间、测试时间和事实核验时间分别记录。
 
 2026-10-03 新增 S84–S97，供[三篇实践记录](../practice/README.md)解释 Workers、R2、Vectorize、Access、Tunnel、service worker 与 MCP 授权的通用机制。这些链接在编辑时查阅；各篇的实际系统观察仍使用正文标明的历史日期，没有新的云端验收。MDN 是浏览器技术参考，MCP 规范由协议项目维护，二者不是 Cloudflare 文档。
+
+2026-10-03 新增 S98–S113，核对 Observability、Traces/SQL、PiHarness、Web Search API、Protected Quick Tunnels，以及补充 R2 费用与新项目脚手架。12 GB-month / 10 GB-month 和 Exa ZDR 的官方页面差异保留在对应正文与 launch 记录。此范围不刷新旧条目或 10-02 历史报告的核验日期，没有账户或付费调用。
 
 ## 历史资料的使用
 

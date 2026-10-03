@@ -79,6 +79,14 @@
       "output": "assets/diagrams/example-lifecycle.svg",
       "source_sha256": "192cd124c29aa79c2b815985eaaa2a836bf91ecd72d0d3459a0effb5c201fa5e",
       "svg_sha256": "b8964e56d60d4ec89418bae71f2bedb9cfba318c4f041cba63318df19c3a88c3"
+    },
+    {
+      "id": "reading-shelf",
+      "source": "diagrams/src/reading-shelf.mmd",
+      "output": "assets/diagrams/reading-shelf.svg",
+      "title": "资料架：更新与撤下怎样分工",
+      "source_sha256": "77d1ba15cb40a623baf34181086ce9737887f99946bbe6d6fc0c1ea3dcbeaf3a",
+      "svg_sha256": "2a15695d592f149955a0fa04b6e523ca86d1bada82a382840a71c50e533c4189"
     }
   ]
 }

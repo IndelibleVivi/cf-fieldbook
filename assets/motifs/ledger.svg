@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="title desc">
+<title id="title">台账与书签</title><desc id="desc">一页带分栏、勾选记录和橙色书签的台账；实施参考类阅读页的原创几何装饰，仅为阅读装饰。</desc>
+<g fill="none" stroke="#D3E4E8" stroke-width="1">
+<path d="M52 40h216M52 178h216"/>
+</g>
+<rect x="88" y="50" width="144" height="106" rx="6" fill="#FFFFFF" stroke="#007F93" stroke-width="1.5"/>
+<path d="M206 50v24l7-5 7 5V50" fill="#BE4B13"/>
+<path d="M88 76h144" stroke="#007F93" stroke-width="1.2"/>
+<path d="M130 76v80M184 76v80" stroke="#8FBBC5" stroke-width="1"/>
+<path d="M88 96h144M88 116h144M88 136h144" stroke="#D3E4E8" stroke-width="1"/>
+<path d="M98 66h20M140 66h28M194 66h16" stroke="#8FBBC5" stroke-width="3" stroke-linecap="round" fill="none"/>
+<path d="M97 88l5 5 9-10M97 108l5 5 9-10" fill="none" stroke="#BE4B13" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="103" cy="126" r="4" fill="none" stroke="#BE4B13" stroke-width="1.4"/>
+<path d="M140 90h30M140 110h22M194 90h26M194 110h32M140 130h26M194 130h20" stroke="#8FBBC5" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+<path d="M76 172h168" fill="none" stroke="#007F93" stroke-width="1.2" stroke-linecap="round"/>
+<path d="M92 180h136" fill="none" stroke="#8FBBC5" stroke-width="1" stroke-linecap="round"/>
+<path d="M44 64h12m-6-6v12M268 52h12m-6-6v12" stroke="#D3E4E8" stroke-width="1"/>
+</svg>

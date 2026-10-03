@@ -1,0 +1,15 @@
+flowchart TB
+  accTitle: 小资料架怎样更新与撤下
+  accDescr: 这是将静态资料架扩展为有版本和权限系统的设计。新原件与派生索引准备完成后才切当前指针；读取先检查资格和当前版本。撤下先关闭读取，之后清理索引和缓存；本目录没有运行这些云端机制。
+  A[编辑者准备 v2 原件<br/>原件可放 R2 或已有存储]:::content
+  A -->|生成与检查| B[预览与检索索引就绪<br/>任务记录保存执行结果]:::content
+  B -->|成功后切换| C[目录记录：current = v2<br/>D1 或已有数据库拥有当前指针]:::state
+  D[读者请求文档]:::content --> E{读取资格有效<br/>内容未撤下？}:::gate
+  E -->|是：读当前版本| C
+  C -->|指向同版原件| F[返回 v2 内容与版本标识]:::content
+  E -->|否| G[拒绝读取<br/>不等待索引清理]:::gate
+  H[编辑者撤下文档]:::content -->|先更新读取资格| E
+  H -. 后续任务 .-> I[清理旧索引与缓存<br/>物理删除另行安排]:::content
+  classDef content fill:#EFF9FB,stroke:#007F93,color:#183544,stroke-width:1.3px
+  classDef state fill:#FFFFFF,stroke:#007F93,color:#183544,stroke-width:1.8px
+  classDef gate fill:#FFF4EC,stroke:#BE4B13,color:#183544,stroke-width:1.3px

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="title desc">
+<title id="title">循环中的三张卡片</title><desc id="desc">三张卡片沿虚线圆环排列，一张带橙色对勾，一旁分出一条通向空心圆的虚线；例子类阅读页的原创几何装饰，仅为阅读装饰，不表示完整状态机。</desc>
+<circle cx="160" cy="104" r="62" fill="none" stroke="#D3E4E8" stroke-width="1" stroke-dasharray="3 6"/>
+<circle cx="214" cy="73" r="3" fill="#FFFFFF" stroke="#007F93" stroke-width="1.2"/>
+<circle cx="160" cy="166" r="3" fill="#FFFFFF" stroke="#007F93" stroke-width="1.2"/>
+<circle cx="106" cy="73" r="3" fill="#FFFFFF" stroke="#007F93" stroke-width="1.2"/>
+<rect x="138" y="34" width="44" height="32" rx="6" fill="#FFFFFF" stroke="#007F93" stroke-width="1.4"/>
+<path d="M148 46h24M148 56h16" stroke="#8FBBC5" stroke-width="2" stroke-linecap="round" fill="none"/>
+<rect x="84" y="119" width="44" height="32" rx="6" fill="#FFFFFF" stroke="#007F93" stroke-width="1.4"/>
+<circle cx="96" cy="135" r="2" fill="#8FBBC5"/>
+<circle cx="106" cy="135" r="2" fill="#8FBBC5"/>
+<circle cx="116" cy="135" r="2" fill="#8FBBC5"/>
+<rect x="192" y="119" width="44" height="32" rx="6" fill="#FFFFFF" stroke="#BE4B13" stroke-width="1.4"/>
+<path d="M205 134l6 6 11-12" fill="none" stroke="#BE4B13" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M236 140 C 256 142 262 148 272 150" fill="none" stroke="#BE4B13" stroke-width="1" stroke-dasharray="2 4"/>
+<circle cx="282" cy="151" r="7" fill="none" stroke="#BE4B13" stroke-width="1.4"/>
+<path d="M120 186h80" fill="none" stroke="#8FBBC5" stroke-width="1" stroke-linecap="round"/>
+<path d="M40 50h12m-6-6v12M284 60h12m-6-6v12" stroke="#D3E4E8" stroke-width="1"/>
+</svg>

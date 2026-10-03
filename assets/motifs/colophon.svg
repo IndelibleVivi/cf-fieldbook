@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+<title id="title">篇尾小印</title><desc id="desc">方形小印章里的橙色日出与两条青色地平线；文章结尾的原创装饰。</desc>
+<rect x="7" y="7" width="50" height="50" rx="12" fill="none" stroke="#BE4B13" stroke-width="2.5"/>
+<path d="M22 38a10 10 0 0 1 20 0" fill="#BE4B13"/>
+<path d="M32 20v-4M21 26l-3-3M43 26l3-3" fill="none" stroke="#BE4B13" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M17 45h30M21 51h22" fill="none" stroke="#007F93" stroke-width="2" stroke-linecap="round"/>
+</svg>

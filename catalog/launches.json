@@ -349,5 +349,142 @@
     "effective_events": [],
     "conflicts": [],
     "next_check": "核查开放条件与文档是否发生实质变化"
+  },
+  {
+    "id": "observability-platform",
+    "name": "Cloudflare Observability / Traces / SQL API",
+    "status": "public_beta",
+    "access": "Cloudflare Traces 与 SQL API 为 beta；dataset 与账号条件分别核对",
+    "announced_on": "2026-10-02",
+    "verified_on": "2026-10-03",
+    "sources": [
+      "S98",
+      "S99",
+      "S100",
+      "S101",
+      "S102",
+      "S103"
+    ],
+    "effective_events": [
+      {
+        "kind": "billing_start",
+        "date": "2026-12-01"
+      }
+    ],
+    "conflicts": [
+      {
+        "topic": "included_storage",
+        "claims": [
+          {
+            "value": "12 GB-month",
+            "source": "S100"
+          },
+          {
+            "value": "10 GB-month",
+            "source": "S98"
+          },
+          {
+            "value": "10 GB-month",
+            "source": "S99"
+          }
+        ],
+        "resolution": "采用当前 pricing docs S100；Enterprise 在续约时迁移"
+      }
+    ],
+    "topics": [
+      "observability",
+      "economics"
+    ],
+    "affected_entries": [
+      "service.observability",
+      "guide.handbook",
+      "report.2026-10-03"
+    ],
+    "next_check": "开放条件、来源差异与生效条款；未进行云端调用"
+  },
+  {
+    "id": "pi-harness",
+    "name": "PiHarness / Pi Durable",
+    "status": "public_beta",
+    "access": "PiHarness beta；Pi Durable experimental",
+    "announced_on": "2026-10-02",
+    "verified_on": "2026-10-03",
+    "sources": [
+      "S104",
+      "S105"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "topics": [
+      "agent-runtime"
+    ],
+    "affected_entries": [
+      "service.agent-runtime",
+      "guide.handbook",
+      "report.2026-10-03"
+    ],
+    "next_check": "开放条件、来源差异与生效条款；未进行云端调用"
+  },
+  {
+    "id": "web-search",
+    "name": "Web Search API",
+    "status": "public_beta",
+    "access": "公开 beta；经 AI Gateway，需 credits 或 provider key",
+    "announced_on": "2026-10-02",
+    "verified_on": "2026-10-03",
+    "sources": [
+      "S106",
+      "S107",
+      "S108"
+    ],
+    "effective_events": [],
+    "conflicts": [
+      {
+        "topic": "exa_zdr",
+        "claims": [
+          {
+            "value": "all providers support ZDR",
+            "source": "S106"
+          },
+          {
+            "value": "Exa: No",
+            "source": "S107"
+          }
+        ],
+        "resolution": "按当前 provider 表记 Exa No；保留公告差异，不承诺 Exa 零保留"
+      }
+    ],
+    "topics": [
+      "retrieval"
+    ],
+    "affected_entries": [
+      "service.search",
+      "guide.handbook",
+      "report.2026-10-03"
+    ],
+    "next_check": "开放条件、来源差异与生效条款；未进行云端调用"
+  },
+  {
+    "id": "protected-quick-tunnel",
+    "name": "Protected Quick Tunnels",
+    "status": "released_feature",
+    "access": "可选 --allowed-mail；本地开发服务由原设备运行",
+    "announced_on": "2026-10-02",
+    "verified_on": "2026-10-03",
+    "sources": [
+      "S109",
+      "S110"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "topics": [
+      "sharing"
+    ],
+    "affected_entries": [
+      "usecase.temporary-sharing",
+      "guide.handbook",
+      "report.2026-10-03"
+    ],
+    "next_check": "开放条件、来源差异与生效条款；未进行云端调用"
   }
 ]

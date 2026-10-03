@@ -49,3 +49,39 @@ CPU 实际执行计算所用的时间。它与从开始到结束的总经过时�
 从开始到结束在时钟上经过的时间，包括计算与等待。任务算了两分钟、又等待十分钟，总经过时间是十二分钟；不能仅用两分钟的计算时间描述运行时间或推算所有资源费用。
 
 继续读：[临时工作室的停止与成本](../guides/handbook.md#停下来也是任务的一部分)。
+
+## api / API
+
+程序之间约定的请求与返回方式。资料架的网页可以向 `/health` 或 `/documents` 请求 JSON；接口能返回数据，并不自动给予调用者读取私有内容的资格。
+
+继续读：[第一个小入口](../guides/handbook.md#first-worker)。
+
+## endpoint / 请求入口
+
+API 中约定接受请求的位置与方法，例如 `GET /health`。同一路径的 GET 与 POST 可以有不同规则；访问域名成功不代表每个 endpoint 都正确或获准。
+
+继续读：[检查不同方法](../examples/health-worker/README.md)。
+
+## deployment / 部署
+
+把检查过的代码、静态文件与配置交给指定运行环境，并启用一个可访问的版本。本地运行、上传成功与读者实际读到该版分别检查；部署也不会自动迁移或备份数据。
+
+继续读：[发布与版本](../guides/handbook.md#release)。
+
+## hostname / 主机名
+
+URL 中标识所访问服务的名称，例如 `docs.example.com`。同一 hostname 的不同路径可以有不同权限，另一 hostname 也可能成为绕过当前限制的入口。
+
+继续读：[请求路线](../guides/handbook.md#routes)。
+
+## dns / 域名解析
+
+把域名与网络记录对应的系统，让客户端找到服务入口。DNS 记录、Cloudflare 代理、HTTPS 与应用身份检查各有职责；修改记录后还需考虑已有缓存。
+
+继续读：[请求怎样找到入口](../guides/handbook.md#routes)。
+
+## jwt / 签名令牌
+
+带有 claims 的 token 格式；应用使用 Access 身份时，要验证签名、签发者、目标受众与有效期。读出 payload 只是读取字段，不是验证其可信性；可信身份之后仍需判断资源权限。
+
+继续读：[应用怎样使用 Access 身份](../guides/handbook.md#access)。

@@ -101,7 +101,7 @@ a.source-ref { display:inline; font-family:Inter,sans-serif; font-size:7.2pt; li
   size:A4; margin:20mm 23mm 20mm;
   @top-left { content:'FIELD EDITIONS'; font:500 8pt Inter; color:#36545e; vertical-align:middle; }
   @top-right { content:string(shortTitle); font-family:'Noto Sans CJK SC'; font-size:8pt; color:#58717a; }
-  @bottom-left { content:'CLOUDFLARE  /  2026.10'; font:7.5pt Inter; letter-spacing:.7pt; color:#58717a; }
+  @bottom-left { content:string(editionName); font:7.5pt Inter; letter-spacing:.7pt; color:#58717a; }
   @bottom-right { content:counter(page,decimal-leading-zero); font:500 11pt Inter; color:#087086; }
 }
 @page cover { margin:0; @top-left {content:none} @top-right {content:none} @bottom-left {content:none} @bottom-right {content:none} }
@@ -231,3 +231,6 @@ table.keep-table {break-inside:avoid;}
  .comparison #chapter-07 {break-inside:avoid;}
  .comparison .sources {break-before:auto; margin-top:9mm;}
 }
+
+.document-edition{string-set:editionName content();position:absolute;width:0;height:0;overflow:hidden}
+.edition-footer{border-top:1px solid var(--rule);margin-top:8mm;padding-top:4mm;font-size:8pt;color:var(--muted);display:flex;justify-content:space-between;gap:5mm}

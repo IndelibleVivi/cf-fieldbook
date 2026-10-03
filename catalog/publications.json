@@ -1,0 +1,205 @@
+{
+  "schema": "fieldbook.publications/1",
+  "note": "Editorial arrangement of the publication families. Markdown remains the only body authority; chapter IDs are stable targets, visible numbers are display order only.",
+  "default_family": "launches",
+  "families": [
+    {
+      "id": "launches",
+      "label": "新发布观察",
+      "kind": "report",
+      "source_entry": "report.2026-10-03",
+      "readings": [
+        "data.launches",
+        "data.decision-routes",
+        "data.sources"
+      ],
+      "cover": {
+        "publisher": "INDEPENDENT REFERENCE",
+        "series": "CLOUDFLARE / FIELD EDITIONS",
+        "kicker": "NEW LAUNCHES / FOR INDIVIDUALS",
+        "short": "新发布观察",
+        "title": "新发布观察",
+        "deck": "运行环境、检索与维护工具的新变化。<br>现在可以用什么，又适合放在哪里。",
+        "toc_intro": "先读感兴趣的方向，费用与开放状态可随时回查。每个章节和来源编号都能点击。",
+        "book": "01"
+      },
+      "front_matter": {
+        "update_note": "本版按报告自身日期与来源范围编排；后续产品变化进入维护页，不回写历史判断。"
+      },
+      "chapters": {
+        "changes": "THE SHIFT",
+        "observability": "OPERATIONS",
+        "agents": "WORKSPACE",
+        "retrieval": "SEARCH",
+        "sharing": "DELIVERY",
+        "economics": "ECONOMICS",
+        "adoption": "PROGRAMMES"
+      },
+      "share_image": "assets/share/launches.png",
+      "share_motif": "assets/motifs/field-notes.svg"
+    },
+    {
+      "id": "handbook",
+      "label": "个人基础设施实践手册",
+      "kind": "handbook",
+      "source_entry": "guide.handbook",
+      "readings": [
+        "data.decision-routes",
+        "data.sources",
+        "example.job-state",
+        "usecase.recoverable-jobs"
+      ],
+      "practice": [
+        "practice.private-reader",
+        "practice.access-pwa",
+        "practice.protected-status"
+      ],
+      "cover": {
+        "publisher": "INDEPENDENT REFERENCE",
+        "series": "CLOUDFLARE / FIELD EDITIONS",
+        "kicker": "A PRACTICAL HANDBOOK",
+        "short": "个人基础设施实践手册",
+        "title": "个人基础设施<br>实践手册",
+        "deck": "从一个入口到可恢复的应用与自动化。<br>按需要阅读，按自己的环境实践。",
+        "toc_intro": "不必顺着所有章节施工。选一件手边的事，沿着它的入口、状态、结果与维护读下去。",
+        "book": "02"
+      },
+      "legacy_anchors": {
+        "workspace": "09--给机一间临时工作室",
+        "observability": "11--留下够用的记录"
+      },
+      "chapters": {
+        "start": "START HERE",
+        "routes": "ROUTES",
+        "first-worker": "FIRST WORKER",
+        "access": "ACCESS",
+        "content": "CONTENT",
+        "jobs": "JOBS",
+        "retrieval": "RETRIEVAL",
+        "models": "MODELS",
+        "workspace": "WORKSPACE",
+        "release": "RELEASE",
+        "observability": "OBSERVABILITY",
+        "economics": "ECONOMICS",
+        "recovery": "RECOVERY",
+        "edition-notes": "EDITION NOTES"
+      },
+      "product_reading": [
+        {
+          "id": "entry-program",
+          "category": "入口与程序",
+          "names": "Workers · Static Assets",
+          "description": "先发布一个网页或小 API，读清请求、程序和绑定资源之间的关系。",
+          "chapter": "first-worker",
+          "action": "新建边缘应用"
+        },
+        {
+          "id": "access",
+          "category": "访问与身份",
+          "names": "Access · Tunnel · Protected Quick Tunnels",
+          "description": "已有本机或服务器应用时，分开考虑网络可达与使用权限。",
+          "chapter": "access",
+          "action": "访问已有服务"
+        },
+        {
+          "id": "content",
+          "category": "内容与数据",
+          "names": "D1 · R2",
+          "description": "把原件、目录、版本与恢复安排放在各自合适的位置。",
+          "chapter": "content",
+          "action": "保存与恢复内容"
+        },
+        {
+          "id": "jobs",
+          "category": "任务与恢复",
+          "names": "Queues · Workflows · Durable Objects",
+          "description": "理解接收、执行、完成和结果未知，再决定怎样重试。",
+          "chapter": "jobs",
+          "action": "处理异步任务"
+        },
+        {
+          "id": "retrieval",
+          "category": "检索与材料",
+          "names": "AI Search · Vectorize · Web Search API",
+          "description": "从一组真实问题比较检索路线，并让结果能回到原文。",
+          "chapter": "retrieval",
+          "action": "找回需要的材料"
+        },
+        {
+          "id": "models",
+          "category": "模型与入口",
+          "names": "Workers AI · AI Gateway",
+          "description": "分清模型、供应路径与判断成本；继续读 Clef / Jev 的比较。",
+          "chapter": "models",
+          "action": "选择模型调用路线"
+        },
+        {
+          "id": "workspace",
+          "category": "Agent 运行与工作空间",
+          "names": "Agents · PiHarness · Durable Objects · Containers · Sandbox",
+          "description": "需要系统包、完整 Linux 或持续工作空间时，再安排临时执行环境与退出。",
+          "chapter": "workspace",
+          "action": "安排临时执行环境"
+        },
+        {
+          "id": "observability",
+          "category": "观测与调查",
+          "names": "Cloudflare Traces · SQL API · MCP · Issues · Alerts",
+          "description": "给错误留下版本与上下文，把一次失败变成可以调查的问题。",
+          "chapter": "observability",
+          "action": "观察真实运行"
+        }
+      ],
+      "home": {
+        "eyebrow": "CLOUDFLARE / AN INDEPENDENT FIELD GUIDE",
+        "lead": "让手边的想法，",
+        "em": "有地方运行。",
+        "deck": "从一个网页、一份资料，到可以恢复的任务。<br>一起读懂 Cloudflare® 服务，也看看它们真正用起来的样子。",
+        "actions": [
+          {
+            "label": "翻开实践手册",
+            "target": "handbook",
+            "chapter": "start"
+          },
+          {
+            "label": "或从三篇真实实践开始 ↗",
+            "target": "practice"
+          }
+        ]
+      },
+      "share_image": "assets/share/handbook.png",
+      "share_motif": "assets/motifs/reading-pages.svg"
+    },
+    {
+      "id": "comparison",
+      "label": "Clef / Jev 专题",
+      "kind": "comparison",
+      "source_entry": "compare.clef-jev",
+      "readings": [
+        "data.decision-routes",
+        "data.sources"
+      ],
+      "cover": {
+        "publisher": "INDEPENDENT REFERENCE",
+        "series": "CLOUDFLARE / FIELD EDITIONS",
+        "kicker": "A COMPARISON / DECISION MODELS",
+        "short": "Clef 与 Jev",
+        "title": "Clef 与 Jev",
+        "deck": "模型、供应路径与判断成本。<br>从接得上，到值得放进工作流。",
+        "toc_intro": "先确定正在比较的是模型还是入口，再读价格、限制和试验方法。",
+        "book": "03"
+      },
+      "chapters": {
+        "models": "MODELS",
+        "providers": "PROVIDERS",
+        "cost": "COST",
+        "contracts": "CONTRACTS",
+        "evidence": "EVIDENCE",
+        "experiment": "EXPERIMENT",
+        "maintenance": "MAINTENANCE"
+      },
+      "share_image": "assets/share/comparison.png",
+      "share_motif": "assets/motifs/weigh-routes.svg"
+    }
+  ]
+}

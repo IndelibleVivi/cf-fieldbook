@@ -170,8 +170,8 @@
         }
       ]
     },
-    {
-      "id": "example.job-state",
+  {
+   "id": "example.job-state",
       "kind": "example",
       "path": "examples/job-state/README.md",
       "track": "maintained",
@@ -221,7 +221,12 @@
       "track": "maintained",
       "status": "current",
       "depends_on": [
-        "service.decision-models"
+        "service.decision-models",
+        "service.observability",
+        "service.search",
+        "service.agent-runtime",
+        "usecase.temporary-sharing",
+        "example.reading-shelf"
       ],
       "related": [
         "example.job-state",
@@ -230,7 +235,7 @@
       "review": {
         "state": "inherited",
         "checked_on": "2026-10-02",
-        "scope": "继承 r3 来源记录，核验范围见来源说明",
+        "scope": "继承 r3 来源记录，核验范围见来源说明；10-03 新主题及 R2/脚手架的局部官方查阅见来源说明，不刷新全部历史事实",
         "next_review_on": "2026-11-01"
       },
       "evidence": [
@@ -401,6 +406,175 @@
         {
           "kind": "source-reviewed",
           "ref": "docs/provenance.md"
+        }
+      ]
+    },
+    {
+      "id": "data.observability-pricing",
+      "kind": "data",
+      "path": "catalog/observability-pricing.json",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [
+        "data.launches"
+      ],
+      "related": [],
+      "review": {
+        "state": "checked",
+        "checked_on": "2026-10-03",
+        "scope": "S98–S113 官方资料查阅与编辑整合；没有账户、付费调用或云端实测",
+        "next_review_on": "2026-11-02"
+      },
+      "evidence": [
+        {
+          "kind": "source-reviewed",
+          "ref": "docs/provenance.md"
+        }
+      ]
+    },
+    {
+      "id": "service.observability",
+      "kind": "service",
+      "path": "services/observability.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [
+        "data.observability-pricing"
+      ],
+      "related": [
+        "guide.handbook"
+      ],
+      "review": {
+        "state": "checked",
+        "checked_on": "2026-10-03",
+        "scope": "S98–S113 官方资料查阅与编辑整合；没有账户、付费调用或云端实测",
+        "next_review_on": "2026-11-02"
+      },
+      "evidence": [
+        {
+          "kind": "source-reviewed",
+          "ref": "docs/provenance.md"
+        }
+      ]
+    },
+    {
+      "id": "service.search",
+      "kind": "service",
+      "path": "services/search.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [],
+      "related": [
+        "guide.handbook"
+      ],
+      "review": {
+        "state": "checked",
+        "checked_on": "2026-10-03",
+        "scope": "S98–S113 官方资料查阅与编辑整合；没有账户、付费调用或云端实测",
+        "next_review_on": "2026-11-02"
+      },
+      "evidence": [
+        {
+          "kind": "source-reviewed",
+          "ref": "docs/provenance.md"
+        }
+      ]
+    },
+    {
+      "id": "service.agent-runtime",
+      "kind": "service",
+      "path": "services/agent-runtime.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [],
+      "related": [
+        "guide.handbook"
+      ],
+      "review": {
+        "state": "checked",
+        "checked_on": "2026-10-03",
+        "scope": "S98–S113 官方资料查阅与编辑整合；没有账户、付费调用或云端实测",
+        "next_review_on": "2026-11-02"
+      },
+      "evidence": [
+        {
+          "kind": "source-reviewed",
+          "ref": "docs/provenance.md"
+        }
+      ]
+    },
+    {
+      "id": "usecase.temporary-sharing",
+      "kind": "use-case",
+      "path": "use-cases/temporary-sharing.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [],
+      "related": [
+        "guide.handbook"
+      ],
+      "review": {
+        "state": "checked",
+        "checked_on": "2026-10-03",
+        "scope": "S98–S113 官方资料查阅与编辑整合；没有账户、付费调用或云端实测",
+        "next_review_on": "2026-11-02"
+      },
+      "evidence": [
+        {
+          "kind": "source-reviewed",
+          "ref": "docs/provenance.md"
+        }
+      ]
+    },
+    {
+      "id": "report.2026-10-03",
+      "kind": "report",
+      "path": "reports/2026-10-03.md",
+      "track": "edition",
+      "status": "current",
+      "depends_on": [
+        "service.observability",
+        "service.search",
+        "service.agent-runtime",
+        "usecase.temporary-sharing"
+      ],
+      "related": [
+        "guide.handbook"
+      ],
+      "review": {
+        "state": "checked",
+        "checked_on": "2026-10-03",
+        "scope": "S98–S113 官方资料查阅与编辑整合；没有账户、付费调用或云端实测",
+        "next_review_on": null
+      },
+      "evidence": [
+        {
+          "kind": "source-reviewed",
+          "ref": "docs/provenance.md"
+        }
+      ]
+    },
+    {
+      "id": "example.reading-shelf",
+      "kind": "example",
+      "path": "examples/reading-shelf/README.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [],
+      "related": [
+        "guide.handbook",
+        "practice.private-reader"
+      ],
+      "review": {
+        "state": "checked",
+        "checked_on": "2026-10-03",
+        "scope": "三份合成原件生成静态阅读页；离线阅读、跳转与下载，不包含云端扩展",
+        "next_review_on": "2026-12-31"
+      },
+      "evidence": [
+        {
+          "kind": "local-executed",
+          "ref": "examples/reading-shelf/build.py"
         }
       ]
     }

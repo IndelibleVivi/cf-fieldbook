@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="title desc">
+<title id="title">窗口与去向云端的箭头</title><desc id="desc">一个页面窗口引出一条橙色路径，穿过节点通向一小朵云；用途类阅读页的原创几何装饰，仅为阅读装饰。</desc>
+<g fill="none" stroke="#D3E4E8" stroke-width="1">
+<path d="M40 40h240M40 178h240"/>
+</g>
+<rect x="48" y="64" width="132" height="90" rx="8" fill="#FFFFFF" stroke="#007F93" stroke-width="1.5"/>
+<path d="M48 82h132" stroke="#007F93" stroke-width="1.2"/>
+<circle cx="60" cy="73" r="2.6" fill="#BE4B13"/>
+<circle cx="71" cy="73" r="2.6" fill="#007F93"/>
+<circle cx="82" cy="73" r="2.6" fill="#D3E4E8"/>
+<path d="M62 98h52M62 112h84M62 126h36M62 140h64" stroke="#8FBBC5" stroke-width="3" stroke-linecap="round" fill="none"/>
+<path d="M180 108 C 214 106 216 76 244 62" fill="none" stroke="#BE4B13" stroke-width="1.6"/>
+<path d="M244 62l-11-1M244 62l-3 11" fill="none" stroke="#BE4B13" stroke-width="1.6" stroke-linecap="round"/>
+<circle cx="208" cy="94" r="3" fill="#FFFFFF" stroke="#BE4B13" stroke-width="1.2"/>
+<path d="M252 48c-5 0-8-3-8-8s3-7 7-7c2-5 6-8 11-8 7 0 12 5 12 12h3c5 0 8 3 8 7s-3 7-7 7z" fill="#EFF9FB" stroke="#007F93" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M48 168h140" fill="none" stroke="#007F93" stroke-width="1.2" stroke-linecap="round"/>
+<path d="M60 176h112" fill="none" stroke="#8FBBC5" stroke-width="1" stroke-linecap="round"/>
+<path d="M34 48h12m-6-6v12M288 120h12m-6-6v12" stroke="#D3E4E8" stroke-width="1"/>
+</svg>

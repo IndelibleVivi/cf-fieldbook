@@ -28,5 +28,11 @@
     "title": "实验生命周期：运行完还要收得回来",
     "source": "diagrams/src/example-lifecycle.mmd",
     "output": "assets/diagrams/example-lifecycle.svg"
+  },
+  {
+    "id": "reading-shelf",
+    "source": "diagrams/src/reading-shelf.mmd",
+    "output": "assets/diagrams/reading-shelf.svg",
+    "title": "资料架：更新与撤下怎样分工"
   }
 ]

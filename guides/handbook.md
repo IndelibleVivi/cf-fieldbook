@@ -1,8 +1,8 @@
 ---
 title: Cloudflare 个人基础设施实践手册
 subtitle: 从一个入口到可恢复的应用与自动化
-edition: 2026.10 · 阅读版 3
-source_cutoff: 2026-10-02
+edition: 2026.10 · 持续阅读修订
+source_cutoff: 2026-10-03
 presentation_revision: 3
 author: Faye & Cove
 github: https://github.com/IndelibleVivi
@@ -13,7 +13,7 @@ scope: 不含邮件服务；通用示例与实际账户分离
 
 # Cloudflare 个人基础设施实践手册
 
-**2026.10 · 阅读版 3**  
+**2026.10 · 持续阅读修订**  
 从一个入口到可恢复的应用与自动化 · Faye & Cove
 
 一个网站能打开，只是开始。用了几周以后，问题会变得更具体：手机怎么访问，朋友能看哪些内容，文件放在哪里，任务断了能否继续，暂时不用时会不会还在付费。
@@ -22,7 +22,9 @@ scope: 不含邮件服务；通用示例与实际账户分离
 
 读完选中的路线后，你应能画清一次请求经过谁、身份在哪里核验、任务与成果如何保存；再用配套离线例子检查一个具体机制。陌生词可以查[术语小词表](../docs/glossary.md)，精确命令见[例子](../examples/README.md)与[实施参考](../reference/implementation.md)。配套练习默认离线，使用合成输入。实际部署的配置条件和验证步骤在各节说明。
 
-产品事实按 **2026-10-02** 的来源记录阅读；不同条目的核验范围见[来源说明](../docs/provenance.md)。决策模型的供应路径另见[Clef 与 Jev 比较](../comparisons/clef-vs-jev.md)，详细代码和状态约束见[实施参考](../reference/implementation.md)。邮件服务不在本期范围内。
+原有条目沿用 **2026-10-02** 的核验范围；本次新增观测、PiHarness、互联网搜索、临时分享及 R2 费用说明，来源查阅截至 **2026-10-03**。不同条目的核验范围见[来源说明](../docs/provenance.md)。决策模型的供应路径另见[Clef 与 Jev 比较](../comparisons/clef-vs-jev.md)，详细代码和状态约束见[实施参考](../reference/implementation.md)。邮件服务不在本期范围内。
+
+<!-- chapter: start -->
 
 ## 01 / 从手边的事情开始
 
@@ -30,13 +32,17 @@ scope: 不含邮件服务；通用示例与实际账户分离
 
 检索、模型与 agent 执行分别在第 7–9 章。系统已经能运行，却越来越难维护，可以直接读第 10–13 章。各章不构成强制施工顺序。
 
+从同一个[三份文档小资料架](../examples/reading-shelf/README.md)开始：直接打开、读完、下载，先取得一个完整结果。之后需要限制读者、保存版本、生成索引时，再沿相应章节扩展。它使用合成输入，没有云端依赖。
+
 本手册解释做法；配套《Cloudflare 新发布观察》记录当期产品变化和价格时间线。工具名或价格影响决策时，可通过文内来源编号回查。
+
+<!-- chapter: routes -->
 
 ## 02 / 给一个请求找路
 
 ### 先分清：入口、程序、数据
 
-浏览器输入域名，先找到服务入口，再由程序处理请求，最后按需要读取数据库或文件。DNS 和 HTTPS 让请求到达正确的地方；Worker 可以在 Cloudflare 上运行程序；Tunnel 则把入口连接到仍在本机或服务器运行的程序。[S45] [S47]
+浏览器输入一个 [hostname / 主机名](../docs/glossary.md#hostname--主机名)，先找到服务入口，再由程序处理请求，最后按需要读取数据库或文件。[DNS / 域名解析](../docs/glossary.md#dns--域名解析)把名称映射到网络位置；HTTPS 保护传输；Worker 可以在 Cloudflare 上运行程序；Tunnel 则把入口连接到仍在本机或服务器运行的程序。[S45] [S47]
 
 因此，小应用有两种同样合理的起点。第一种是 Worker 加必要的数据存储。第二种是 Access／Tunnel 加现有应用，数据库继续留在原来的服务器。选择取决于程序需要什么环境，不取决于控制台里有多少服务可以开。
 
@@ -61,11 +67,13 @@ scope: 不含邮件服务；通用示例与实际账户分离
 >
 > **答案：不能。** binding 让程序访问资源，最终用户仍需由应用核验身份与读取资格。资源绑定不替代用户权限判断。
 
+<!-- chapter: first-worker -->
+
 ## 03 / 发布第一个小入口
 
 ### 先选一个很容易判断对错的功能
 
-健康检查适合起步：`GET /health` 返回固定 JSON，未知路径返回 404，不读取文件、不调用模型、不接受业务写入。这样一旦响应不对，排查范围很小。
+一个 [endpoint / 请求入口](../docs/glossary.md#endpoint--请求入口)是服务约定处理请求的地址与方法；例如下面这个健康入口。健康检查适合起步：`GET /health` 返回固定 JSON，未知路径返回 404，不读取文件、不调用模型、不接受业务写入。这样一旦响应不对，排查范围很小。
 
 随包的 `examples/health-worker/` 已有完整源码、配置模板和测试。它还检查 HEAD 与不允许的方法；人读手册时先理解行为，实施时再打开完整文件。
 
@@ -98,17 +106,42 @@ npx --no-install wrangler dev --port 8787
 
 然后在另一终端请求本地 `/health` 和 `/missing`。本地通过后，再核对目标账户、路由和配置，执行单独的远端部署。完整命令与模板留在实施参考中；本包没有替读者安装工具或创建生产入口。
 
+### 在新项目中取得同一个小入口
+
+还没有 Worker 项目时，在仓库以外的新目录运行官方脚手架：
+
+```bash
+npm create cloudflare@latest -- my-first-worker
+cd my-first-worker
+```
+
+选择 Hello World、Worker only、JavaScript，初次部署选 No；将本仓库 [index.mjs](../examples/health-worker/index.mjs) 的 handler 放进新项目的 `src/index.js`，保留脚手架生成的 dependency 与 lockfile，再按该项目的开发命令检查 `/health`。脚手架下载需要网络，不属于本包离线例子的执行结果。[S113]
+
+[deployment / 部署](../docs/glossary.md#deployment--部署)是将已检查的代码与配置交给指定运行环境。首次公开部署前，选定目标 account 和对外地址，再按[实施参考的 Worker 路线](../reference/implementation.md#04--路线-a先发布一个很小能验证的-worker)执行；不要将模板中的禁止公开入口设置当成已经发布。只有静态资料页的需求，也可以从[公开资料架](../examples/reading-shelf/README.md)停下，不必继续加数据库、身份和模型。
+
 ### 前端加入后，多检查一次缓存
 
 Workers Static Assets 可把网页与 API 一起发布。要确定静态资源和 Worker 的处理顺序，避免 SPA fallback 把不存在的 API 变成一张“看起来正常”的首页。静态资源与动态请求也有不同计费规则。[S46] [S34]
 
 私人 PWA 可以先只缓存公开壳，私有 API 使用 `no-store`。检查退出登录、切换用户和更新旧版本之后的行为：用户已经离开，并不意味着浏览器里保存过的内容自动消失。
 
+<!-- chapter: access -->
+
 ## 04 / 私人服务的门与钥匙
+
+### 先分享一个短期 demo
+
+已经在本机打开的小资料架，只想给两位朋友看，可以先用 Protected Quick Tunnel 的邮箱 PIN，不必先配正式域名。`--allowed-mail` 是可选限制；没有它的普通 Quick Tunnel 仍向拿到 URL 的人开放。电脑关机或 `cloudflared` 停止后，访问也停止。[S109]
+
+```bash
+cloudflared tunnel --url http://localhost:8080 --allowed-mail 'alice@example.com,bob@example.com'
+```
+
+这是供读者另外执行的网络命令，本仓库没有启动 Tunnel。先试允许邮箱、另一个不允许的邮箱，再停止连接器确认入口失效；完整步骤与开发限制见[临时给几个人看本地 demo](../use-cases/temporary-sharing.md)。长期私有服务继续读下面的 Access 路线。
 
 ### 能到达，不等于有权使用
 
-Access 可以保护一个 hostname 或指定路径，让用户先完成身份验证。应用依赖该身份时，应验证 JWT 的签名、issuer、audience 与有效期，而不是只看请求头是否存在。[S48]
+Access 可以保护一个 hostname 或指定路径，让用户先完成身份验证。应用依赖该身份时，应验证 [JWT / 签名令牌](../docs/glossary.md#jwt--签名令牌)的签名、issuer、audience 与有效期，而不是只看请求头是否存在。[S48]
 
 拿到可信身份之后，应用继续决定角色、资源和动作。没有必要机械地再叠几份 bearer；额外凭据应当服务于单独撤销、机器作用域或动作确认，而不是仅仅增加层数。
 
@@ -141,6 +174,8 @@ ingress:
 
 WARP 是设备接入与流量策略；Mesh 面向加入组织的设备和私网；Tunnel 发布明确选择的服务。Mesh 当前仍有 beta 标识。与现有 VPN 共存时，先用非关键设备观察路由和 DNS，保留不依赖待改路径的恢复入口。[S61] [S62]
 
+<!-- chapter: content -->
+
 ## 05 / 保存内容，也保存它的来历
 
 ### 一份文件，不只是一串字节
@@ -156,6 +191,12 @@ WARP 是设备接入与流量策略；Mesh 面向加入组织的设备和私网�
 
 这是建议的分工，不要求替换已有数据库。完整 SQL 示例保留在实施参考中。
 
+小资料架的第二份《更新与撤下笔记》可以做这项练习：先改写一句话、重建网页，再确认阅读与下载来自同一原件。扩展到在线系统后，下面的当前指针和读取资格才需要数据库持久化。
+
+![将资料架扩展为有版本系统：新原件和索引准备好才切当前指针；读取先核对资格，撤下先停止返回，再清理索引与缓存。](../assets/diagrams/reading-shelf.svg)
+
+这是扩展设计，静态例子没有运行图中的数据库、任务或权限机制。
+
 ### 更新、撤回与删除不要混成一个按钮
 
 更新可以新增版本，再把当前指针切过去；撤回首先让内容不再对读者可见；物理删除才移除原件或派生数据。把三者分开，才能解释某个旧引用为什么存在，也更容易恢复误操作。
@@ -168,9 +209,13 @@ D1 Time Travel 有计划相关的保留期，原地恢复会改变数据库。�
 
 一个可用的演练是恢复到隔离目标，再检查代表性记录、原件 hash、版本与权限。数据库恢复成功但文件缺失，或文件齐全但权限回到旧状态，都不算恢复完了。
 
+<!-- chapter: jobs -->
+
 ## 06 / 一次任务，可能执行不止一次
 
 ### 先想清楚用户在等什么
+
+为小资料架新增第四份文档、生成预览或索引时，可以沿下面的任务记录处理；已有三份静态页面没有后台任务。
 
 用户上传文档后，网页可以先显示“已接收”，后台再生成预览或索引。Queues 适合将接收与处理分开；Workflows 适合有多个步骤、等待与恢复的流程；Durable Objects 适合按实体协调；Cron 负责按时间触发。[S53] [S55] [S56] [S58]
 
@@ -217,7 +262,15 @@ Workflows 当前 Paid 包含每月 50 万步骤与 1 GB·月状态，步骤和�
 
 这里的 [CPU time](../docs/glossary.md#cpu-time--cpu-time)是实际计算时间，[Wall time](../docs/glossary.md#wall-time--wall-time)是从开始到结束的总经过时间。记录等待与计算的区别，再按产品各自的计量单位核对预算。
 
+<!-- chapter: retrieval -->
+
 ## 07 / 先找回原件，再组织答案
+
+### 先问：搜哪一份世界
+
+小资料架只有三份自备原件，问“哪份说明撤下规则”，需要检索自己的集合；问“今天上游改了什么”，才需要互联网搜索。AI Search / Vectorize 与 Web Search API 进入的是这两种不同位置。2026-10-02 发布的 Web Search API beta 经 AI Gateway 调用，不因为名字里有 Search 就读取你的私有 bucket。[S106]
+
+完整任务、来源回读与 provider 比较见[自己的材料，还是互联网上的新信息](../services/search.md)。搜索结果先是候选；应用读回原页、核对日期，再把引用放进答案。费用、ZDR 与实际效果分开判断。
 
 ### 托管检索与自己的管线
 
@@ -249,11 +302,15 @@ Cloudflare Agent Memory 当前仍是 private beta，与 AI Search 的 GA 分开�
 
 自己的记忆设计可以先保留自动抽取建议与原始来源，让人查看当前有效内容。测试旧偏好变更、同名人物、上下文冲突和明确禁止召回，比只测几条事实问答更能看见问题。
 
+<!-- chapter: models -->
+
 ## 08 / 模型、路由与三种缓存
 
 ### 先弄清谁在回答、谁在计费
 
 Workers AI 提供模型推理；AI Gateway 组织经过它的调用、凭据、观测与路由。通过 binding 或受控凭据，可以减少应用直接持有 provider key；Gateway 的访问资格本身仍是敏感能力。[S41] [S45] [S15]
+
+资料架问“撤下规则在哪里”时，允许动作可以是读标题、读第二份原文、或停止并报告材料不足。完整输入见[Clef / Jev 的首个有限决策任务](../comparisons/clef-vs-jev.md)；离线阅读例子没有调用模型。
 
 先记录模型、时间、结果、token 和费用。确实需要正文调试时，再限定内容和保留期。首次创建 Gateway 在 2026-09-24 或之后的账户走新的 Workers Logs 规则；Unified Billing 充值另收 5%。[S15]
 
@@ -295,13 +352,21 @@ User Insights 帮助查看流经 Gateway 的归属与成本，异常标记不自
 
 Clef 系列适合分类、筛选和下一步建议，不一定要为一个小判断生成长解释。先准备正例、反例与无法判断项，让模型只提出建议，再看误判代价是否可接受。概率仍需在自己的材料上校准。[S16] [S17] [S18]
 
-## 09 / 给机一间临时工作室
+<!-- chapter: workspace -->
+
+## 09 / 让 agent 的工作持续，给工具安排环境
 
 ### 不同运行层，负责不同的事情
 
 普通 API、字段变换与轻量计算可以留在 Worker。需要系统包、原生程序或完整 Linux 时再用 Containers。Agents SDK 提供身份、状态、连接与执行能力；它不是另一台 Linux 机器。[S58] [S59]
 
 一次任务最好带着明确输入进入：哪个版本、允许做什么、预算多少、成果保存在哪里、怎样取消。临时执行者得到这次任务的能力，不必持有长期管理账户的钥匙。
+
+### harness 保存工作，环境执行工具
+
+如果资料更新任务读到一半进程重启，要保留的是对话、未完成工作与下一步；如果工具要跑系统命令，需要的是执行环境。这两份状态不能靠一张磁盘快照代替。PiHarness 把 Pi 的 loop、transcript 和 inbox 接入 DO SQLite，由 Agents Lifecycle 在有未完成工作时唤醒；Containers / Sandbox 仍承担需要 Linux 的工具环境。[S105]
+
+PiHarness 为 beta，Pi Durable 为 experimental。官方工具示例的 `replay: "safe"` 用在无副作用的字数统计，不能推导邮件、付款或发布都可随意重放。把它和第 6 章的[未知结果](#结果未知应该有一个明确位置)一起读，再看[agent 运行分工](../services/agent-runtime.md)，选择是否研究这条实现，而不是因新 SDK 自动迁移。[S104]
 
 ### 1.0 要重新看生命周期
 
@@ -329,6 +394,8 @@ Containers 的 CPU 按实际活跃使用计，内存和磁盘按配置及运行�
 
 Cloudflare OS 则适合观察更完整的文件、工具与工作空间。当前自部署源码和托管候补是两种状态，研究 Gatekeeper、导出与升级即可，不必立即承载关键工作。[S20]
 
+<!-- chapter: release -->
+
 ## 10 / 发布以后，真的用一遍
 
 ### 检查哪一版，就发布哪一版
@@ -351,23 +418,27 @@ Browser Run 可用于固定视口下的页面读取和操作。一个有用的�
 
 Kitesurf 可以用于独立浏览实验，但不能代替最终目标浏览器。登录任务可以使用获准会话，没必要把整份个人浏览器资料交给临时环境；发布、支付等动作仍须有具体授权。[S19]
 
-## 11 / 留下够用的记录
+<!-- chapter: observability -->
 
-### 总耗时不够解释问题
+## 11 / 沿着一条请求，找到问题发生的地方
 
-一个搜索用了十二秒，可能慢在 embedding、索引、权限核验或生成。一次任务等了很久，也可能主要在排队，而不是执行。把时间分到阶段，才能知道值得改哪一段。
+### 从一次慢请求开始
 
-日常记录可以保持小：请求 ID、部署版本、动作、阶段、耗时、结果与重试次数。完整正文和堆栈按需要另行控制，不必每条请求都存下来。
+小资料架昨天很快，今天“搜索资料”用了十二秒。先记录请求 ID、部署版本、路径和时间范围，再把成功与失败的请求放在一起比较：慢在入口、Worker、索引读回、权限核验还是生成？总耗时不能回答这些问题。
 
-### 给 Issues 一个无害的测试错误
+Cloudflare Traces 的 open beta 可展示支持范围内的规则、转换、缓存、路由、Worker 与源站处理。应用内部的检索和生成仍需自己的阶段记录，不将平台 span 当作每个内部步骤都已自动覆盖。[S99]
 
-Workers Issues 当前公开 beta 能关联失败、版本与源码材料，配置后只处理新流量。把开关写进项目配置，先制造一个没有敏感内容的错误，确认聚合和上下文，再连接 webhook 或修复工具。[S11] [S12]
+### 平时少采，调查时定向采
 
-第一步只生成调查与候选修复，也已经能减少维护劳动。Workers 看不到的本机、离线和外部路径，仍需自己的记录。
+设置较低的 baseline，再用 Trace Rules 对需要调查的路径或临时 header 提高采样。规则按第一条匹配生效；保存草稿和 Deploy 是两个动作。入站 trace context 默认拒绝，放开后也不证明请求身份可信。[S101]
 
-### 通知应该让人知道做什么
+### 查询、调查、通知接成一条路
 
-“CPU 有点高”不一定需要打断人；“任务队列已经超过可接受等待时间”更接近一个动作。为持续错误、积压、结果未知、成本变化和索引迟迟未就绪选择少量通知，并写清该看哪份材料。
+SQL API beta 给多种 dataset 一个共同查询入口；当前每个 statement 只读一个 dataset，并需要下界时间条件。可以切 dataset 用请求身份对照，不声称跨 dataset JOIN 已开放。官方 SQL / Observability MCP 供有权限的人与 agent 调查，修改生产配置仍另有授权。[S102] [S103]
+
+Workers Issues 继续承接错误与版本；Alerts 给持续故障或积压一个可行动的入口。日志保留请求 ID、阶段耗时、结果和重试次数，正文与个人信息按实际需要限制。一次调查该怎样走，以及采样、保留与费用的完整解释见[观测与调查](../services/observability.md)。[S11] [S12] [S98]
+
+<!-- chapter: economics -->
 
 ## 12 / 算清持续成本
 
@@ -383,6 +454,23 @@ Workers Paid 最低每账户每月 $5，多项目共享包含量；R2、浏览�
 
 D1 计行，不只看 SQL 次数；R2 计对象操作；向量需要乘维度；队列还会因重试增加操作量；容器的空闲内存仍在运行时间里。这些单位比“每月应该只花几美元”更有用。[S06] [S37] [S38] [S39] [S40]
 
+### R2 价格：流量免费，存储和操作仍要算
+
+R2 Standard 的标价为 $0.015 / GB-month、Class A $4.50 / 百万次、Class B $0.36 / 百万次；每月包含 10 GB-month、100 万 A、1,000 万 B。Infrequent Access 有不同单价、取回费用与 30 天最低保存期，不享受这份 Standard 免费量。直接从 R2 出站不收费，接上其他计量服务后仍可能产生它们的费用；最终账单还有单位向上取整。[S112]
+
+### Observability：当前与已公布的费用分开读
+
+<!-- facts: observability-costs -->
+固定资料日期：**2026-10-03**。
+
+| 条款 | Free | Paid |
+|---|---|---|
+| 当前 Workers Logs [S111] | 200,000 events / 日；3 天 | 20,000,000 events / 月；超出 $0.60 / 百万；7 天 |
+| 已公布；将在 2026-12-01 生效 [S100] | 0.5 GB 摄取 / 日；7 天 | 50 GB 摄取 + 12 GB-month / billing cycle；超出 $0.25 / GB + $0.10 / GB-month |
+<!-- /facts -->
+
+上表共用 [费用记录](../catalog/observability-pricing.json)与[生效事件](../catalog/launches.json)。当前 pricing docs 的 Paid 存储包含量为 12 GB-month，发布博客仍写 10；采用文档口径并保留差异。未采样安全 dataset 不消费共享包含量；Enterprise 在合同续约时迁移。按字节计费后，大 attributes 和完整正文也增加摄取量，不只数 span。[S100]
+
 ### 给每次实验记一笔小账
 
 记录输入规模、次数、实际运行时间、资源与保留产物。先合并账户下的总用量，扣除一次共享包含量，再按项目分配观察。小规模便宜，不保证索引全量重建或重试风暴也便宜。
@@ -394,6 +482,8 @@ D1 计行，不只看 SQL 次数；R2 计对象操作；向量需要乘维度；
 免费计划可能在达到上限后停止；Paid 包含量之外可能继续计费；beta 免费可能有未来起算日。Artifacts 的来源存在 10 月 14／15 日一天冲突，AI Search 新计费自 11 月 1 日开始，要把核验日与生效日同时留下。[S07] [S08] [S10]
 
 普通 KV 与 KV Instant 也不能混看。后者面向特殊读重型负载，写入、删除、列举每次 $0.10，存储每 MB·月 $100，不适合作为普通个人状态库的默认选项。[S42] [S25]
+
+<!-- chapter: recovery -->
 
 ## 13 / 坏了、恢复、暂时不用
 
@@ -423,6 +513,8 @@ D1 计行，不只看 SQL 次数；R2 计对象操作；向量需要乘维度；
 
 同时检查域名是否仍指向废弃服务，备份能否在不依赖原服务时读取，外部模型和日志是否还有保留设置。一项应用停止访问，不一定意味着所有关联费用都停止。
 
+<!-- chapter: edition-notes -->
+
 ## 14 / 继续维护这份手册
 
 ### 保留问题，更新做法
@@ -437,7 +529,7 @@ D1 计行，不只看 SQL 次数；R2 计对象操作；向量需要乘维度；
 
 | 需要什么 | 仓库入口 |
 |---|---|
-| 本期产品变化 | `reports/2026-10-02.md` |
+| 本期产品变化 | [2026-10-03 观察](../reports/2026-10-03.md)；[10-02 历史观察](../reports/2026-10-02.md) |
 | 人的阅读版 | `guides/handbook.md` |
 | 实施细节、完整代码和状态约束 | `reference/implementation.md` |
 | 离线示例与测试 | `examples/`、`tests/` |
@@ -449,7 +541,7 @@ D1 计行，不只看 SQL 次数；R2 计对象操作；向量需要乘维度；
 
 ## 来源索引
 
-决策模型、接入路径与价格在本期资料中经过再次核对；其他产品条目沿用此前的来源记录，范围见[来源说明](../docs/provenance.md)。资料核验不等于账户或模型实测。
+原有条目沿用 2026-10-02 的核验范围；新增四主题与 R2 费用来源查阅于 2026-10-03。完整范围与来源差异见[来源说明](../docs/provenance.md)。资料查阅不等于账户、模型或云端实测。
 
 - **[S02]** · cf CLI 发布
 - **[S03]** · cf CLI 文档
@@ -459,7 +551,18 @@ D1 计行，不只看 SQL 次数；R2 计对象操作；向量需要乘维度；
 - **[S08]** · Artifacts 价格
 - **[S09]** · AI Search GA
 - **[S10]** · AI Search 限制与价格
+- **[S100]** · Cloudflare Observability 价格
+- **[S101]** · Cloudflare Traces 采样与传播配置
+- **[S102]** · SQL API 查询
+- **[S103]** · SQL API 限制
+- **[S104]** · PiHarness 发布
+- **[S105]** · PiHarness 状态与 Lifecycle
+- **[S106]** · Web Search API 发布
+- **[S109]** · Protected Quick Tunnels 发布
 - **[S11]** · Workers Issues 发布
+- **[S111]** · Workers Logs 迁移前计费
+- **[S112]** · R2 存储类别与价格
+- **[S113]** · Workers 新项目脚手架
 - **[S12]** · Workers Issues 文档
 - **[S13]** · AutoRouter 发布
 - **[S14]** · AI Gateway User Insights
@@ -512,6 +615,8 @@ D1 计行，不只看 SQL 次数；R2 计对象操作；向量需要乘维度；
 - **[S77]** · TypeSafe：confidence 的含义
 - **[S78]** · TypeSafe：Jev 1.13 已知能力边界
 - **[S79]** · Cloudflare AI Gateway：统一 REST API
+- **[S98]** · Cloudflare Observability 新平台发布
+- **[S99]** · Cloudflare Traces 发布
 
 ## 关于这一版
 
@@ -581,3 +686,18 @@ GitHub：[github.com/IndelibleVivi](https://github.com/IndelibleVivi)
 [S77]: https://docs.typesafe.ai/confidence "TypeSafe：confidence 的含义"
 [S78]: https://docs.typesafe.ai/model-jaggedness/jev-1.13 "TypeSafe：Jev 1.13 已知能力边界"
 [S79]: https://developers.cloudflare.com/ai-gateway/usage/rest-api/ "Cloudflare AI Gateway：统一 REST API"
+
+[S100]: https://developers.cloudflare.com/observability/pricing/ "Cloudflare Observability 价格"
+[S101]: https://developers.cloudflare.com/observability/traces/configuration/ "Cloudflare Traces 采样与传播配置"
+[S102]: https://developers.cloudflare.com/analytics/sql-api/query-api/ "SQL API 查询"
+[S103]: https://developers.cloudflare.com/analytics/sql-api/limits/ "SQL API 限制"
+[S104]: https://developers.cloudflare.com/changelog/post/2026-10-02-pi-harness/ "PiHarness 发布"
+[S105]: https://developers.cloudflare.com/agents/harnesses/pi/ "PiHarness 状态与 Lifecycle"
+[S106]: https://developers.cloudflare.com/changelog/post/2026-10-02-introducing-web-search-api/ "Web Search API 发布"
+[S109]: https://developers.cloudflare.com/changelog/post/2026-10-02-protected-quick-tunnels/ "Protected Quick Tunnels 发布"
+[S112]: https://developers.cloudflare.com/r2/pricing/ "R2 存储类别与价格"
+[S113]: https://developers.cloudflare.com/workers/get-started/guide/ "Workers 新项目脚手架"
+[S98]: https://blog.cloudflare.com/one-observability-platform/ "Cloudflare Observability 新平台发布"
+[S99]: https://blog.cloudflare.com/cloudflare-tracing/ "Cloudflare Traces 发布"
+
+[S111]: https://developers.cloudflare.com/workers/platform/pricing/ "当前 Workers Logs 计费"

@@ -1,0 +1,71 @@
+{
+  "schema": "fieldbook.publication-releases/1",
+  "note": "Explicit registry of checked publication outputs. A local candidate is not a release; the reading site only distributes files listed here (or safe historical version pages), never an unregistered .build PDF.",
+  "releases": [],
+  "updates": [
+    {
+      "date": "2026-10-03",
+      "families": [
+        "handbook",
+        "launches"
+      ],
+      "kind": "content",
+      "topics": [
+        "observability-platform",
+        "pi-harness",
+        "web-search",
+        "protected-quick-tunnel"
+      ],
+      "summary": "新增请求调查、PiHarness、互联网搜索与临时分享，费用区分现行条款与十二月生效条款；保留来源冲突。"
+    },
+    {
+      "date": "2026-10-03",
+      "families": [
+        "handbook"
+      ],
+      "kind": "editorial",
+      "summary": "新增三份合成文档的贯穿资料架、首个 Worker 路径与基础术语，恢复示例反馈靠近控制区。"
+    },
+    {
+      "date": "2026-10-03",
+      "families": [
+        "comparison"
+      ],
+      "kind": "editorial",
+      "summary": "开篇加入完整有限决策输入；模型和供应价格仍沿用 2026-10-02 的核验范围，没有因观测新品修改模型结论。"
+    }
+  ],
+  "historical": [
+    {
+      "family": "handbook",
+      "edition": "r3",
+      "cutoff": "2026-10-02",
+      "files": {
+        "pdf": "https://github.com/IndelibleVivi/cf-fieldbook/blob/main/dist/cf-practical-handbook-2026-10-02-cyan-orange.pdf",
+        "html": "https://github.com/IndelibleVivi/cf-fieldbook/blob/main/dist/cf-practical-handbook-2026-10-02-cyan-orange.html",
+        "md": "https://github.com/IndelibleVivi/cf-fieldbook/blob/main/dist/cf-practical-handbook-2026-10-02-cyan-orange.md"
+      }
+    },
+    {
+      "family": "comparison",
+      "edition": "r3",
+      "cutoff": "2026-10-02",
+      "files": {
+        "pdf": "https://github.com/IndelibleVivi/cf-fieldbook/blob/main/dist/cf-clef-vs-jev-2026-10-02.pdf",
+        "html": "https://github.com/IndelibleVivi/cf-fieldbook/blob/main/dist/cf-clef-vs-jev-2026-10-02.html",
+        "md": "https://github.com/IndelibleVivi/cf-fieldbook/blob/main/dist/cf-clef-vs-jev-2026-10-02.md"
+      }
+    },
+    {
+      "family": "launches",
+      "edition": "r3",
+      "cutoff": "2026-10-02",
+      "files": {
+        "pdf": "https://github.com/IndelibleVivi/cf-fieldbook/blob/main/dist/cf-launches-individuals-2026-10-02-cyan-orange.pdf",
+        "html": "https://github.com/IndelibleVivi/cf-fieldbook/blob/main/dist/cf-launches-individuals-2026-10-02-cyan-orange.html",
+        "md": "https://github.com/IndelibleVivi/cf-fieldbook/blob/main/dist/cf-launches-individuals-2026-10-02-cyan-orange.md"
+      }
+    }
+  ],
+  "latest": {}
+}

@@ -55,13 +55,16 @@ class ReadingSiteTests(unittest.TestCase):
 
     def test_home_has_three_real_reading_paths(self):
         soup = BeautifulSoup((self.output / 'index.html').read_text(), 'html.parser')
+        # The home page names the three works: handbook, Clef/Jev comparison, current report.
         self.assertEqual([a['href'] for a in soup.select('.path')], [
-            'guides/handbook.html', 'products.html', 'reports/2026-10-02.html'])
+            'guides/handbook.html', 'comparisons/clef-vs-jev.html', 'reports/2026-10-03.html'])
         for path in ('reference/implementation.html', 'examples/job-state/README.html',
-                     'examples/health-worker/README.html', 'examples/decision-routing/README.html', 'diagrams/README.html'):
+                     'examples/health-worker/README.html', 'examples/decision-routing/README.html',
+                     'examples/reading-shelf/README.html', 'diagrams/README.html'):
             self.assertTrue((self.output / path).is_file(), path)
         diagrams = BeautifulSoup((self.output / 'diagrams/README.html').read_text(), 'html.parser')
-        self.assertEqual(len(diagrams.select('img.technical-diagram')), 5)
+        self.assertEqual(len(diagrams.select('img.technical-diagram')), 6)
+        self.assertIsNotNone(diagrams.find(id='diagram-reading-shelf'))
 
     def test_real_practice_is_discoverable_without_claiming_a_new_cloud_run(self):
         home = BeautifulSoup((self.output / 'index.html').read_text(), 'html.parser')
@@ -293,17 +296,22 @@ GitHub · [https://github.com/IndelibleVivi](https://github.com/IndelibleVivi)
 
     def test_numbered_chapter_markup_preserves_old_ids_and_search_labels(self):
         site = build_site.Site(self.root, self.root / '.build/heading-test')
-        for path in ('guides/handbook.md', 'reports/2026-10-02.md'):
+        for path in ('guides/handbook.md', 'reports/2026-10-03.md'):
             page = str(Path(path).with_suffix('.html'))
             soup = BeautifulSoup((self.output / page).read_text(), 'html.parser')
             labels = re.findall(r'^## (\d{2} / .+)$', build_site.split_frontmatter(site.texts[path])[1], re.M)
             for label in labels:
-                heading = soup.find(id=build_site.heading_id(label))
-                self.assertIn('numbered-chapter', heading['class'])
-                self.assertEqual(heading.select_one('.chapter-number').get_text(), label[:2])
-                self.assertEqual(heading.select_one('.chapter-separator').get_text(), ' / ')
-                self.assertEqual(heading.select_one('.chapter-title').get_text(), label[5:])
-                toc = soup.select_one(f'.contents a[href="#{heading["id"]}"]')
+                legacy = build_site.heading_id(label)
+                # The stable chapter ID carries the markup; the legacy slug remains as
+                # an alias anchor resolving to the same chapter.
+                alias = soup.find(id=legacy)
+                self.assertIsNotNone(alias, legacy)
+                chapter = alias.find_parent('h2') if alias.name != 'h2' else alias
+                self.assertIn('numbered-chapter', chapter['class'])
+                self.assertEqual(chapter.select_one('.chapter-number').get_text(), label[:2])
+                self.assertEqual(chapter.select_one('.chapter-separator').get_text(), ' / ')
+                self.assertEqual(chapter.select_one('.chapter-title').get_text(), label[5:])
+                toc = soup.select_one(f'.contents a[href="#{chapter["id"]}"]')
                 self.assertEqual(toc.get_text(), label)
                 self.assertEqual(toc.select_one('.toc-separator').get_text(), ' / ')
             for link in soup.select('.contents ol a'):
@@ -336,8 +344,11 @@ GitHub · [https://github.com/IndelibleVivi](https://github.com/IndelibleVivi)
         self.assertIn('Cloudflare, Inc.', copy)
         products = BeautifulSoup((self.output / 'products.html').read_text(), 'html.parser')
         self.assertEqual(len(products.select('.product-reading')), 8)
-        for name in ('Workers', 'Access', 'Tunnel', 'D1', 'R2', 'Queues', 'Workflows',
-                     'AI Search', 'Vectorize', 'Workers AI', 'AI Gateway', 'Containers', 'Sandbox', 'Workers Issues'):
+        # The eight groups extend the existing purposes with current services and products.
+        for name in ('Workers', 'Access', 'Tunnel', 'Protected Quick Tunnels', 'D1', 'R2', 'Queues',
+                     'Workflows', 'Durable Objects', 'AI Search', 'Vectorize', 'Web Search API',
+                     'Workers AI', 'AI Gateway', 'Agents', 'PiHarness', 'Containers', 'Sandbox',
+                     'Cloudflare Traces', 'SQL API', 'MCP', 'Issues', 'Alerts'):
             self.assertIn(name, products.get_text())
         self.assertTrue(all('#' in link['href'] for link in products.select('.product-body h2 a')))
 
@@ -426,7 +437,9 @@ GitHub · [https://github.com/IndelibleVivi](https://github.com/IndelibleVivi)
     def test_glossary_links_and_controlled_questions_are_progressive(self):
         soup = BeautifulSoup((self.output / 'guides/handbook.html').read_text(), 'html.parser')
         terms = json.loads(soup.find(id='term-data').string)
-        self.assertEqual(len(terms), 8)
+        # The in-place glossary covers every term the handbook links, at least the
+        # original eight; the exact set follows the manuscript, not a fixed count.
+        self.assertGreaterEqual(len(terms), 8)
         glossary = BeautifulSoup((self.output / 'docs/glossary.html').read_text(), 'html.parser')
         for anchor, term in terms.items():
             self.assertIsNotNone(glossary.find(id=anchor))
@@ -490,6 +503,36 @@ GitHub · [https://github.com/IndelibleVivi](https://github.com/IndelibleVivi)
                     soup = BeautifulSoup(page.read_text(), 'html.parser')
                     self.assertIsNone(soup.find(id='recovery-data'))
                     self.assertFalse(any('examples/job-state/demo.html' in a.get('href', '') or a.get('href') == 'demo.html' for a in soup.find_all('a')), page)
+
+
+    def test_version_pages_respect_withdrawn_and_draft_body_boundaries(self):
+        for status in ('withdrawn', 'draft'):
+            with self.subTest(status=status), tempfile.TemporaryDirectory() as temp:
+                root = Path(temp) / 'fieldbook'
+                shutil.copytree(self.root, root, ignore=shutil.ignore_patterns('.build'))
+                path = root / 'catalog/entries.json'
+                data = json.loads(path.read_text())
+                entry = next(e for e in data['entries'] if e['id'] == 'guide.handbook')
+                entry['status'] = status
+                path.write_text(json.dumps(data, ensure_ascii=False))
+                (root / entry['path']).write_text('# PRIVATE_SENTINEL_TITLE\n\n## 01 / PRIVATE_SENTINEL_CHAPTER\nPRIVATE_SENTINEL_BODY')
+                result = build_site.build_site(root, base_url=build_site.PUBLIC_SITE_URL)
+                for page in result['html_pages']:
+                    self.assertNotIn('PRIVATE_SENTINEL', (root / '.build/site' / page).read_text(), page)
+
+    def test_article_metadata_and_reviewed_png_are_portable(self):
+        with tempfile.TemporaryDirectory() as temp:
+            output = self.root / '.build/social-check'
+            build_site.build_site(self.root, output, build_site.PUBLIC_SITE_URL)
+            for path, key in [('guides/handbook.html', 'handbook'), ('comparisons/clef-vs-jev.html', 'comparison'),
+                              ('reports/2026-10-03.html', 'launches')]:
+                soup = BeautifulSoup((output / path).read_text(), 'html.parser')
+                self.assertIn(self.root.joinpath('assets/share/' + key + '.png').name, soup.select_one('meta[property="og:image"]')['content'])
+                self.assertIn(build_site.PUBLIC_SITE_URL + path, soup.select_one('link[rel="canonical"]')['href'])
+                self.assertEqual(len(soup.select('meta[name="twitter:description"]')), 1)
+                self.assertEqual((output / ('assets/share/' + key + '.png')).read_bytes(),
+                                 (ROOT / ('assets/share/' + key + '.png')).read_bytes())
+            self.assertIn('2026-10-03', BeautifulSoup((output / 'guides/handbook.html').read_text(), 'html.parser').select_one('meta[name="description"]')['content'])
 
 
 if __name__ == '__main__':

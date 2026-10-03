@@ -55,3 +55,62 @@ test('aliases preserve every extra query constraint and ordinary AND semantics',
   }
   assert.equal(normalize('ＱＵＥＵＥＳ　ＡＣＫ'), 'queues ack');
 });
+
+test('ordinary questions reach a section that actually answers them', () => {
+  for (const query of ['网页怎么上线', '怎么部署网站', '怎样发布网页']) {
+    const item = first(query);
+    const body = normalize([item.section, item.text].join(' '));
+    // The lead answers the query in its own body, and it is a reading page
+    // (handbook, implementation reference or a practice note), not an index.
+    assert.ok(/部署|发布|上线|release|workers|网页/.test(body), `${query}: first result must answer it`);
+    assert.ok(/^(guides\/handbook|reference\/implementation|practice\/)/.test(item.url), item.url);
+  }
+  const r2 = first('R2价格');
+  assert.ok(/r2/.test(normalize([r2.section, r2.text].join(' '))));
+  assert.ok(/价格|存储|费用/.test(normalize([r2.section, r2.text].join(' '))));
+});
+
+test('product queries bind to stable chapter IDs, not displayed numbers', () => {
+  // The handbook chapter IDs are stable; a fixture index records them per record.
+  assert.ok(index.some(item => item.chapter === 'economics' && item.url.includes('guides/handbook.html#')));
+  assert.ok(index.some(item => item.chapter === 'jobs'));
+  assert.ok(index.some(item => item.chapter === 'workspace' && item.section.includes('agent')));
+  const clef = first('Clef');
+  assert.equal(clef.url.split('#')[0], 'comparisons/clef-vs-jev.html');
+  assert.equal(clef.section, '', 'the whole-work landing record leads a product query');
+});
+
+test('Chinese text adjacent to a product name still resolves the product', () => {
+  for (const query of ['用Clef', '用 Clef', '了解R2']) {
+    const items = search(index, query);
+    assert.ok(items.length, query);
+    assert.ok(items.some(item => /clef|r2/i.test(item.url + ' ' + normalize(item.text))), query);
+  }
+  assert.deepEqual(search(index, '用Clef 不存在这个词987'), []);
+});
+
+test('current explanations beat dated reports unless the query asks for history', () => {
+  const plain = search(index, '搜索');
+  const firstReport = result => result.findIndex(item => item.url.startsWith('reports/'));
+  assert.ok(firstReport(plain) !== 0, 'a dated report does not lead a plain query');
+  // A dated report only enters when the query names its subject; the history keyword
+  // removes the penalty rather than inventing matches that the body lacks.
+  const dated = search(index, 'observability');
+  assert.ok(dated.some(item => item.url.startsWith('reports/')) || dated.some(item => item.url.startsWith('services/')),
+            'the query resolves to real sections');
+  for (const item of dated) {
+    const body = normalize([item.title, item.section, item.context, item.text].join(' '));
+    assert.ok(body.includes('observability'), 'history preference keeps AND semantics');
+  }
+});
+
+test('R2 cost aliases retain the product constraint and related results group by page', () => {
+  const {group} = require('../styles/search.js');
+  const items = search(index, 'R2价格');
+  assert.ok(items.length);
+  for (const item of items) assert.ok(normalize(item.title + ' ' + item.section + ' ' + item.text).includes('r2'));
+  const groups = group(items);
+  assert.equal(groups.flat().length, items.length);
+  assert.equal(new Set(groups.map(items => items[0].url.split('#')[0])).size, groups.length);
+  assert.equal(groups[0][0].url, items[0].url);
+});

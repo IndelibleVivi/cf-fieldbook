@@ -8,10 +8,12 @@ import json
 from pathlib import Path
 import re
 
+
 ROOT = Path(__file__).resolve().parents[1]
 PAGE_BLOCKS = {'services/decision-models.md': {'cf-routes'},
                'comparisons/clef-vs-jev.md': {'all-routes', 'costs', 'contexts'},
-               'guides/handbook.md': {'cf-routes'}}
+               'guides/handbook.md': {'cf-routes', 'observability-costs'},
+               'services/observability.md': {'observability-costs'}}
 PAGES = tuple(PAGE_BLOCKS)
 BLOCK = re.compile(r'<!-- facts: ([a-z-]+) -->\n.*?<!-- /facts -->', re.S)
 
@@ -57,7 +59,25 @@ def tables(root: Path) -> dict[str, str]:
             'costs': '\n'.join(estimate), 'contexts': '\n'.join(contexts)}
 
 
-def project_markdown(root: Path, relative_path: str) -> str:
+def observability_costs(root: Path, as_of: str) -> str:
+    """Project announced fees using a fixed editorial date, never the reader's clock."""
+    from datetime import date
+    date.fromisoformat(as_of)
+    data = json.loads((root / 'catalog/observability-pricing.json').read_text())
+    launch = next(row for row in json.loads((root / 'catalog/launches.json').read_text())
+                  if row['id'] == data['launch_id'])
+    effective = next(event['date'] for event in launch['effective_events'] if event['kind'] == 'billing_start')
+    current, announced = data['current'], data['announced']
+    phase = '已公布；将在 ' + effective + ' 生效' if as_of < effective else '按已公布条款于 ' + effective + ' 生效；未因此刷新核验'
+    lines = [f'固定资料日期：**{as_of}**。', '',
+             '| 条款 | Free | Paid |', '|---|---|---|']
+    if as_of < effective:
+        lines.append(f"| 当前 Workers Logs [{current['source']}] | {current['free_events_per_day']:,} events / 日；{current['free_retention_days']} 天 | {current['paid_events_per_month']:,} events / 月；超出 ${current['extra_usd_per_million']:.2f} / 百万；{current['paid_retention_days']} 天 |")
+    lines.append(f"| {phase} [{announced['source']}] | {announced['free_ingestion_gb_per_day']} GB 摄取 / 日；{announced['retention_days']} 天 | {announced['paid_ingestion_gb_per_cycle']} GB 摄取 + {announced['paid_storage_gb_month_per_cycle']} GB-month / billing cycle；超出 ${announced['extra_ingestion_usd_per_gb']:.2f} / GB + ${announced['extra_storage_usd_per_gb_month']:.2f} / GB-month |")
+    return '\n'.join(lines)
+
+
+def project_markdown(root: Path, relative_path: str, *, as_of: str | None = None) -> str:
     path = (root / relative_path).resolve()
     if not path.is_relative_to(root.resolve()):
         raise ValueError('Markdown path escapes root')
@@ -68,7 +88,10 @@ def project_markdown(root: Path, relative_path: str) -> str:
     markers = [m[1] for m in BLOCK.finditer(text)]
     if set(markers) != PAGE_BLOCKS[relative_path] or len(markers) != len(set(markers)):
         raise ValueError(f'missing, duplicate or unknown fact block in {relative_path}')
-    blocks = tables(root)
+    blocks = tables(root) if 'cf-routes' in markers or 'all-routes' in markers else {}
+    if 'observability-costs' in markers:
+        cutoff = re.search(r'^source_cutoff: (\d{4}-\d{2}-\d{2})$', text, re.M)[1]
+        blocks['observability-costs'] = observability_costs(root, as_of or cutoff)
     return BLOCK.sub(lambda m: f'<!-- facts: {m[1]} -->\n{blocks[m[1]]}\n<!-- /facts -->', text)
 
 

@@ -25,7 +25,7 @@ def text(x,y,s,**attrs):
     attr=' '.join(f'{k.replace("_","-")}="{escape(str(v))}"' for k,v in attrs.items())
     return f'<text x="{x}" y="{y}" {attr}>{escape(s)}</text>'
 
-def rect(x,y,w,h,stroke=C,fill='white',sw=2):
+def rect(x,y,w,h,stroke=C,fill='none',sw=2):
     return f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="2" fill="{fill}" stroke="{stroke}" stroke-width="{sw}"/>'
 
 def line(x1,y1,x2,y2,stroke=C,sw=2,dash=''):
@@ -69,7 +69,7 @@ def two_routes():
 def task_state():
     p=''
     for x,label in zip((0,266,536),TASK_STATES):
-        p+=rect(x,20,190,64,C,PALE if x==536 else 'white')+text(x+95,59,label,text_anchor='middle',font_weight='600')
+        p+=rect(x,20,190,64,C,PALE if x==536 else 'none')+text(x+95,59,label,text_anchor='middle',font_weight='600')
     p+=line(190,52,266,52,C,3)+line(456,52,536,52,C,3)
     p+=f'<path d="M361 84 V144 H455" fill="none" stroke="{O}" stroke-width="3"/>'
     p+=rect(455,113,271,64,O)+text(590,152,UNKNOWN_RESULT,text_anchor='middle')
@@ -78,8 +78,7 @@ def task_state():
     return svg(740,225,'接收、执行与完成是不同阶段','任务由已接收到执行中，再到结果已确认。如果执行的外部结果未知，先进入核对，而不是盲目再做。这里只画主要关系，不是完整状态机。',p)
 
 def narrow_svg(height,title,desc,content):
-    return svg(360,height,title,desc,
-        f'<rect width="360" height="{height}" fill="#FFFFFF"/>'+content).replace(
+    return svg(360,height,title,desc,content).replace(
             '<svg ', '<svg lang="zh-CN" ', 1)
 
 def arrow_down(x,y1,y2,color):
@@ -112,7 +111,7 @@ def task_state_mobile():
     p=''
     for index,label in enumerate(TASK_STATES):
         y=12+94*index
-        p+=f'<g id="task-stage-{index}">'+rect(36,y,288,58,C,PALE if index==2 else 'white')
+        p+=f'<g id="task-stage-{index}">'+rect(36,y,288,58,C,PALE if index==2 else 'none')
         p+=text(180,y+36,label,text_anchor='middle',font_weight='600')+'</g>'
         if index<2:p+=arrow_down(180,y+62,y+87,C)
     # The unknown result branches from execution, not from confirmed completion.
