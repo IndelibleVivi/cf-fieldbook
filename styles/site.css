@@ -259,7 +259,7 @@ a { color:var(--ink) }
 .product-body>p { font-size:16px;line-height:1.9;max-width:35em;color:var(--muted) }
 .product-actions { display:flex;gap:26px;flex-wrap:wrap;font-size:13px;margin-top:15px }
 .products-page .reading-end { display:flex;gap:26px;flex-wrap:wrap }
-.publications-page { max-width:1040px;margin:auto;padding:58px 36px 70px }
+main.publications-page { max-width:1040px;margin:auto;padding:58px 36px 70px }
 .family-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:26px;margin:38px 0 }
 .family-card { border:1px solid var(--line);border-radius:16px;padding:26px 24px;background:var(--paper-soft,transparent);display:flex;flex-direction:column;gap:12px }
 .family-card h2 { font:600 24px/1.5 var(--serif);margin:0 }
@@ -277,7 +277,14 @@ a { color:var(--ink) }
 .version-back { font-size:14px;margin-top:30px }
 .publications-foot { font-size:14px;margin-top:26px }
 .family-card .release-list { margin:0 }
-@media (max-width: 760px) { .version-chapters { columns:1 } }
+@media (max-width: 760px) {
+main.publications-page { padding:35px 22px 50px }
+.family-grid { grid-template-columns:minmax(0,1fr) }
+.version-chapters { columns:1 }
+}
+@media (max-width: 360px) {
+.global-nav { flex-wrap:wrap;justify-content:flex-start;gap:4px 16px }
+}
 .trademark { font-size:10px!important;color:var(--muted) }
 .not-found { max-width:1240px;margin:auto;padding:76px 36px 90px }
 .not-found-layout { display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center }
