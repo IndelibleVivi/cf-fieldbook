@@ -22,7 +22,7 @@ scope: 不含邮件服务；通用示例与实际账户分离
 
 读完选中的路线后，你应能画清一次请求经过谁、身份在哪里核验、任务与成果如何保存；再用配套离线例子检查一个具体机制。陌生词可以查[术语小词表](../docs/glossary.md)，精确命令见[例子](../examples/README.md)与[实施参考](../reference/implementation.md)。配套练习默认离线，使用合成输入。实际部署的配置条件和验证步骤在各节说明。
 
-原有条目沿用 **2026-10-02** 的核验范围；本次新增观测、PiHarness、互联网搜索、临时分享及 R2 费用说明，来源查阅截至 **2026-10-03**。不同条目的核验范围见[来源说明](../docs/provenance.md)。决策模型的供应路径另见[Clef 与 Jev 比较](../comparisons/clef-vs-jev.md)，详细代码和状态约束见[实施参考](../reference/implementation.md)。邮件服务不在本期范围内。
+原有条目沿用 **2026-10-02** 的核验范围；本次新增观测、PiHarness、互联网搜索、临时分享及 R2 费用说明，来源查阅截至 **2026-10-03**。严格机器认证、Tunnel API 与 Sandbox 接口另于 **2026-10-05** 定向核验，不刷新全书事实。不同条目的核验范围见[来源说明](../docs/provenance.md)。决策模型的供应路径另见[Clef 与 Jev 比较](../comparisons/clef-vs-jev.md)，详细代码和状态约束见[实施参考](../reference/implementation.md)。邮件服务不在本期范围内。
 
 <!-- chapter: start -->
 
@@ -147,6 +147,8 @@ Access 可以保护一个 hostname 或指定路径，让用户先完成身份验
 
 对机器客户端，Service Tokens 能避免模拟网页登录。按用途单独签发，设置有效期和撤销方式，再映射到允许的操作范围。浏览器里的长期秘密、多人共用的万能 key，都不适合作为这种边界。[S49]
 
+**严格 Service Token 认证（定点核验于 2026-10-05）。** 启用严格设置后，带 Service Token 请求头的请求**只**按 Service Auth 策略判定：不再接受 Allow 策略或用户 cookie；认证／授权失败返回 **401／403**，**不再 302 跳转**登录；成功请求也不会得到可复用的 `CF_Authorization` cookie，调用方每次都须继续携带 Service Token 请求头。在 **2026-10-05 或之后创建的新组织**强制启用且不能关闭；此前的组织仍可自行配置。远程 MCP 的 OAuth 属于另一条路线，不要与 Service Token 混为一谈。[S49] [S116]
+
 ### 不只测“自己能打开”
 
 上线前也试匿名用户、已登录但没有资格的用户、过期 token 和错误 audience。再列出所有替代入口：默认开发域名、其他 Custom Domain、预览地址、源站直连。保护一个域名，不会自动证明另一条路也安全。
@@ -167,6 +169,8 @@ ingress:
 这只是示例结构。端口要对应实际监听，最后一条为未知入口提供兜底；源站若还另开公网端口，仍需检查是否绕过访问限制。
 
 顺序可以很朴素：先确认本机 HTTP 正常，再检查连接器与 Tunnel，最后从外部验证 hostname 和权限。Quick Tunnel 适合短暂试验，长期入口使用可管理的命名配置。升级、日志和恢复方式依然属于服务器维护的一部分。
+
+普通 HTTP ingress 不受 2026 年私有路由与连接端点变更影响；若另有脚本自行维护私有网段路由或读取 tunnel 连接，见[实施参考的维护提示](../reference/implementation.md#私有路由与连接维护api-变更核验于-2026-10-05)。该提示不新增可执行集成。[S117]
 
 ### MCP 与私网各有自己的入口
 
@@ -368,6 +372,12 @@ Clef 系列适合分类、筛选和下一步建议，不一定要为一个小判
 
 PiHarness 为 beta，Pi Durable 为 experimental。官方工具示例的 `replay: "safe"` 用在无副作用的字数统计，不能推导邮件、付款或发布都可随意重放。把它和第 6 章的[未知结果](#结果未知应该有一个明确位置)一起读，再看[agent 运行分工](../services/agent-runtime.md)，选择是否研究这条实现，而不是因新 SDK 自动迁移。[S104]
 
+### 同一个工作区，先核对 SDK 版本
+
+Artifacts 保存可审查的文件历史，Sandbox 提供 Linux 工具环境。当前 Artifacts 的组合示例固定模板 `#v0`，使用旧 Sandbox SDK 的 `getSandbox()` 与 `setEnvVars()`；Sandbox 1.0 则要求应用自己的 Durable Object 与 `this.ctx.container`。这些是两代 Sandbox 运行接口，不能混写。核验于 2026-10-05。[S114] [S115]
+
+可以按任务建立仓库，向获准运行会话提供短期、限仓库的写入 token。Builds 与 Preview 要明确配置，推送文件不等于成果被接受。版本历史、文件系统快照与 agent 任务状态分别保存不同事实，需要定义衔接。[S07] [S114]
+
 ### 1.0 要重新看生命周期
 
 Sandbox 1.0 由应用自己的 Durable Object 控制 `ctx.container`。命令使用参数数组，每次指定工作目录和环境；新镜像未必含有旧镜像的全部工具，旧进程也不会因为 Worker 更新就自动替换。[S72]
@@ -529,7 +539,7 @@ R2 Standard 的标价为 $0.015 / GB-month、Class A $4.50 / 百万次、Class B
 
 | 需要什么 | 仓库入口 |
 |---|---|
-| 本期产品变化 | [2026-10-03 观察](../reports/2026-10-03.md)；[10-02 历史观察](../reports/2026-10-02.md) |
+| 本期产品变化 | [2026.10 首发选编](../reports/2026-10-first-release.md)；[10-03](../reports/2026-10-03.md)与[10-02](../reports/2026-10-02.md)历史观察 |
 | 人的阅读版 | `guides/handbook.md` |
 | 实施细节、完整代码和状态约束 | `reference/implementation.md` |
 | 离线示例与测试 | `examples/`、`tests/` |
@@ -541,7 +551,7 @@ R2 Standard 的标价为 $0.015 / GB-month、Class A $4.50 / 百万次、Class B
 
 ## 来源索引
 
-原有条目沿用 2026-10-02 的核验范围；新增四主题与 R2 费用来源查阅于 2026-10-03。完整范围与来源差异见[来源说明](../docs/provenance.md)。资料查阅不等于账户、模型或云端实测。
+原有条目沿用 2026-10-02 的核验范围；新增四主题与 R2 费用来源查阅于 2026-10-03；S114–S117 的接口与认证说明定向核验于 2026-10-05。完整范围与来源差异见[来源说明](../docs/provenance.md)。资料查阅不等于账户、模型或云端实测。
 
 - **[S02]** · cf CLI 发布
 - **[S03]** · cf CLI 文档
@@ -588,6 +598,10 @@ R2 Standard 的标价为 $0.015 / GB-month、Class A $4.50 / 百万次、Class B
 - **[S47]** · Cloudflare Tunnel
 - **[S48]** · Access JWT 验证
 - **[S49]** · Access Service Tokens
+- **[S116]** · Access 严格 Service Token 认证
+- **[S114]** · Artifacts：Sandbox SDK 示例
+- **[S115]** · Sandbox SDK 1.0：替换 Sandbox 类
+- **[S117]** · Tunnel routes 与 connections API 变更
 - **[S50]** · D1 Time Travel
 - **[S51]** · D1 数据导出
 - **[S52]** · R2 对象生命周期
@@ -697,6 +711,10 @@ GitHub：[github.com/IndelibleVivi](https://github.com/IndelibleVivi)
 [S109]: https://developers.cloudflare.com/changelog/post/2026-10-02-protected-quick-tunnels/ "Protected Quick Tunnels 发布"
 [S112]: https://developers.cloudflare.com/r2/pricing/ "R2 存储类别与价格"
 [S113]: https://developers.cloudflare.com/workers/get-started/guide/ "Workers 新项目脚手架"
+[S116]: https://developers.cloudflare.com/changelog/post/2026-10-02-strict-service-token-authentication/ "Access 严格 Service Token 认证"
+[S117]: https://developers.cloudflare.com/changelog/post/2026-07-09-tunnel-routes-and-connections-api-changes/ "Tunnel routes 与 connections API 变更"
+[S114]: https://developers.cloudflare.com/artifacts/examples/sandbox-sdk-artifacts/ "Artifacts：Sandbox SDK 示例"
+[S115]: https://developers.cloudflare.com/sandbox/sdk/migrate/replace-the-sandbox-class/ "Sandbox SDK 1.0：替换 Sandbox 类"
 [S98]: https://blog.cloudflare.com/one-observability-platform/ "Cloudflare Observability 新平台发布"
 [S99]: https://blog.cloudflare.com/cloudflare-tracing/ "Cloudflare Traces 发布"
 

@@ -7,7 +7,7 @@
       "id": "launches",
       "label": "新发布观察",
       "kind": "report",
-      "source_entry": "report.2026-10-03",
+      "source_entry": "report.2026-10-first-release",
       "readings": [
         "data.launches",
         "data.decision-routes",
@@ -18,22 +18,28 @@
         "series": "CLOUDFLARE / FIELD EDITIONS",
         "kicker": "NEW LAUNCHES / FOR INDIVIDUALS",
         "short": "新发布观察",
-        "title": "新发布观察",
-        "deck": "运行环境、检索与维护工具的新变化。<br>现在可以用什么，又适合放在哪里。",
+        "title": "新发布观察<br>2026.10 首发选编",
+        "deck": "运行环境、维护、检索与创作的新变化。<br>现在可以用什么，又适合放在哪里。",
         "toc_intro": "先读感兴趣的方向，费用与开放状态可随时回查。每个章节和来源编号都能点击。",
         "book": "01"
       },
       "front_matter": {
-        "update_note": "本版按报告自身日期与来源范围编排；后续产品变化进入维护页，不回写历史判断。"
+        "update_note": "首发选编沿用 2026-10-02 主体、并入 2026-10-03 四组议题，并对少量条款做 2026-10-05 定点核验；这是混合来源，不是整篇重新核验。10-02 与 10-03 报告另作独立可读页保留。"
       },
       "chapters": {
         "changes": "THE SHIFT",
+        "execution": "WORKSPACE",
         "observability": "OPERATIONS",
-        "agents": "WORKSPACE",
         "retrieval": "SEARCH",
+        "models": "MODELS",
+        "browser": "BROWSER",
+        "data": "DATA",
+        "agents": "AGENTS",
         "sharing": "DELIVERY",
         "economics": "ECONOMICS",
-        "adoption": "PROGRAMMES"
+        "adoption": "AVAILABILITY",
+        "scenarios": "SCENARIOS",
+        "programmes": "PROGRAMMES"
       },
       "share_image": "assets/share/launches.png",
       "share_motif": "assets/motifs/field-notes.svg"

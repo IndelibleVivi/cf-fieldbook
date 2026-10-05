@@ -21,6 +21,20 @@ python3 tools/content.py check
 
 `catalog/publications.json` 拥有作品的源条目、封面、章节类型与服务入口；Markdown 拥有正文和稳定 chapter 标记。章节编号只是显示顺序，重排不改变章节身份。报告日期与文件名由所选正文身份生成，新一期报告无需修改 renderer。
 
+2026.10 首发三册使用完整实践手册、Clef / Jev 专题和[新发布观察首发选编](../reports/2026-10-first-release.md)。`launches.source_entry` 显式选择选编稿；它保留 10 月 2 日报告的选题范围，按主题吸收 10 月 3 日四组更新。两篇历史报告保持自己的身份和正文。选编的 10 月 5 日编辑与定向核查，不刷新所有继承来源；另外两册也不因此统一修改事实日期。
+
+本地准备首发三册时，显式选择三作品并使用尚未占用的候选 ID，例如：
+
+```bash
+.venv/bin/python tools/editions.py freeze first-release-20261005-r1 --all
+.venv/bin/python tools/editions.py build first-release-20261005-r1 --all
+.venv/bin/python tools/editions.py check first-release-20261005-r1-handbook
+.venv/bin/python tools/editions.py check first-release-20261005-r1-comparison
+.venv/bin/python tools/editions.py check first-release-20261005-r1-launches
+```
+
+制作图文附件时，从这次通过检查的各册 `outputs/` 精确选择 PDF，再从同一文件提取封面。不要整目录复制 `.build/`，也不要把旧 r3 封面配到新正文。附件身份与核验范围随实际候选记录；本地交付不等于 GitHub Release 或社交平台发布。
+
 先按[贡献说明](../CONTRIBUTING.md)安装依赖。默认只冻结当前观察；用 `--publication` 明确选择 `handbook`、`comparison` 或 `launches`：
 
 ```bash

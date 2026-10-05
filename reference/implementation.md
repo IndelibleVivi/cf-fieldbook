@@ -231,6 +231,16 @@ ingress:
 
 Quick Tunnel 适合临时试验；长期使用应选择可管理的命名入口。后台连接器的开机启动、日志轮转、升级与停用也要有说明。一个持续运行的进程，维护责任仍然属于设备或服务器侧。
 
+### 私有路由与连接维护：API 变更（核验于 2026-10-05）
+
+本参考没有把私有路由或连接管理写成可执行集成；普通 HTTP ingress 不受下面变更影响。如果读者另有脚本自行维护私有网段路由或 tunnel 连接，按当前官方变更核对端点，不要沿用旧路径。[S117]
+
+- **私有路由**：旧 `POST` / `PATCH` / `DELETE /accounts/{account_id}/teamnet/routes/network/{ip_network_encoded}` 于 **2026-10-05** 移除。新建用 `POST /accounts/{account_id}/teamnet/routes`，在 JSON body 提供 `network` 与 `tunnel_id`；修改／删除用 `PATCH` / `DELETE /accounts/{account_id}/teamnet/routes/{route_id}`。
+- **连接查询**：Tunnel（`cfd_tunnel`）与 Mesh（`warp_connector`）的 list/get 响应不再内嵌 `connections` 字段。Tunnel 连接改用 `GET /accounts/{account_id}/cfd_tunnel/{tunnel_id}/connections`；不是从 routes 端点读取。
+- **客户端**：使用 `cloudflared tunnel route ip add` / `delete` 的脚本需升级客户端。cloudflared 与 Terraform 不依赖被移除的 `connections` 字段；这条结论只针对连接查询，不表示所有私网 route API／provider 用法都免于检查。
+
+本仓库未调用这些账户接口；以上为官方迁移说明的维护摘要。[S117]
+
 ### 与设备私网的区别
 
 Cloudflare One Client / WARP 是终端接入和流量策略；Mesh 连接加入组织的设备与私网；Tunnel 发布被明确选择的服务。当前 Mesh 仍有 beta 标识，不应成为没有替代方案的唯一灾难恢复入口。[S61]
@@ -766,6 +776,9 @@ Workers 侧的观测不会自动看到所有本机脚本、第三方平台和离
 **S72 · Sandbox SDK 1.0 迁移差异**  
 <https://developers.cloudflare.com/sandbox/sdk/migrate/changes-in-1-0/>
 
+**S117 · Tunnel routes 与 connections API 变更**  
+<https://developers.cloudflare.com/changelog/post/2026-07-09-tunnel-routes-and-connections-api-changes/>
+
 
 [S02]: https://blog.cloudflare.com/cloudflare-cf-cli-launch/ "cf CLI 发布"
 [S03]: https://developers.cloudflare.com/cf/ "cf CLI 文档"
@@ -823,6 +836,7 @@ Workers 侧的观测不会自动看到所有本机脚本、第三方平台和离
 [S70]: https://developers.cloudflare.com/changelog/post/2026-10-01-pending-io-keep-alive/ "Durable Objects pending I/O 保活"
 [S71]: https://developers.cloudflare.com/changelog/post/2026-10-01-workers-oauth-provider-1x/ "Workers OAuth Provider v1"
 [S72]: https://developers.cloudflare.com/sandbox/sdk/migrate/changes-in-1-0/ "Sandbox SDK 1.0 迁移差异"
+[S117]: https://developers.cloudflare.com/changelog/post/2026-07-09-tunnel-routes-and-connections-api-changes/ "Tunnel routes 与 connections API 变更"
 
 ---
 

@@ -886,5 +886,37 @@
     "accessed": "2026-10-03",
     "kind": "official_primary",
     "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+  },
+  {
+    "id": "S114",
+    "title": "Artifacts：Sandbox SDK 示例",
+    "url": "https://developers.cloudflare.com/artifacts/examples/sandbox-sdk-artifacts/",
+    "accessed": "2026-10-05",
+    "kind": "official_primary",
+    "verification_scope": "targeted_2026_10_05_public_document_consulted; template_v0_getSandbox_setEnvVars; no_account_or_live_deployment"
+  },
+  {
+    "id": "S115",
+    "title": "Sandbox SDK 1.0：替换 Sandbox 类",
+    "url": "https://developers.cloudflare.com/sandbox/sdk/migrate/replace-the-sandbox-class/",
+    "accessed": "2026-10-05",
+    "kind": "official_primary",
+    "verification_scope": "targeted_2026_10_05_public_document_consulted; own_durable_object_ctx_container_for_1_0; no_account_or_live_deployment"
+  },
+  {
+    "id": "S116",
+    "title": "Access 严格 Service Token 认证",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-02-strict-service-token-authentication/",
+    "accessed": "2026-10-05",
+    "kind": "official_primary",
+    "verification_scope": "targeted_2026_10_05_public_document_consulted; strict_headers_only_service_auth_401_403_no_302_no_cf_authorization_cookie; no_account_or_live_deployment"
+  },
+  {
+    "id": "S117",
+    "title": "Tunnel routes 与 connections API 变更",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-07-09-tunnel-routes-and-connections-api-changes/",
+    "accessed": "2026-10-05",
+    "kind": "official_primary",
+    "verification_scope": "targeted_2026_10_05_public_document_consulted; teamnet_routes_patch_delete_and_dedicated_connections_endpoint; list_get_embedded_connections_field_removed_2026_10_05; no_account_or_live_deployment"
   }
 ]

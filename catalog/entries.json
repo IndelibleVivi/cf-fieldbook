@@ -12,7 +12,7 @@
       "review": {
         "state": "inherited",
         "checked_on": "2026-10-02",
-        "scope": "继承 r3 来源记录，核验范围见来源说明",
+        "scope": "继承 r3 来源记录；10-05 增补 S114–S117 定点来源，核验范围见来源说明",
         "next_review_on": "2026-11-01"
       },
       "evidence": [
@@ -235,7 +235,7 @@
       "review": {
         "state": "inherited",
         "checked_on": "2026-10-02",
-        "scope": "继承 r3 来源记录，核验范围见来源说明；10-03 新主题及 R2/脚手架的局部官方查阅见来源说明，不刷新全部历史事实",
+        "scope": "继承 r3 来源记录，核验范围见来源说明；10-03 新主题及 R2/脚手架的局部官方查阅见来源说明；10-05 仅对严格 Service Token、Tunnel routes/connections 与 Artifacts/Sandbox API 区分做定点官方核验，不刷新全部历史事实",
         "next_review_on": "2026-11-01"
       },
       "evidence": [
@@ -260,12 +260,45 @@
       "review": {
         "state": "inherited",
         "checked_on": "2026-10-02",
-        "scope": "继承 r3 来源记录，核验范围见来源说明",
+        "scope": "继承 r3 来源记录，核验范围见来源说明；10-05 仅 Tunnel routes/connections 维护提示做定点官方核验，不刷新全部历史事实",
         "next_review_on": "2026-11-01"
       },
       "evidence": [
         {
           "kind": "prior-edition",
+          "ref": "docs/provenance.md"
+        }
+      ]
+    },
+    {
+      "id": "report.2026-10-first-release",
+      "kind": "report",
+      "path": "reports/2026-10-first-release.md",
+      "track": "edition",
+      "status": "current",
+      "depends_on": [
+        "report.2026-10-02",
+        "report.2026-10-03",
+        "data.launches",
+        "data.decision-routes",
+        "data.observability-pricing"
+      ],
+      "related": [
+        "guide.handbook",
+        "service.observability",
+        "service.search",
+        "service.agent-runtime",
+        "usecase.temporary-sharing"
+      ],
+      "review": {
+        "state": "checked",
+        "checked_on": "2026-10-05",
+        "scope": "混合来源选编：继承 2026-10-02 主体、收录 2026-10-03 四组议题、2026-10-05 对严格 Service Token、Tunnel routes/connections 与 Artifacts/Sandbox API 区分做定点官方来源核验；非整篇重新核验，无账户或云端实测",
+        "next_review_on": null
+      },
+      "evidence": [
+        {
+          "kind": "source-reviewed",
           "ref": "docs/provenance.md"
         }
       ]

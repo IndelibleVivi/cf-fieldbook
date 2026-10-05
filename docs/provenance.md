@@ -14,6 +14,10 @@ r3 重新核对来源 S16–S18，并补充 S73–S83，重点覆盖 Clef / Jev�
 
 2026-10-03 新增 S98–S113，核对 Observability、Traces/SQL、PiHarness、Web Search API、Protected Quick Tunnels，以及补充 R2 费用与新项目脚手架。12 GB-month / 10 GB-month 和 Exa ZDR 的官方页面差异保留在对应正文与 launch 记录。此范围不刷新旧条目或 10-02 历史报告的核验日期，没有账户或付费调用。
 
+2026-10-05 新增 S114–S117，定向核对 Artifacts 官方示例仍使用 Sandbox v0、Sandbox 1.0 的迁移接口、Access 严格 Service Token 认证，以及当日到达移除日期的 Tunnel 私网路由与连接查询 API。结论进入手册、实施参考与首发选编；没有执行账户配置、API 迁移或云端恢复实验。首发图文的三款 CF 模型输入单价另于当日核对，未由此刷新专题的全篇来源日期。
+
+[首发选编](../reports/2026-10-first-release.md)是独立的新编排，按主题吸收两篇历史观察，保留继承事实、后续增补和定向核查各自的范围。原 10 月 2 日和 10 月 3 日报告不被覆盖，构建日期也不作为它们的新事实日期。
+
 ## 历史资料的使用
 
 实践手册和实施参考分别解释入口与权限、数据职责、异步恢复、私有回源及浏览器会话边界。[实施参考第 16 章](../reference/implementation.md)集中列出容易误判的做法及其核查依据。

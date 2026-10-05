@@ -120,7 +120,15 @@ class PublicationTests(unittest.TestCase):
         editions.freeze(self.root, 'report-a', 'launches')
         output = editions.build(self.root, 'report-a', ['md'])
         produced = {p.name for p in output.iterdir()}
-        self.assertTrue(any('2026-10-03' in name for name in produced), produced)
+        self.assertTrue(any('2026-10-05' in name for name in produced), produced)
+        # The first-release report must retain the original breadth and the
+        # subsequent updates; exporting the shorter follow-up loses both pages
+        # about snapshots, file history and image retrieval in the share set.
+        text = next(output.glob('*.md')).read_text()
+        for topic in ('Containers', 'Artifacts', 'AI Search', 'Clef', 'Browser',
+                      'Observability', 'PiHarness', 'Web Search', 'Quick Tunnel',
+                      'The Cold Start', 'Git 平台比赛'):
+            self.assertIn(topic, text)
 
     def test_swapping_report_entry_needs_no_renderer_change(self):
         rel = 'reports/2026-12-31.md'
@@ -178,7 +186,8 @@ class PublicationTests(unittest.TestCase):
     # --- historical report stays frozen ------------------------------------
 
     def test_live_catalog_edits_do_not_rewrite_history(self):
-        report = (self.root / 'reports/2026-10-02.md').read_bytes()
+        reports = {name: (self.root / 'reports' / name).read_bytes()
+                   for name in ('2026-10-02.md', '2026-10-03.md')}
         sources = self.root / 'catalog/sources.json'
         data = json.loads(sources.read_text())
         # Mutate a source actually cited by the selected report, so the HTML
@@ -189,7 +198,8 @@ class PublicationTests(unittest.TestCase):
         content.sync(self.root, check=False)
         editions.freeze(self.root, 'hist', 'launches')
         output = editions.build(self.root, 'hist', ['md', 'html'])
-        self.assertEqual(report, (self.root / 'reports/2026-10-02.md').read_bytes())
+        for name, original in reports.items():
+            self.assertEqual(original, (self.root / 'reports' / name).read_bytes())
         self.assertNotIn('LIVE_SOURCE_SENTINEL', next(output.glob('cf-cloudflare*.html')).read_text())
 
     def test_glossary_is_frozen_and_embedded_in_portable_outputs(self):

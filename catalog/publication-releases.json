@@ -4,6 +4,33 @@
   "releases": [],
   "updates": [
     {
+      "date": "2026-10-05",
+      "families": [
+        "launches"
+      ],
+      "kind": "content",
+      "topics": [
+        "first-release-anthology",
+        "strict-service-token",
+        "tunnel-routes-connections",
+        "artifacts-sandbox-apis"
+      ],
+      "summary": "新增 2026.10 首发选编，统一 10-02 主体与 10-03 四组议题；launches 作品改选该正文，10-02 与 10-03 报告保留独立可读页。定点核验严格 Service Token、Tunnel routes/connections 与 Artifacts/Sandbox API 区分并加注，未做整篇重新核验。"
+    },
+    {
+      "date": "2026-10-05",
+      "families": [
+        "handbook"
+      ],
+      "kind": "content",
+      "topics": [
+        "strict-service-token",
+        "tunnel-routes-connections",
+        "artifacts-sandbox-apis"
+      ],
+      "summary": "补充严格 Service Token 的策略与 cookie 行为、私网路由 API 维护提示，以及 Artifacts 组合示例所用 Sandbox v0 与 1.0 的接口边界；仅定向核验，不刷新全书事实日期。"
+    },
+    {
       "date": "2026-10-03",
       "families": [
         "handbook",

@@ -19,7 +19,7 @@
 | 理解任务为什么登记了却没完成 | [任务中断与恢复](use-cases/recoverable-jobs.md) | 看见租约恢复、迟到拒绝与未知结果，知道哪些动作不能盲目重试 |
 | 让模型建议下一步，而由程序控制执行 | [有限决策与下一步动作](use-cases/bounded-decision.md) | 区分模型建议、允许的动作与需要检验的误判 |
 | 比较 Clef、Jev 与接入路线 | [服务页](services/decision-models.md) · [Clef / Jev 专题](comparisons/clef-vs-jev.md) | 在同一任务下比较模型与供应路径，不把价格当作正确率 |
-| 判断本期产品变化是否影响自己 | [2026-10-03 新发布观察](reports/2026-10-03.md) | 读观测、PiHarness、互联网搜索与临时分享，区分现在可用与未来计费 |
+| 判断本期产品变化是否影响自己 | [2026.10 首发选编](reports/2026-10-first-release.md) | 从执行环境、文件历史与图片检索，读到观测、agent、费用与开放状态 |
 | 先做完一个可读的小项目 | [三份文档的小资料架](examples/reading-shelf/README.md) | 直接阅读、下载合成文档，沿同一份材料继续理解权限、更新、任务与检索 |
 | 运行例子，或把检查交给 agent | [四个离线例子](examples/README.md) · [恢复任务单](templates/job-recovery-task.md) | 用合成输入取得实际输出、失败证据与清理结果 |
 
@@ -74,7 +74,7 @@ Node.js 20+ 用于 Worker 测试；Mermaid 只在修改图示时需要安装。[
 
 ## 状态与边界
 
-这是持续编辑的 source-available 参考仓库；具体实现、验证和未启用能力见[当前状态](docs/current-state.md)。手册与报告按各自来源截止日期阅读；[实践记录](practice/README.md)匿名重构作者维护过的系统，保留历史观察日期，并链接相关官方机制文档。局部工程验证不能代表全篇事实或历史系统重新核验。旧三册 Markdown / HTML / PDF 固定保留在 `dist/`，用于历史阅读；新构建进入 `.build/`，不覆盖旧版。
+这是持续编辑的 source-available 参考仓库；具体实现、验证和未启用能力见[当前状态](docs/current-state.md)。[2026.10 首发选编](reports/2026-10-first-release.md)按主题整合 10 月 2 日完整报告与 10 月 3 日四组更新，两篇历史观察仍可独立阅读。手册与报告按各自来源范围阅读；10 月 5 日的认证、API 与 SDK 定向核查不表示全书重新核验。[实践记录](practice/README.md)匿名重构作者维护过的系统，保留历史观察日期，并链接相关官方机制文档。旧三册 Markdown / HTML / PDF 固定保留在 `dist/`，用于历史阅读；新构建进入 `.build/`，不覆盖旧版。新版 PDF 为本地首发候选，尚未发布为 Release。
 
 公共例子使用合成输入，没有账号凭据或真实运行数据。阅读站由 GitHub Pages 托管，主分支通过检查后自动更新。搜索在浏览器内完成，不向搜索服务发送查询；站点不嵌入统计脚本或远程字体。云端实验、定期上游监控和新版出版物 Release 独立于网站部署。
 

@@ -486,5 +486,87 @@
       "report.2026-10-03"
     ],
     "next_check": "开放条件、来源差异与生效条款；未进行云端调用"
+  },
+  {
+    "id": "strict-service-token",
+    "name": "Access 严格 Service Token 认证",
+    "status": "released_feature",
+    "access": "新组织 2026-10-05 起强制；旧组织可配置",
+    "announced_on": "2026-10-02",
+    "verified_on": "2026-10-05",
+    "sources": [
+      "S49",
+      "S116"
+    ],
+    "effective_events": [
+      {
+        "kind": "new_org_mandatory",
+        "date": "2026-10-05"
+      }
+    ],
+    "conflicts": [],
+    "topics": [
+      "access"
+    ],
+    "affected_entries": [
+      "guide.handbook",
+      "report.2026-10-first-release"
+    ],
+    "next_check": "官方严格认证默认值、组织日期条件或返回行为变化时复查；未进行账户或云端调用"
+  },
+  {
+    "id": "tunnel-routes-connections",
+    "name": "Tunnel routes 与 connections API 变更",
+    "status": "released_feature",
+    "access": "私有路由维护用 teamnet routes；连接列表迁移到专用端点",
+    "announced_on": "2026-07-09",
+    "verified_on": "2026-10-05",
+    "sources": [
+      "S117"
+    ],
+    "effective_events": [
+      {
+        "kind": "removal",
+        "date": "2026-10-05"
+      }
+    ],
+    "conflicts": [],
+    "topics": [
+      "access",
+      "tunnel"
+    ],
+    "affected_entries": [
+      "guide.handbook",
+      "reference.implementation",
+      "report.2026-10-first-release"
+    ],
+    "next_check": "私网路由端点、客户端迁移要求或 connections 字段说明变化时复查；未进行账户或云端调用"
+  },
+  {
+    "id": "artifacts-sandbox-apis",
+    "name": "Artifacts 与 Sandbox SDK 的 API 区分",
+    "status": "released_sdk",
+    "access": "Artifacts 组合示例仍用 Sandbox SDK v0；1.0 接口另按迁移文档核对",
+    "announced_on": null,
+    "verified_on": "2026-10-05",
+    "sources": [
+      "S07",
+      "S59",
+      "S72",
+      "S114",
+      "S115"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "topics": [
+      "agent-runtime",
+      "workspace"
+    ],
+    "affected_entries": [
+      "guide.handbook",
+      "service.agent-runtime",
+      "report.2026-10-first-release"
+    ],
+    "next_check": "复查 Artifacts 示例模板与 Sandbox 1.0 迁移文档是否改动；未进行账户或云端调用"
   }
 ]

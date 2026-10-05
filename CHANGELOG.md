@@ -1,5 +1,11 @@
 # 变更记录
 
+## 2026-10-05 · 首发选编
+
+- 新发布观察采用完整的 2026.10 首发选编：保留 10 月 2 日报告主题，按章整合 Observability、PiHarness、Web Search API 与 Protected Quick Tunnel；两份日期报告与固定 r3 文件继续保留。
+- 手册与实施参考补充严格 Service Token、Tunnel 私网路由／连接查询迁移，以及 Artifacts 组合示例中的 Sandbox v0 与 1.0 接口区别。仅这些条款定向核验于 10 月 5 日，没有全书刷新日期或新的云端实测。
+- 三部作品可按首发选择冻结独立 PDF 候选；公开版本索引仍只发布已登记的文件，本次没有新 PDF Release。
+
 ## 2026-10-03 · 内容与出版编排
 
 - 新增 Observability、PiHarness、Web Search API 与 Protected Quick Tunnels 当前主题和 10 月 3 日观察；保留官方来源冲突、开放状态与未来费用生效日期，旧观察不自动更新。

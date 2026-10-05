@@ -57,7 +57,7 @@ class ReadingSiteTests(unittest.TestCase):
         soup = BeautifulSoup((self.output / 'index.html').read_text(), 'html.parser')
         # The home page names the three works: handbook, Clef/Jev comparison, current report.
         self.assertEqual([a['href'] for a in soup.select('.path')], [
-            'guides/handbook.html', 'comparisons/clef-vs-jev.html', 'reports/2026-10-03.html'])
+            'guides/handbook.html', 'comparisons/clef-vs-jev.html', 'reports/2026-10-first-release.html'])
         for path in ('reference/implementation.html', 'examples/job-state/README.html',
                      'examples/health-worker/README.html', 'examples/decision-routing/README.html',
                      'examples/reading-shelf/README.html', 'diagrams/README.html'):
@@ -525,7 +525,7 @@ GitHub · [https://github.com/IndelibleVivi](https://github.com/IndelibleVivi)
             output = self.root / '.build/social-check'
             build_site.build_site(self.root, output, build_site.PUBLIC_SITE_URL)
             for path, key in [('guides/handbook.html', 'handbook'), ('comparisons/clef-vs-jev.html', 'comparison'),
-                              ('reports/2026-10-03.html', 'launches')]:
+                              ('reports/2026-10-first-release.html', 'launches')]:
                 soup = BeautifulSoup((output / path).read_text(), 'html.parser')
                 self.assertIn(self.root.joinpath('assets/share/' + key + '.png').name, soup.select_one('meta[property="og:image"]')['content'])
                 self.assertIn(build_site.PUBLIC_SITE_URL + path, soup.select_one('link[rel="canonical"]')['href'])
