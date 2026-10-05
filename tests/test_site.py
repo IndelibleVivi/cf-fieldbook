@@ -186,7 +186,8 @@ class ReadingSiteTests(unittest.TestCase):
 
     def test_real_authoring_comments_do_not_leak_into_body_or_search(self):
         index = json.loads((self.output / 'search-index.json').read_text())
-        for path in ('guides/handbook.html', 'reports/2026-10-02.html'):
+        for path in ('guides/handbook.html', 'reports/2026-10-02.html',
+                     'reports/2026-10-first-release.html'):
             soup = BeautifulSoup((self.output / path).read_text(), 'html.parser')
             for marker in ('<!-- facts:', '<!-- /facts -->', '<!-- SOURCES -->', '<!-- figure:'):
                 self.assertNotIn(marker, soup.select_one('.prose').get_text())
@@ -255,7 +256,8 @@ cat < input > output
             self.assertNotIn(banner, (self.output / path).read_text())
 
     def test_shared_footer_owns_signature_and_opening_metadata_is_semantic(self):
-        for path in ('guides/handbook.html', 'reports/2026-10-02.html'):
+        for path in ('guides/handbook.html', 'reports/2026-10-02.html',
+                     'reports/2026-10-first-release.html'):
             soup = BeautifulSoup((self.output / path).read_text(), 'html.parser')
             self.assertEqual(soup.body.get_text().count('Faye & Cove'), 1)
             self.assertEqual(soup.select_one('.site-footer .signature').get_text(), 'made by Faye & Cove')
