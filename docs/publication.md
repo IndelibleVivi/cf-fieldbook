@@ -69,6 +69,10 @@ python3 tools/content.py check
 
 快照固定内容和渲染代码，不打包 Python、浏览器或字体。依赖按记录安装；跨系统排版可能不同，要重新视觉验收，不能承诺 PDF 跨平台逐字节重现。同册链接转换为文内锚点，其他正文、例子与附件转换为正式阅读站地址。封面及篇尾给出本册版本／更新页，篇尾另有当前阅读入口，页脚带轻量版次；没有本机 `file:` URI。渲染禁止远程资产请求，既不补抓事实，也不调用云端例子。
 
+PDF 在文件内嵌入字体；HTML 仍使用阅读设备自己的字体。`tools/render.py` 的 `embed_compact_cid_fonts` 在 WeasyPrint 写文件前，把 Adobe-Identity-0 且 CID 与 glyph index 一致的 CFF 字体按 `CIDFontType0C` 嵌入：直接保留原 CFF table bytes，只改变 OpenType 外层封装，不重编字形、不改文字映射、正文流、链接或书签。它处理本机 PingFang SC 在 PDFKit / Quick Look 下缺字和错字形的兼容问题；TrueType、其他 CFF charset 与 name-keyed CFF 保持原封装。`fonttools` / `pydyf` 使用现有渲染依赖，版本随 edition 记录；不分发独立系统字体文件。
+
+字体已嵌入、`pdftotext` 输出正确仍不足以证明显示正常。PDF 字体或 renderer 变更后，至少用 Poppler 和目标设备的原生预览打开正文页，检查中文、Latin、粗体、表格与目录；macOS 使用 Preview / Quick Look，iPhone 使用实际分发入口。macOS 原生检查通过不能写成 iPhone 微信已验证。修正版使用新候选 ID；旧冻结输入、输出与 `dist/` 不覆盖。
+
 ## 当前阅读、版本与下载
 
 阅读站提供[作品与版本入口](https://indeliblevivi.github.io/cf-fieldbook/publications.html)及每册的版本页。`catalog/publication-releases.json` 分别拥有当前编辑修订、固定历史版链接和已分发版登记；编辑修订按作品关联，不把任意 repo commit 当成该册过期。专题的新增任务说明属于编辑修订，不刷新模型事实日期。

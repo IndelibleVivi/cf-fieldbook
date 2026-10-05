@@ -1,5 +1,10 @@
 # 变更记录
 
+## 2026-10-05 · PDF 原生预览兼容
+
+- PDF renderer 把 identity CID CFF 的原字体数据按 `CIDFontType0C` 嵌入，处理本机 PingFang SC 在 PDFKit / Quick Look 的正文缺字与错字形；保持原字形、正文、分页、链接与书签。
+- 首发三册生成独立 r4 本地兼容候选，正文和事实日期保留。macOS 原生预览与 Poppler 检查通过；读者确认 iPhone 微信中 r4 专题正文显示正常，其他分册与合订本未逐页手机验收。旧冻结版与 `dist/` 不覆盖，没有新 PDF Release。
+
 ## 2026-10-05 · 首发选编
 
 - 新发布观察采用完整的 2026.10 首发选编：保留 10 月 2 日报告主题，按章整合 Observability、PiHarness、Web Search API 与 Protected Quick Tunnel；两份日期报告与固定 r3 文件继续保留。

@@ -10,6 +10,7 @@
 - 阅读站默认冷白，可切暖纸；选择只存读者本地浏览器，无 JavaScript 时保持冷白。篇类题头、透明母题、篇尾日出印与轻动画沿用青橙视觉；动画遵循减弱动态设置。键盘定位用内部底色与下划线，署名集中于页脚。
 - 三部作品的编排归 `catalog/publications.json`，Markdown 仍拥有正文。稳定章节 ID 与显示编号分开，旧网页锚点保留；新增报告按条目和正文身份编排，不再修改 renderer 内的固定日期。
 - edition 可独立冻结一个作品，也可一次生成三部作品的独立候选。冻结固定所需正文、数据、图示、词表与渲染代码；所引用词义嵌入当版附录。2026.10 首发的三册完整 PDF 已生成本地候选并检查分页与链接，没有发布新的 Release；`dist/` 固定 r3 历史文件未改。
+- 首发兼容候选 `first-release-20261005-r4-{comparison,launches,handbook}` 修复本机 PingFang SC 的 OpenType / CFF 封装在 PDFKit 与 Quick Look 下缺字和错字形的问题。三册仍为 10 / 22 / 27 页，正文文字、链接和书签逐页保留；59 页正文已用 macOS 原生引擎复看，Quick Look 正文复现页恢复。读者确认 iPhone 微信中 r4 专题正文显示正常；其他分册与合订本没有逐页手机验收。新文件没有登记为 GitHub Release；旧冻结文件保留。
 - 六张 Mermaid 图由锁定的 11.17.2 引擎生成；新增资料架更新／撤下图明确为扩展设计。入口路线与任务状态的横／窄 SVG 继续共用语义源。
 - 当前正文、来源说明与阅读投影不保留与本作品无关的材料致谢；历史固定出版物不在本轮改写。来源核验与分发边界见[来源说明](provenance.md)。
 - `Checks and Pages` 对提交运行离线检查，主分支通过后更新[正式阅读站](https://indeliblevivi.github.io/cf-fieldbook/)，PR 只检查。最新运行结果见[GitHub Actions](https://github.com/IndelibleVivi/cf-fieldbook/actions)；网站部署与出版物 Release 是两件事。

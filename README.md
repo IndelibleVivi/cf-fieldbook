@@ -78,6 +78,8 @@ Node.js 20+ 用于 Worker 测试；Mermaid 只在修改图示时需要安装。[
 
 公共例子使用合成输入，没有账号凭据或真实运行数据。阅读站由 GitHub Pages 托管，主分支通过检查后自动更新。搜索在浏览器内完成，不向搜索服务发送查询；站点不嵌入统计脚本或远程字体。云端实验、定期上游监控和新版出版物 Release 独立于网站部署。
 
+PDF 构建保留可复制文字、链接和书签，并对本机 PingFang 的 CFF 字体封装作原生预览兼容处理；新文件仍须在实际阅读设备验收。字体嵌入或文字提取通过不能代替显示检查，见[出版流程](docs/publication.md)。
+
 原创功能代码采用 [SUL-1.0](LICENSE)；原创正文、出版物、独立图形和资料编排采用 [CC BY-NC-SA 4.0](LICENSE-DOCUMENTATION.md)。这是一份 source-available 项目，不是无商业使用限制的 OSI 开源软件；具体路径与第三方例外见[许可与权利范围](LICENSE-STATUS.md)。
 
 [项目规格](SPEC.md) · [架构](docs/architecture.md) · [生命周期](docs/lifecycle.md) · [内容设计](docs/content-design.md) · [来源说明](docs/provenance.md) · [AGENTS](AGENTS.md)

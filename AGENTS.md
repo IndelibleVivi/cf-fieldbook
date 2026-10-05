@@ -15,6 +15,7 @@ CF Fieldbook 是独立的参考资料与离线例子仓库。先读 [README](REA
 - `examples/job-state/model.py` 拥有恢复规则；`tools/recovery_demo.py` 执行模型生成合成场景，`styles/recovery.js` 只控制场景与播放。演示只随 current 例子分发，不增加云端执行。
 - `examples/reading-shelf/materials/` 拥有三份合成原件；`build.py` 生成 `index.html`，不另行编辑生成正文。静态例子不包含手册扩展设计中的权限、数据库或索引。
 - `tools/editions.py freeze/build/check` 是三册出版入口，使用冻结输入内的 renderer；`.build/editions/` 是本地产物，`dist/` 是固定 r3 历史。
+- `tools/render.py embed_compact_cid_fonts` 拥有 PDF 的 identity CID CFF 封装兼容处理，保留原 CFF bytes；不要通过改字形、改正文或栅格化来修显示。字体／renderer 改动须同时看 Poppler 与原生预览正文，文字提取不能代替显示验收；具体设备实测分开记录。
 - `tools/share_images.py` 从作品编排、日期与原创 SVG 生成 `assets/share/` PNG；普通站点构建只复制。作品身份、截止日或母题变化须重建并复看分享卡。
 - Mermaid 在 `diagrams/src/` 编辑，SVG 由工具生成；不要手改导出图。原创装饰在 `assets/motifs/`。
 - 阅读概念图由 `tools/figures.py` 显式生成；入口与任务状态的横／窄布局共用语义，不单改一份导出。

@@ -11,6 +11,7 @@ Source dates are scoped per entry. Exported HTML embeds CSS and SVG, never fonts
 from __future__ import annotations
 import argparse
 import html
+import io
 import json
 from pathlib import Path
 import re
@@ -31,6 +32,34 @@ FIGCAP={
  'two-routes':'两种常见路线，不要求同时采用。Tunnel 不替原设备运行程序。',
  'task-state':'接收、执行与完成分开记录。示意主线，不是完整状态机；其他分支见下表。'
 }
+
+def embed_compact_cid_fonts(document, pdf):
+    """Keep identity CID CFF outlines, but use the compact PDF font container.
+
+    PDFKit can misrender the OpenType wrapper produced by WeasyPrint for
+    PingFang, while the same unmodified CFF table works as CIDFontType0C.
+    This supported write_pdf finisher changes neither shaping nor page streams.
+    TrueType, name-keyed CFF and non-identity charsets keep their original form.
+    """
+    from fontTools.ttLib import TTFont
+    import pydyf
+
+    for obj in pdf.objects:
+        if not isinstance(obj, pydyf.Stream) or obj.extra.get('Subtype') != '/OpenType':
+            continue
+        data = b''.join(obj.stream)
+        with TTFont(io.BytesIO(data)) as font:
+            if 'CFF ' not in font:
+                continue
+            top = font['CFF '].cff.topDictIndex[0]
+            if getattr(top, 'ROS', None) != ('Adobe', 'Identity', 0):
+                continue
+            if top.charset != ['.notdef', *(f'cid{i:05d}' for i in range(1, len(top.charset)))]:
+                continue
+            # Read the original table bytes: recompiling CFF may alter outlines,
+            # hints or private dictionaries. Only its outer container changes.
+            obj.stream = [font.reader['CFF ']]
+            obj.extra['Subtype'] = '/CIDFontType0C'
 
 def no_network_fetcher(url: str, **kwargs):
     if url.startswith(('http:','https:','ftp:')):
@@ -263,7 +292,8 @@ def render_one(collection,fam,sources,dist,edition,formats):
         # Every link is already an in-book anchor or a public https URL; no
         # repository-relative href survives, so no file URI can leak.
         doc=HTML(string=final,base_url=str(ROOT),url_fetcher=no_network_fetcher)
-        doc.write_pdf(str(target.with_suffix('.pdf')),pdf_tags=True)
+        doc.write_pdf(str(target.with_suffix('.pdf')),pdf_tags=True,
+                      finisher=embed_compact_cid_fonts)
     print('Built',target.name,','.join(formats),flush=True)
 
 def main():

@@ -164,8 +164,11 @@ def build(root: Path, ident: str, formats: list[str]) -> Path:
                            for p in sorted(outputs.rglob('*')) if p.is_file()}
     manifest['formats'] = formats
     manifest['build_python'] = sys.version.split()[0]
-    manifest['build_packages'] = {name: version(name) for name in ('markdown-it-py', 'beautifulsoup4', 'PyYAML', 'weasyprint')}
-    manifest['font_policy'] = 'System fonts; no font files distributed; layout may vary across systems.'
+    manifest['build_packages'] = {name: version(name) for name in
+                                  ('markdown-it-py', 'beautifulsoup4', 'PyYAML',
+                                   'weasyprint', 'fonttools', 'pydyf')}
+    manifest['font_policy'] = ('System fonts; PDF embeds identity CID CFF as CIDFontType0C; '
+                               'no standalone font files distributed; layout may vary across systems.')
     manifest['build_state'] = 'built-local-candidate'
     (target / 'edition.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n')
     return outputs
