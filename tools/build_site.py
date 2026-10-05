@@ -385,6 +385,7 @@ class Site:
         dialog = f'''<dialog id="term-dialog" aria-labelledby="term-title"><div class="term-dialog-head"><p class="eyebrow">术语 / FIELD NOTES</p><button type="button" id="term-close" aria-label="关闭词义">关闭 ×</button></div><h2 id="term-title"></h2><p id="term-definition"></p><a id="term-full-link" href="{u('docs/glossary.html')}">在词表中继续阅读</a></dialog><script id="term-data" type="application/json">{term_data}</script>''' if self.terms else ''
         document = f'''<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="google-site-verification" content="7VmMLWHwFBaFG7l2fMQyj7y3wFvLIC9Lmudl_CuoVHE">
 <title>{escape(title)} · CF Fieldbook</title><meta name="author" content="Faye &amp; Cove">
 <meta name="description" content="{escape(description)}">
 {social}

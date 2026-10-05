@@ -80,6 +80,8 @@ node --test tests/site-search.test.cjs
 
 `--base-url` 用于 canonical 地址、站点地图和 404 导航。网站提供 `sitemap.xml`、`robots.txt`、原创 favicon 和 404 页面；本地预览可以省略该参数。`robots.txt` 只有部署在域名根目录时才是该域名的爬虫入口；GitHub 项目子路径中的同名文件不控制整个域名，页面仍各自声明索引状态。部署只上传显式选出的站点文件，不上传仓库根目录、`.build/editions` 或运行环境。
 
+`tools/build_site.py` 的公共页面模板保留本项目 Search Console 的 `google-site-verification` meta。这是公开的所有权验证标记，不是访问凭据或 analytics 脚本；正式站点验证后也须保留。重排模板时检查生成首页的 `<head>` 仍包含标记；fork 或更换站点所有者时移除原标记，并在自己的 Search Console 获取新的验证值。对应 URL-prefix 为 `https://indeliblevivi.github.io/cf-fieldbook/`，sitemap 为该前缀下的 `sitemap.xml`；验证、提交与实际收录分别确认。
+
 初次为 fork 启用时，在仓库 **Settings → Pages → Build and deployment** 中选择 **GitHub Actions**，并把 workflow 的 `--base-url` 改为该 fork 的实际网址。主分支变更触发构建；也可以在 Actions 中手动运行 **Checks and Pages**。使用自定义域名时同步该地址，DNS 和域名验证按托管平台说明配置。
 
 发布后检查 Actions 中 build 与 deploy 均成功，再打开网站核对首页、深层文章、搜索和下载。失败时检查对应步骤日志：内容或测试失败先修复源文件；部署失败核对 Pages 设置与 environment 权限。失败的构建不会更新当前站点。
