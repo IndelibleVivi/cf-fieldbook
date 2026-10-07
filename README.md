@@ -20,8 +20,10 @@
 | 让模型建议下一步，而由程序控制执行 | [有限决策与下一步动作](use-cases/bounded-decision.md) | 区分模型建议、允许的动作与需要检验的误判 |
 | 比较 Clef、Jev 与接入路线 | [服务页](services/decision-models.md) · [Clef / Jev 专题](comparisons/clef-vs-jev.md) | 在同一任务下比较模型与供应路径，不把价格当作正确率 |
 | 判断本期产品变化是否影响自己 | [2026.10 首发选编](reports/2026-10-first-release.md) | 从执行环境、文件历史与图片检索，读到观测、agent、费用与开放状态 |
+| 用程序盘点或维护 CF 资源 | [API 与 SDK 维护](reference/api-maintenance.md) · [可靠操作例子](examples/api-operations/README.md) | 选择调用入口，识别完整分页、总期限、部分失败与未知写结果 |
+| 找回项目为什么这样选，判断变化是否相关 | [把变化接到当前项目](use-cases/project-context.md) · [项目判断任务单](templates/project-context-task.md) | 由 agent 读取已有理由与具体用法，区分命中、已查范围未发现和未知 |
 | 先做完一个可读的小项目 | [三份文档的小资料架](examples/reading-shelf/README.md) | 直接阅读、下载合成文档，沿同一份材料继续理解权限、更新、任务与检索 |
-| 运行例子，或把检查交给 agent | [四个离线例子](examples/README.md) · [恢复任务单](templates/job-recovery-task.md) | 用合成输入取得实际输出、失败证据与清理结果 |
+| 运行例子，或把检查交给 agent | [五个离线例子](examples/README.md) · [恢复任务单](templates/job-recovery-task.md) | 用合成输入取得实际输出、失败证据与清理结果 |
 
 不熟悉的词可以先查[术语小词表](docs/glossary.md)。需要精确配置、命令或完整状态约束时，从对应例子进入[实施参考](reference/implementation.md)。
 
@@ -62,6 +64,7 @@ python3 -m http.server 8767 --bind 127.0.0.1 --directory .build/site
 
 ```sh
 python3 tools/fieldbook.py impact data.decision-routes
+python3 tools/fieldbook.py impact-source S117
 python3 tools/fieldbook.py due --as-of 2026-11-01
 python3 tools/fieldbook.py check
 python3 tools/check.py
@@ -71,6 +74,8 @@ node --test examples/health-worker/worker.test.mjs
 ```
 
 Node.js 20+ 用于 Worker 测试；Mermaid 只在修改图示时需要安装。[贡献与维护](CONTRIBUTING.md)给出依赖、修改位置与验证方法；[出版流程](docs/publication.md)说明共源数据和冻结版次的构建。
+
+`impact-source` 从登记条目的正文引用与 JSON `sources` 字段定位，复用依赖查询生成复查候选。它不判定项目受影响、不读取外部 repo 或刷新核验日期。项目自身的目标、运行位置或功能改变时，也可用项目判断任务单取回相应机制；当前配置和采用理由仍由各项目自己的已有文档持有，私人证据留在仓库外。
 
 ## 状态与边界
 

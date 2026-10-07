@@ -1,0 +1,36 @@
+{
+  "schema": "fieldbook.example/1",
+  "id": "example.api-operations",
+  "default_mode": "offline",
+  "network_required": false,
+  "credentials_required": false,
+  "live_supported": false,
+  "run_from": "repository-root",
+  "run_command": [
+    "python3",
+    "examples/api-operations/demo.py"
+  ],
+  "check_command": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_api_operations.py",
+    "-v"
+  ],
+  "input_kind": "synthetic",
+  "observation_scope": [
+    "paginated inventory completeness",
+    "per-operation request and dispatched-retry accounting",
+    "bounded total deadline shared by pages and retries",
+    "retryable and permanent read failures",
+    "malformed or repeated cursor bounds",
+    "uncertain write resolved only by payload-matching readback"
+  ],
+  "cloud_resources_created": [],
+  "teardown": "not applicable: offline checks create no cloud resources",
+  "evidence_notice": "Marks a local synthetic model only. It is not the Cloudflare Python or Go SDK and does not prove real API behavior, idempotency, or durable crash recovery."
+}

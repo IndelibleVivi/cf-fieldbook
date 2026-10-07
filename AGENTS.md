@@ -12,6 +12,9 @@ CF Fieldbook 是独立的参考资料与离线例子仓库。先读 [README](REA
 - `tools/build_site.py` 是唯一阅读站构建入口，只分发显式 allowlist。阅读呈现的注释过滤与单次署名不回写 Markdown；代码中的注释示例和权利声明须保留，不通过开启任意 HTML 来处理维护标记。
 - `docs/glossary.md` 的词条首段拥有短释义；站点从它生成就地解释，冻结出版物嵌入当版所引用的定义。术语链接保留普通 Markdown 锚点。
 - `styles/search.js` 拥有本地问题别名与排序；索引来自实际正文小节。搜索目标必须有答案，不能用别名掩盖缺失内容。
+- `tools/fieldbook.py impact-source` 从登记条目的正文引用与 JSON `sources` 字段定位，再复用 `impact`；直接引用也纳入候选，历史条目保持传播终点。来源书目、代码、注释与附录不作为使用点，不推断项目适用性、不改正文或日期。
+- `use-cases/project-context.md` 与 `templates/project-context-task.md` 拥有项目判断的阅读和工单入口；具体项目的配置、采用理由、暂缓条件与当前证据由该项目已有文档持有。本书只保存通用机制、公开来源与合成场景，不建私有跨项目状态表。
+- `examples/api-operations/model.py` 拥有合成分页、总期限和未知写结果核对的教学行为；不是实际 SDK，不引入网络或真实账号。
 - `examples/job-state/model.py` 拥有恢复规则；`tools/recovery_demo.py` 执行模型生成合成场景，`styles/recovery.js` 只控制场景与播放。演示只随 current 例子分发，不增加云端执行。
 - `examples/reading-shelf/materials/` 拥有三份合成原件；`build.py` 生成 `index.html`，不另行编辑生成正文。静态例子不包含手册扩展设计中的权限、数据库或索引。
 - `tools/editions.py freeze/build/check` 是三册出版入口，使用冻结输入内的 renderer；`.build/editions/` 是本地产物，`dist/` 是固定 r3 历史。
@@ -23,7 +26,7 @@ CF Fieldbook 是独立的参考资料与离线例子仓库。先读 [README](REA
 
 ## Change boundaries
 
-改变条目前查询 `python3 tools/fieldbook.py impact <id>`；结果是候选范围，`related` 不传播。不要自动重写历史报告或刷新事实核验日期。来源审阅、代码测试和云端实测分别记录。
+改变条目前查询 `python3 tools/fieldbook.py impact <id>`；来源变化可先用 `impact-source <source-id>`。结果是候选范围，`related` 不传播。项目是否命中须核对具体版本、调用、字段或运行流程；产品名关联不够。不要自动重写历史报告或刷新事实核验日期。来源审阅、代码测试和云端实测分别记录。
 
 例子默认离线。新增云端执行、付费调用、外部资源或账户变更需要该任务的明确授权。网站只发布静态阅读文件，不运行例子。未经授权不改变许可、远端或既有部署配置。
 

@@ -92,6 +92,77 @@ def impact(catalog:dict,changed:list[str])->dict:
     for i in reached:related.update(byid[i].get('related',[]))
     return {'changed':sorted(changed),'current_review_candidates':maintained,'edition_errata_candidates':editions,'inactive_candidates':inactive,'related_only':sorted(related-reached),'dependency_reasons':reasons,'note':'Candidates only. No text, dates, source facts or publications were changed.'}
 
+def markdown_sources(text:str)->set[str]:
+    """Read authored [Snn] citations, excluding code, notes and source appendices."""
+    visible=[];fence=None;in_comment=False;frontmatter=False
+    for number,line in enumerate(text.splitlines()):
+        if number==0 and line=='---':frontmatter=True;continue
+        if frontmatter:
+            if line=='---':frontmatter=False
+            continue
+        if fence:
+            if re.fullmatch(r' {0,3}'+re.escape(fence[0])+r'{'+str(fence[1])+r',}\s*',line):fence=None
+            continue
+        if not in_comment:
+            opening=re.match(r'^ {0,3}(`{3,}|~{3,})',line)
+            if opening:fence=(opening[1][0],len(opening[1]));continue
+            if line.startswith(('    ','\t')):continue
+        line=re.sub(r'(`+)(?!`)(.*?)\1(?!`)', '', line)
+        if not in_comment and line.strip()=='<!-- SOURCES -->':break
+        # Notes may span lines; a source boundary inside a note is not a boundary.
+        clean='';remaining=line
+        while remaining:
+            if in_comment:
+                end=remaining.find('-->')
+                if end<0:break
+                remaining=remaining[end+3:];in_comment=False
+            else:
+                start=remaining.find('<!--')
+                if start<0:clean+=remaining;break
+                clean+=remaining[:start];remaining=remaining[start+4:];in_comment=True
+        if re.match(r'^ {0,3}\[S\d{2,3}\]:',clean):continue
+        visible.append(clean)
+    return set(re.findall(r'(?<![!\\])\[(S\d{2,3})\](?!:)', '\n'.join(visible)))
+
+def entry_sources(root:Path,entry:dict)->set[str]:
+    """Index only content owners and structured sources fields, never the bibliography."""
+    if entry['path']=='catalog/sources.json':return set()
+    path=local_path(root,entry['path'])
+    if path.suffix=='.md':return markdown_sources(path.read_text(encoding='utf-8'))
+    if path.suffix!='.json':return set()
+    found=set()
+    def visit(value):
+        if isinstance(value,dict):
+            refs=value.get('sources',[])
+            if isinstance(refs,list):
+                found.update(s for s in refs if isinstance(s,str) and re.fullmatch(r'S\d{2,3}',s))
+            for child in value.values():visit(child)
+        elif isinstance(value,list):
+            for child in value:visit(child)
+    visit(json.loads(path.read_text(encoding='utf-8')))
+    return found
+
+def impact_source(root:Path,catalog:dict,changed:list[str])->dict:
+    known={s['id'] for s in json.loads((root/'catalog/sources.json').read_text(encoding='utf-8'))}
+    unknown=set(changed)-known
+    if unknown:raise ValueError('unknown source ID: '+', '.join(sorted(unknown)))
+    requested=set(changed);citations=[]
+    for entry in catalog['entries']:
+        matches=entry_sources(root,entry)&requested
+        if matches:citations.append({'id':entry['id'],'path':entry['path'],'sources':sorted(matches)})
+    citations.sort(key=lambda e:e['id'])
+    roots=[e['id'] for e in citations]
+    result=impact(catalog,roots)
+    # Direct consumers need review too; ordinary impact excludes its changed roots.
+    for entry in catalog['entries']:
+        if entry['id'] not in roots:continue
+        key='edition_errata_candidates' if entry['track']=='edition' else ('current_review_candidates' if entry['status']=='current' else 'inactive_candidates')
+        result[key].append(entry['id'])
+    for key in ('current_review_candidates','edition_errata_candidates','inactive_candidates'):
+        result[key]=sorted(set(result[key]))
+    return {'sources':sorted(requested),'direct_citations':citations,**result,
+            'note':'Citation and dependency candidates only; applicability is unverified. No text, dates, project files or publications were changed.'}
+
 def due(catalog:dict,asof:date)->list[dict]:
     result=[]
     for e in catalog['entries']:
@@ -153,6 +224,7 @@ def main()->int:
     ap=argparse.ArgumentParser(description=__doc__);ap.add_argument('--root',type=Path,default=ROOT)
     sub=ap.add_subparsers(dest='command',required=True);sub.add_parser('check')
     im=sub.add_parser('impact');im.add_argument('ids',nargs='+')
+    ims=sub.add_parser('impact-source');ims.add_argument('ids',nargs='+')
     du=sub.add_parser('due');du.add_argument('--as-of',type=date.fromisoformat,required=True)
     args=ap.parse_args();root=args.root.resolve()
     if args.command=='check':
@@ -161,7 +233,9 @@ def main()->int:
         print('PASS: content index, scoped dates, dependency graph, diagram pairing, example metadata, design links.');print('Offline only: not source-fact truth, live cloud acceptance, or universal privacy scanning.');return 0
     cat=load(root);errors=validate_entries(root,cat)
     if errors:raise ValueError('\n'.join(errors))
-    obj=impact(cat,args.ids) if args.command=='impact' else due(cat,args.as_of)
+    if args.command=='impact':obj=impact(cat,args.ids)
+    elif args.command=='impact-source':obj=impact_source(root,cat,args.ids)
+    else:obj=due(cat,args.as_of)
     print(json.dumps(obj,ensure_ascii=False,indent=2));return 0
 if __name__=='__main__':
     try:sys.exit(main())

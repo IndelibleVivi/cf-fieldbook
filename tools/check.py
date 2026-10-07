@@ -12,6 +12,11 @@ from urllib.parse import urlparse
 ROOT = Path(__file__).resolve().parents[1]
 ALLOWED = {'blog.cloudflare.com', 'developers.cloudflare.com', 'www.cloudflare.com', 'docs.typesafe.ai', 'openrouter.ai', 'vercel.com', 'huggingface.co', 'developer.mozilla.org', 'modelcontextprotocol.io'}
 
+def source_url_allowed(value: str) -> bool:
+    uri = urlparse(value)
+    official_repo = uri.hostname == 'github.com' and uri.path.startswith('/cloudflare/')
+    return uri.scheme == 'https' and not uri.username and not uri.password and (uri.hostname in ALLOWED or official_repo)
+
 
 def validate(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
@@ -22,14 +27,13 @@ def validate(root: Path = ROOT) -> list[str]:
     for source in sources:
         if not re.fullmatch(r'S\d{2,3}', source['id']):
             errors.append(f"bad source ID: {source['id']}")
-        uri = urlparse(source['url'])
-        if uri.scheme != 'https' or uri.hostname not in ALLOWED:
+        if not source_url_allowed(source['url']):
             errors.append(f"unapproved source URL: {source['id']}")
         try:
             date.fromisoformat(source['accessed'])
         except ValueError:
             errors.append(f"bad checked date: {source['id']}")
-    for name in [*(p.relative_to(root).as_posix() for p in sorted((root / 'reports').glob('*.md'))), 'guides/handbook.md', 'reference/implementation.md', 'comparisons/clef-vs-jev.md', 'services/observability.md', 'services/search.md', 'services/agent-runtime.md', 'use-cases/temporary-sharing.md']:
+    for name in [*(p.relative_to(root).as_posix() for p in sorted((root / 'reports').glob('*.md'))), 'guides/handbook.md', 'reference/implementation.md', 'reference/api-maintenance.md', 'comparisons/clef-vs-jev.md', 'services/observability.md', 'services/search.md', 'services/agent-runtime.md', 'use-cases/temporary-sharing.md', 'use-cases/project-context.md']:
         text = (root / name).read_text()
         refs = set(re.findall(r'\[(S\d{2,3})\]', text))
         if refs - ids:

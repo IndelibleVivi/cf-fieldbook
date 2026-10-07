@@ -8,6 +8,7 @@
 | [health-worker](health-worker/README.md) | 最小路由、响应与错误路径 | 真实 Worker 部署、Access 策略或账户可用 |
 | [job-state](job-state/README.md) · [失败与恢复实践](../use-cases/recoverable-jobs.md) | 任务中断、租约恢复、迟到拒绝和未知结果核对的离线过程 | 云队列端到端交付或外部副作用安全 |
 | [decision-routing](decision-routing/README.md) | 决策请求外壳、路线与费用算术 | 模型判断正确、阈值可迁移、provider 独立 |
+| [api-operations](api-operations/README.md) · [API 维护](../reference/api-maintenance.md) | 完整分页、整件事的期限、部分失败与写结果未知后的核对 | 真实 SDK、账号盘点、API 幂等或持久化崩溃恢复 |
 
 后续例子遵循 [生命周期](../docs/lifecycle.md)，用 [模板](../templates/practice-example.md) 保留问题、因果与退出，而不是只贴一份删掉名字的配置。
 

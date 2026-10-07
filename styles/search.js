@@ -19,6 +19,13 @@
       words: ['价格', '费用', '存储', '计费'], required: ['r2'], intent: 'r2' },
     { phrases: ['网页搜索', '搜索网页', '联网搜索'], words: ['web search', '搜索'], intent: 'websearch' },
     { phrases: ['临时执行环境', '跑 linux', '系统包'], words: ['containers', 'sandbox', '容器'], intent: 'workspace' },
+    { phrases: ['sdk 分页', '盘点不完整'], words: ['分页', '迭代', '后页'], intent: 'api' },
+    { phrases: ['api 超时'], words: ['超时', '期限', 'timeout'], intent: 'api' },
+    { phrases: ['搬到 vps', '减少本机负担'], words: ['vps', '源设备', '运行位置'], intent: 'migration' },
+    { phrases: ['发布变慢'], words: ['发布', '耗时', 'publisher'], intent: 'publishing' },
+    { phrases: ['静态官网'], words: ['官网', '静态页面', '表单'], intent: 'static' },
+    { phrases: ['这次更新影响我吗'], words: ['适用性', '命中', '未知'], intent: 'project' },
+    { phrases: ['以前为什么不用', '为什么暂缓'], words: ['采用理由', '暂缓原因', '重评条件'], intent: 'reasons' },
   ];
   // Product/Works queries: prefer the whole-work or whole-section entry.
   const products = ['clef', 'jev', 'workers', 'worker', 'r2', 'd1', 'tunnel', 'access', 'queues',
@@ -103,6 +110,14 @@
       if (parsed.intents.includes('workspace') && inChapter(stable.workspace)) score += 60;
       if (parsed.intents.includes('lease') && mechanism && body.includes('租约')) score += 80;
       if (parsed.intents.includes('lease') && mechanism && item.section && body.includes('租约')) score += 18;
+      if (parsed.intents.includes('api') && url.startsWith('reference/api-maintenance.html#')) score += 90;
+      if (parsed.intents.includes('project') && url.startsWith('use-cases/project-context.html#')) score += 90;
+      if (url.startsWith('use-cases/project-context.html#')) {
+        if (parsed.intents.includes('migration') && heading.includes('vps')) score += 110;
+        if (parsed.intents.includes('publishing') && heading.includes('发布')) score += 110;
+        if (parsed.intents.includes('static') && heading.includes('官网')) score += 110;
+        if (parsed.intents.includes('reasons') && heading.includes('采用理由')) score += 110;
+      }
       // Product/Work queries: the whole-work landing record leads, and the whole
       // section that owns the product groups just behind it.
       if (parsed.product) {

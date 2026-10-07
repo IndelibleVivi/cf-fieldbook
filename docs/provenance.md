@@ -1,6 +1,6 @@
 # 来源与历史版本
 
-`dist/` 保存 2026-10-02 阅读版 r3 的三册 Markdown、HTML 和 PDF，作为固定的历史出版物；当前 Markdown 与 catalog 持续维护，四个离线例子使用合成输入。
+`dist/` 保存 2026-10-02 阅读版 r3 的三册 Markdown、HTML 和 PDF，作为固定的历史出版物；当前 Markdown 与 catalog 持续维护，五个离线例子使用合成输入。
 
 产品事实引用 Cloudflare 的公开官方资料；第三方模型引用其原厂或供应入口，浏览器与协议行为引用对应维护方。编辑分析与匿名历史观察另标证据范围，不以私人资料作为产品证据。
 
@@ -15,6 +15,8 @@ r3 重新核对来源 S16–S18，并补充 S73–S83，重点覆盖 Clef / Jev�
 2026-10-03 新增 S98–S113，核对 Observability、Traces/SQL、PiHarness、Web Search API、Protected Quick Tunnels，以及补充 R2 费用与新项目脚手架。12 GB-month / 10 GB-month 和 Exa ZDR 的官方页面差异保留在对应正文与 launch 记录。此范围不刷新旧条目或 10-02 历史报告的核验日期，没有账户或付费调用。
 
 2026-10-05 新增 S114–S117，定向核对 Artifacts 官方示例仍使用 Sandbox v0、Sandbox 1.0 的迁移接口、Access 严格 Service Token 认证，以及当日到达移除日期的 Tunnel 私网路由与连接查询 API。结论进入手册、实施参考与首发选编；没有执行账户配置、API 迁移或云端恢复实验。首发图文的三款 CF 模型输入单价另于当日核对，未由此刷新专题的全篇来源日期。
+
+2026-10-08 新增 S118–S122，定向查阅官方 SDK 入口、Go `v7.12.0` README 与 release、OpenAPI schemas 仓库用途、R2 调用入口，并复看 S117 的 Tunnel 字段迁移。Go 默认值固定该版本，不泛化到其他语言；OpenAPI 仅核对仓库用途，没有全量 schema diff。资料进入 API 维护和项目判断指南，操作例子使用语言无关的合成模型。未安装 SDK、访问账户、读取其他项目现状或执行云端调用；旧正文与历史来源日期没有整体刷新。
 
 [首发选编](../reports/2026-10-first-release.md)是独立的新编排，按主题吸收两篇历史观察，保留继承事实、后续增补和定向核查各自的范围。原 10 月 2 日和 10 月 3 日报告不被覆盖，构建日期也不作为它们的新事实日期。
 

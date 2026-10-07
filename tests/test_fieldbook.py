@@ -5,6 +5,8 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('fieldbook',ROOT/'tools/fieldbook.py')
 fb=importlib.util.module_from_spec(spec);spec.loader.exec_module(fb)
+check_spec=importlib.util.spec_from_file_location('editorial_check',ROOT/'tools/check.py')
+editorial=importlib.util.module_from_spec(check_spec);check_spec.loader.exec_module(editorial)
 
 def entry(i,path,deps=(),related=(),track='maintained',status='current'):
  return {'id':i,'path':path,'kind':'guide','depends_on':list(deps),'related':list(related),'track':track,'status':status,'review':{'state':'checked','checked_on':'2026-10-02','scope':'test fixture only','next_review_on':'2026-10-16'},'evidence':[]}
@@ -48,6 +50,58 @@ class FieldbookTests(unittest.TestCase):
  def test_actual_index_related_does_not_cascade(self):
   got=fb.impact(fb.load(ROOT),['data.decision-routes']);self.assertNotIn('usecase.bounded-decision',got['current_review_candidates']);self.assertIn('usecase.bounded-decision',got['related_only'])
  def test_actual_pairing_valid(self):self.assertEqual(fb.validate_diagrams(ROOT),[])
+ def source_fixture(self):
+  (self.root/'catalog').mkdir(exist_ok=True)
+  (self.root/'catalog/sources.json').write_text(json.dumps([{'id':'S01'},{'id':'S02'},{'id':'S03'}]))
+ def test_source_impact_includes_direct_consumers_and_dependency_candidates(self):
+  self.source_fixture();(self.root/'a.md').write_text('Fact [S01].')
+  (self.root/'c.md').write_text('Historical [S02].')
+  got=fb.impact_source(self.root,self.cat,['S02','S01','S01'])
+  self.assertEqual(got['sources'],['S01','S02'])
+  self.assertEqual(got['changed'],['data.a','report.c'])
+  self.assertEqual(got['current_review_candidates'],['data.a','guide.b'])
+  self.assertEqual(got['edition_errata_candidates'],['report.c'])
+  self.assertEqual(got['related_only'],['guide.d'])
+  self.assertEqual(got['direct_citations'][0],{'id':'data.a','path':'a.md','sources':['S01']})
+ def test_source_impact_preserves_edition_terminal_and_inactive_rules(self):
+  self.source_fixture();(self.root/'c.md').write_text('[S01]')
+  self.cat['entries'][3]['depends_on']=['report.c']
+  got=fb.impact_source(self.root,self.cat,['S01'])
+  self.assertEqual(got['current_review_candidates'],[])
+  self.assertEqual(got['edition_errata_candidates'],['report.c'])
+  self.cat['entries'][2]['track']='maintained';self.cat['entries'][2]['status']='withdrawn'
+  self.assertEqual(fb.impact_source(self.root,self.cat,['S01'])['inactive_candidates'],['report.c'])
+ def test_citation_scan_ignores_code_notes_definitions_and_appendix(self):
+  text='---\ntitle: [S03]\n---\nText [S01] and [S02](https://example.com).\n`[S03]`\n```md\n[S03]\n<!-- SOURCES -->\n```\n~~~\n[S03]\n~~~\n    [S03]\n<!-- note\n[S03]\n-->\n[S03]: https://example.com\n![S03](image.svg)\n<!-- SOURCES -->\n[S03]\n'
+  self.assertEqual(fb.markdown_sources(text),{'S01','S02'})
+ def test_code_and_notes_cannot_hide_later_real_citations(self):
+  text='`<!-- SOURCES -->`\n    <!-- SOURCES -->\n<!-- note\n<!-- SOURCES -->\n-->\n[S01]\n\\[S03]\n'
+  self.assertEqual(fb.markdown_sources(text),{'S01'})
+ def test_structured_sources_are_not_arbitrary_json_mentions_or_bibliography(self):
+  self.source_fixture();(self.root/'a.json').write_text(json.dumps({'description':'[S03]','items':[{'sources':['S01']},{'nested':{'sources':['S02']}}]}))
+  self.cat['entries'][0]['path']='a.json'
+  self.cat['entries'].append(entry('data.sources','catalog/sources.json'))
+  got=fb.impact_source(self.root,self.cat,['S01'])
+  self.assertEqual(got['changed'],['data.a'])
+  self.assertEqual(fb.entry_sources(self.root,self.cat['entries'][0]),{'S01','S02'})
+ def test_known_unused_source_returns_empty_and_unknown_source_rejected(self):
+  self.source_fixture();got=fb.impact_source(self.root,self.cat,['S03'])
+  self.assertEqual(got['direct_citations'],[]);self.assertEqual(got['current_review_candidates'],[])
+  with self.assertRaisesRegex(ValueError,'unknown source ID: S99'):fb.impact_source(self.root,self.cat,['S99'])
+ def test_source_query_preserves_catalog_and_files(self):
+  self.source_fixture();(self.root/'a.md').write_text('[S01]')
+  before=copy.deepcopy(self.cat);files={p:p.read_bytes() for p in self.root.rglob('*') if p.is_file()}
+  fb.impact_source(self.root,self.cat,['S01'])
+  self.assertEqual(self.cat,before);self.assertTrue(all(p.read_bytes()==b for p,b in files.items()))
+ def test_actual_tunnel_source_reaches_registered_citations(self):
+  got=fb.impact_source(ROOT,fb.load(ROOT),['S117'])
+  self.assertIn('guide.handbook',got['current_review_candidates'])
+  self.assertIn('reference.implementation',got['current_review_candidates'])
+  self.assertNotIn('data.sources',got['changed'])
+ def test_official_repository_sources_keep_owner_and_https_boundaries(self):
+  self.assertTrue(editorial.source_url_allowed('https://github.com/cloudflare/cloudflare-go/blob/v7.12.0/README.md'))
+  for url in ['https://github.com/another-owner/cloudflare-go','https://github.com/cloudflare-copy/api-schemas','http://github.com/cloudflare/api-schemas','https://token@github.com/cloudflare/api-schemas']:
+   self.assertFalse(editorial.source_url_allowed(url),url)
  def test_source_drift_rejected(self):
   for sub in ['assets/diagrams','diagrams']:shutil.copytree(ROOT/sub,self.root/sub)
   (self.root/'diagrams/src/architecture.mmd').write_text('flowchart TB\n A-->B\n')

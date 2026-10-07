@@ -16,6 +16,27 @@ if (!process.env.FIELDBOOK_SEARCH_INDEX) {
 const index = JSON.parse(fs.readFileSync(process.env.FIELDBOOK_SEARCH_INDEX || path.join(generated, 'search-index.json'), 'utf8'));
 if (generated) test.after(() => fs.rmSync(generated, { recursive: true }));
 const first = query => { const result = search(index, query); assert.ok(result.length, query); return result[0]; };
+test('resource operation questions reach concrete API guidance', () => {
+  for (const query of ['SDK 分页', 'API 超时', '盘点不完整']) {
+    const item = first(query);
+    assert.ok(item.url.startsWith('reference/api-maintenance.html#'), item.url);
+    assert.match(item.text, /分页|超时|期限|完整/);
+  }
+  assert.match(first('SDK 分页').section, /完整分页/);
+  assert.match(first('API 超时').section, /超时与重试/);
+});
+test('project questions reach reasons, applicability and task scenarios', () => {
+  for (const query of ['搬到 VPS', '发布变慢', '静态官网', '这次更新影响我吗', '以前为什么不用']) {
+    const item = first(query);
+    assert.ok(item.url.startsWith('use-cases/project-context.html#'), item.url);
+    assert.ok(item.text.length > 80, 'The target must answer the question in its own section');
+  }
+  assert.match(first('搬到 VPS').section, /VPS/);
+  assert.match(first('发布变慢').section, /发布越来越慢/);
+  assert.match(first('静态官网').section, /官网/);
+  assert.match(first('以前为什么不用').section, /采用理由/);
+  assert.equal(search(index, '这次更新影响我吗 完全不存在的词').length, 0);
+});
 test('real index contains h2 and h3 records with stable section links', () => {
   assert.ok(index.some(item => item.url.startsWith('guides/handbook.html#') && item.section.startsWith('06 /')));
   assert.ok(index.some(item => item.section.startsWith('绑定：') && item.url.includes('#')));

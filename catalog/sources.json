@@ -918,5 +918,45 @@
     "accessed": "2026-10-05",
     "kind": "official_primary",
     "verification_scope": "targeted_2026_10_05_public_document_consulted; teamnet_routes_patch_delete_and_dedicated_connections_endpoint; list_get_embedded_connections_field_removed_2026_10_05; no_account_or_live_deployment"
+  },
+  {
+    "id": "S118",
+    "title": "Cloudflare 官方 SDK 与 curl 使用入口",
+    "url": "https://developers.cloudflare.com/fundamentals/api/reference/sdks/",
+    "accessed": "2026-10-08",
+    "kind": "official_primary",
+    "verification_scope": "sdk_languages_and_application_integration; public_document_consulted; no_sdk_install_account_or_live_deployment"
+  },
+  {
+    "id": "S119",
+    "title": "Cloudflare Go v7.12.0：分页、超时与重试",
+    "url": "https://github.com/cloudflare/cloudflare-go/blob/v7.12.0/README.md",
+    "accessed": "2026-10-08",
+    "kind": "official_primary",
+    "verification_scope": "pinned_go_v7_12_0_timeout_retries_pagination; not_other_language_defaults; public_document_consulted; no_sdk_install_account_or_live_deployment"
+  },
+  {
+    "id": "S120",
+    "title": "Cloudflare Go v7.12.0 release：管理接口与迁移",
+    "url": "https://github.com/cloudflare/cloudflare-go/releases/tag/v7.12.0",
+    "accessed": "2026-10-08",
+    "kind": "official_primary",
+    "verification_scope": "containers_management_and_zero_trust_pagination_breaking_changes; public_document_consulted; no_sdk_install_account_or_live_deployment"
+  },
+  {
+    "id": "S121",
+    "title": "Cloudflare API OpenAPI schemas",
+    "url": "https://github.com/cloudflare/api-schemas",
+    "accessed": "2026-10-08",
+    "kind": "official_primary",
+    "verification_scope": "repository_purpose_and_schema_inventory; not_full_schema_review; public_document_consulted; no_sdk_install_account_or_live_deployment"
+  },
+  {
+    "id": "S122",
+    "title": "R2 API：Workers、S3 与 REST 的职责",
+    "url": "https://developers.cloudflare.com/r2/api/",
+    "accessed": "2026-10-08",
+    "kind": "official_primary",
+    "verification_scope": "workers_s3_rest_routes_and_high_throughput_recommendation; public_document_consulted; no_sdk_install_account_or_live_deployment"
   }
 ]

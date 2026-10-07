@@ -28,13 +28,13 @@ PUBLIC_DOCS = (
     'README.md', 'CHANGELOG.md', 'SPEC.md', 'CONTRIBUTING.md', 'LICENSE-STATUS.md', 'LICENSE-DOCUMENTATION.md', 'docs/architecture.md',
     'docs/lifecycle.md', 'docs/publication.md', 'docs/content-design.md',
     'docs/migration-r3.md', 'docs/current-state.md', 'docs/reading-site.md', 'docs/provenance.md', 'docs/glossary.md', 'examples/README.md',
-    'diagrams/README.md', 'templates/practice-example.md', 'templates/release-card.md', 'templates/job-recovery-task.md',
+    'diagrams/README.md', 'templates/practice-example.md', 'templates/release-card.md', 'templates/job-recovery-task.md', 'templates/project-context-task.md',
 )
 PUBLIC_REPOSITORY_PATHS = {
     'AGENTS.md', '.github/workflows/check.yml', 'requirements-render.txt', 'requirements-design.txt',
     'package.json', 'package-lock.json',
     *(f'tools/{name}.py' for name in ('build_site', 'content', 'editions', 'render', 'figures', 'fieldbook', 'check', 'render_diagrams', 'recovery_demo', 'publications', 'share_images')),
-    *(f'tests/{name}.py' for name in ('test_examples', 'test_fieldbook', 'test_job_recovery', 'test_decision_example', 'test_site', 'test_publication')),
+    *(f'tests/{name}.py' for name in ('test_examples', 'test_fieldbook', 'test_job_recovery', 'test_decision_example', 'test_api_operations', 'test_site', 'test_publication')),
     'tests/site-search.test.cjs',
 }
 REPOSITORY_URL = 'https://github.com/IndelibleVivi/cf-fieldbook/blob/main/'
@@ -51,6 +51,7 @@ LINK_LABELS = {'internal': '站内阅读', 'term': '词义，可就地展开或�
                'source': '外部来源，离开本站', 'attachment': '附件；下载或打开文件'}
 READER_PREFIXES = {'services', 'comparisons', 'use-cases', 'guides', 'reference', 'reports', 'examples', 'practice'}
 EXAMPLE_FILES = {
+    'api-operations': ('model.py', 'demo.py', 'example.meta.json'),
     'decision-routing': ('payloads.py', 'example.meta.json'),
     'health-worker': ('index.mjs', 'worker.test.mjs', 'wrangler.example.json', 'example.meta.json'),
     'job-state': ('model.py', 'demo.py', 'example.meta.json'),
@@ -674,7 +675,7 @@ class Site:
 <section class="entry-paths" aria-label="三份作品入口">{works}</section>
 <section class="practice-section" aria-labelledby="practice-heading"><header class="section-heading"><div><p class="eyebrow">NOTES FROM THE FIELD</p><h2 id="practice-heading">真实问题，实际走过的路。</h2></div><a href="{escape(self.reading_url('practice/README.html'))}">全部实践记录 →</a></header><div class="practice-grid">{practice_cards}</div><p class="practice-caption">来自作者维护过的系统 · 匿名重构 · 各篇保留观察日期与验证范围</p></section>
 <section class="product-spread" aria-labelledby="products-heading"><div class="section-intro"><p class="eyebrow">PRODUCTS / READING PATHS</p><h2 id="products-heading">一个服务，<br>放在什么位置？</h2><p>入口、运行、数据与恢复，各回答不同的问题。沿着一条路径读，不必一次组合所有服务。</p><img class="edge-detail" src="assets/motifs/edge-route.svg" width="360" height="220" alt="" aria-hidden="true"></div><div><ul class="product-links">{self.product_links(compact=True)}</ul><a class="all-products" href="products.html">打开服务阅读索引 →</a></div></section>
-<section class="shelf"><div><p class="eyebrow">READ · INSPECT · TAKE AWAY</p><h2>沿着解释，找到依据。</h2><p>读懂一个做法，再看完整代码与来源。<br>也可以带走 Markdown 和离线例子。</p></div><ul><li><a href="directory.html">全部资料与内容搜索 <span>→</span></a></li><li><a href="examples/README.html">四个离线例子 <span>→</span></a></li><li><a href="{escape(self.reading_url('reference/implementation.html'))}">实施参考：代码与恢复语义 <span>→</span></a></li><li><a href="diagrams/README.html">六张图：架构与资料生命周期 <span>→</span></a></li><li><a href="sources.html">来源与核验范围 <span>→</span></a></li></ul></section>
+<section class="shelf"><div><p class="eyebrow">READ · INSPECT · TAKE AWAY</p><h2>沿着解释，找到依据。</h2><p>读懂一个做法，再看完整代码与来源。<br>也可以带走 Markdown 和离线例子。</p></div><ul><li><a href="directory.html">全部资料与内容搜索 <span>→</span></a></li><li><a href="{escape(self.reading_url('use-cases/project-context.html'))}">把变化接到当前项目 <span>→</span></a></li><li><a href="{escape(self.reading_url('reference/api-maintenance.html'))}">API 与 SDK：可靠维护资源 <span>→</span></a></li><li><a href="examples/README.html">五个离线例子 <span>→</span></a></li><li><a href="{escape(self.reading_url('reference/implementation.html'))}">实施参考：代码与恢复语义 <span>→</span></a></li><li><a href="diagrams/README.html">六张图：架构与资料生命周期 <span>→</span></a></li><li><a href="sources.html">来源与核验范围 <span>→</span></a></li></ul></section>
 <section class="edition-strip"><p class="eyebrow">DATES &amp; SOURCES</p><p>服务解释持续维护；报告保留各自日期。价格、开放条件和接口限制请结合正文的核验范围与来源阅读。</p><a href="sources.html">查阅来源索引 →</a></section></main>'''
         if self.demo_available():
             body = body.replace('<li><a href="examples/README.html">', '<li><a href="examples/job-state/demo.html">逐步观察任务恢复 <span>→</span></a></li><li><a href="examples/README.html">')

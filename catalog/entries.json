@@ -12,7 +12,7 @@
       "review": {
         "state": "inherited",
         "checked_on": "2026-10-02",
-        "scope": "继承 r3 来源记录；10-05 增补 S114–S117 定点来源，核验范围见来源说明",
+        "scope": "继承 r3 来源记录；10-05 增补 S114–S117 定点来源，核验范围见来源说明；10-08 增补 S118–S122 定向 SDK／API 来源，原日期不作为全库重新核验",
         "next_review_on": "2026-11-01"
       },
       "evidence": [
@@ -170,8 +170,8 @@
         }
       ]
     },
-  {
-   "id": "example.job-state",
+    {
+      "id": "example.job-state",
       "kind": "example",
       "path": "examples/job-state/README.md",
       "track": "maintained",
@@ -608,6 +608,87 @@
         {
           "kind": "local-executed",
           "ref": "examples/reading-shelf/build.py"
+        }
+      ]
+    },
+    {
+      "id": "reference.api-maintenance",
+      "kind": "reference",
+      "path": "reference/api-maintenance.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [],
+      "related": [
+        "reference.implementation",
+        "usecase.recoverable-jobs",
+        "example.api-operations",
+        "usecase.project-context"
+      ],
+      "review": {
+        "state": "checked",
+        "checked_on": "2026-10-08",
+        "scope": "2026-10-08 定向查阅 S118–S122 与复看 S117；Go 默认值固定 v7.12.0，没有 SDK／账户或云端实测",
+        "next_review_on": "2026-11-07"
+      },
+      "evidence": [
+        {
+          "kind": "source-reviewed",
+          "ref": "reference/api-maintenance.md"
+        }
+      ]
+    },
+    {
+      "id": "usecase.project-context",
+      "kind": "use-case",
+      "path": "use-cases/project-context.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [
+        "reference.api-maintenance",
+        "practice.private-reader",
+        "usecase.recoverable-jobs"
+      ],
+      "related": [
+        "service.search",
+        "service.agent-runtime",
+        "guide.handbook"
+      ],
+      "review": {
+        "state": "checked",
+        "checked_on": "2026-10-08",
+        "scope": "2026-10-08 编辑判断与合成任务场景；引用当前书内机制，S117 定向复看；未读取或验收其他项目现状",
+        "next_review_on": "2026-11-07"
+      },
+      "evidence": [
+        {
+          "kind": "source-reviewed",
+          "ref": "use-cases/project-context.md"
+        }
+      ]
+    },
+    {
+      "id": "example.api-operations",
+      "kind": "example",
+      "path": "examples/api-operations/README.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [
+        "reference.api-maintenance"
+      ],
+      "related": [
+        "example.job-state",
+        "usecase.project-context"
+      ],
+      "review": {
+        "state": "checked",
+        "checked_on": "2026-10-08",
+        "scope": "2026-10-08 合成离线教学模型与失败路径审阅、执行；分页／总期限／计数、未知写回读与冲突检查，不是实际 SDK 或持久化恢复验收",
+        "next_review_on": "2026-11-07"
+      },
+      "evidence": [
+        {
+          "kind": "local-executed",
+          "ref": "examples/api-operations/README.md"
         }
       ]
     }

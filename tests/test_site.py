@@ -46,6 +46,38 @@ class ReadingSiteTests(unittest.TestCase):
         for path, value in self.before.items():
             self.assertEqual((self.root / path).read_bytes(), value, str(path))
 
+    def test_api_guides_task_sheet_and_current_example_downloads_are_selected(self):
+        for path in ('reference/api-maintenance', 'use-cases/project-context', 'templates/project-context-task'):
+            self.assertTrue((self.output / (path + '.html')).is_file())
+            self.assertTrue((self.output / (path + '.md')).is_file())
+        for filename in ('model.py', 'demo.py', 'example.meta.json'):
+            self.assertEqual((self.output / 'examples/api-operations' / filename).read_bytes(),
+                             (ROOT / 'examples/api-operations' / filename).read_bytes())
+        home = BeautifulSoup((self.output / 'index.html').read_text(), 'html.parser')
+        for href in ('reference/api-maintenance.html', 'use-cases/project-context.html'):
+            self.assertIsNotNone(home.find('a', href=href))
+        sources = BeautifulSoup((self.output / 'sources.html').read_text(), 'html.parser')
+        self.assertIsNotNone(sources.find(id='S119'))
+
+    def test_api_operation_withdrawal_removes_code_downloads_and_search_text(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / 'fieldbook'
+            shutil.copytree(self.root, root, ignore=shutil.ignore_patterns('.build'))
+            build_site.build_site(root)
+            output = root / '.build/site'
+            self.assertTrue((output / 'examples/api-operations/model.py').is_file())
+            catalog_path = root / 'catalog/entries.json'
+            catalog = json.loads(catalog_path.read_text())
+            entry = next(e for e in catalog['entries'] if e['id'] == 'example.api-operations')
+            entry['status'] = 'withdrawn'
+            catalog_path.write_text(json.dumps(catalog, ensure_ascii=False))
+            (root / entry['path']).write_text('# Withdrawn\n\nAPI_WITHDRAWAL_SENTINEL\n')
+            build_site.build_site(root)
+            for filename in ('model.py', 'demo.py', 'example.meta.json', 'README.md'):
+                self.assertFalse((output / 'examples/api-operations' / filename).exists())
+            self.assertNotIn('API_WITHDRAWAL_SENTINEL', (output / 'search-index.json').read_text())
+            self.assertIn('已撤下', (output / 'examples/api-operations/README.html').read_text())
+
     def test_download_bundle_keeps_software_and_content_license_notices(self):
         self.assertEqual((self.output / 'LICENSE').read_bytes(), (ROOT / 'LICENSE').read_bytes())
         for name in ('LICENSE-STATUS.md', 'LICENSE-DOCUMENTATION.md'):

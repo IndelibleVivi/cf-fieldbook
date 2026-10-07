@@ -25,10 +25,13 @@ macOS 已安装 Homebrew Pango/GLib、却遇到 `cannot load library libgobject-
 
 ```sh
 python3 tools/fieldbook.py impact data.decision-routes
+python3 tools/fieldbook.py impact-source S117
 python3 tools/fieldbook.py due --as-of 2026-11-01
 ```
 
 `related` 是相关阅读；不驱动重写。旧报告只进入历史核对候选，后来的改价不自动成为旧报告的错误。
+
+`impact-source` 接受来源 ID，先扫描登记条目的正文引用与 JSON `sources` 字段，再沿同一个 `depends_on` 查询传播；正文代码、注释、来源定义／附录和总书目不构成使用点。直接引用的条目也进入相应候选组；历史条目仍是传播终点。未找到引用仅表示书内登记范围没有命中，不表示项目未使用该接口。项目采用理由、当前调用和重评条件由项目已有文档持有，参考[项目判断任务单](templates/project-context-task.md)。
 
 ## 提交前检查
 
