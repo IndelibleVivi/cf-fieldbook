@@ -24,13 +24,30 @@
       "model_author": "Cloudflare",
       "gateway": "Cloudflare",
       "selector": "@cf/cloudflare/clef-flash",
-      "input_usd_per_million": "0.09",
-      "output_usd_per_million": null,
-      "context": "65536; max64 questions; images extension",
+      "input_usd_per_million": "0.038",
+      "output_usd_per_million": "0",
+      "context": "Hosted: 24576 tokens; max64 questions; images extension",
       "sources": [
-        "S18"
+        "S18",
+        "S123"
       ],
-      "verified_on": "2026-10-02",
+      "verified_on": "2026-10-13",
+      "evidence": "official_documentation_not_inference_test"
+    },
+    {
+      "id": "cf-clef-omni",
+      "model": "Clef-omni",
+      "model_author": "Cloudflare",
+      "gateway": "Cloudflare",
+      "selector": "@cf/cloudflare/clef-omni",
+      "input_usd_per_million": "0.150",
+      "output_usd_per_million": "0",
+      "context": "Hosted: 64000 tokens; max64 questions; images/audio/videos extensions",
+      "sources": [
+        "S124",
+        "S123"
+      ],
+      "verified_on": "2026-10-13",
       "evidence": "official_documentation_not_inference_test"
     },
     {
@@ -40,12 +57,12 @@
       "gateway": "Cloudflare",
       "selector": "@cf/cloudflare/clef",
       "input_usd_per_million": "0.24",
-      "output_usd_per_million": null,
-      "context": "65536; max64 questions; images extension",
+      "output_usd_per_million": "0",
+      "context": "Hosted: 65536 tokens; max64 questions; images extension",
       "sources": [
         "S17"
       ],
-      "verified_on": "2026-10-02",
+      "verified_on": "2026-10-13",
       "evidence": "official_documentation_not_inference_test"
     },
     {

@@ -1,5 +1,6 @@
 """Offline request preparation only. No HTTP, credentials, or model inference.
 
+Only text/JSON state is prepared, including for Clef-omni; media is not encoded.
 The small demo uses a 16 KiB state cap of its own; it is NOT a tokenizer or a
 claim about a provider context window. Sources are linked from README.md.
 """
@@ -12,12 +13,13 @@ from typing import Any
 CF_MODELS = {
     "cf-jev": ("typesafe/jev", None),
     "cf-clef-flash": ("@cf/cloudflare/clef-flash", "clef-flash"),
+    "cf-clef-omni": ("@cf/cloudflare/clef-omni", "clef-omni"),
     "cf-clef": ("@cf/cloudflare/clef", "clef"),
 }
 
 
 def prepare_cf(route: str, state: Any, questions: dict[str, Any]) -> dict[str, Any]:
-    """Construct a unified /ai/run body. Unknown routes never fall back."""
+    """Construct a text/JSON unified /ai/run body. Unknown routes never fall back."""
     if route not in CF_MODELS:
         raise ValueError("unknown route")
     if not isinstance(state, (str, dict, list)):

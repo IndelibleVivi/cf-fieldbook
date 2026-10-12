@@ -10,6 +10,8 @@ source_cutoff: 2026-10-08
 
 本文于 2026-10-08 定向查阅官方 SDK、Go `v7.12.0`、OpenAPI 仓库与 R2 API 文档；Tunnel 变更另复看已有来源。没有安装 SDK、访问账号或执行云端请求。下面的可靠操作方法是编辑建议；Go 的默认值只适用于所标版本。
 
+10 月 13 日另核查 `v7.13.0` release 与 API MCP 的 Skills 扩展，下文补充具体触发点。原先 `v7.12.0` 的客户端默认值继续按固定版本阅读，没有据新 release 推断它们已重新验收。
+
 ## 控制台、CLI、REST、SDK、binding 各接哪一段
 
 | 手边的操作 | 先找哪个入口 | 还需要检查什么 |
@@ -66,9 +68,16 @@ Go `v7.12.0` release 增加 Containers application、instance、version、rollou
 4. 命中后检查完整分页、调用参数和失败行为；需要改动时遵循该项目授权与验证入口。
 5. 没命中就附核查范围收口；证据不够则保留未知，不宣布不受影响。
 
+以 `v7.13.0` 为例：release 移除 `Registrar.Domains` 下的 List／Get／Update，替代入口为 `Registrar.Registrations`。用过 Go SDK 的项目先查这个方法是否真的出现，再决定迁移；不需要随每次生成式 SDK 更新重写全部教程。GitHub 发布时间为 10 月 12 日，release notes 标注 10 月 9 日，两个日期分别保留。[S142]
+
 例如 Tunnel 的 list/get 内嵌 `connections` 于 2026-10-05 移除，应查询专用 connections endpoint。只有仍解析旧字段的调用需要据此修正；部署了 Tunnel 本身不能证明项目命中该变化。官方说明还区分了 `cloudflared` 与读取该字段的集成。[S117]
 
-来源查询只检查登记条目的正文引用和 JSON `sources` 字段，接着沿 `depends_on` 传播；来源书目、代码示例、注释与来源附录不作为正文使用点。它返回当前复查、历史勘误和非活动候选，`related` 不传播。它不分析私人项目，不改变日期，也不判定所有引用已经过时。
+来源查询只检查登记条目的正文引用和 JSON `source` 单值／`sources` 数组，接着沿 `depends_on` 传播；来源书目、代码示例、注释与来源附录不作为正文使用点。它返回当前复查、历史勘误和非活动候选，`related` 不传播。它不分析私人项目，不改变日期，也不判定所有引用已经过时。
+
+## Agent 怎样取得官方操作指导
+
+10 月 10 日起，Cloudflare API MCP 在 `https://mcp.cloudflare.com/mcp` 提供 Skills over MCP：支持该扩展的客户端可用 `skills/list` 发现，再从 `skill://<name>/<path>` 读取。客户端具备 MCP 工具能力不自动说明它支持 Skills 扩展；接线时分别确认资源发现、内容读取和实际操作权限。本书没有连接真实账户验证此入口。[S134]
+
 
 ## 把这次操作交回项目工作
 
@@ -77,3 +86,12 @@ Go `v7.12.0` release 增加 Containers application、instance、version、rollou
 接下来读[把变化接到当前项目](../use-cases/project-context.md)，或直接使用[项目判断任务单](../templates/project-context-task.md)。采用理由和当前配置由项目自己的已有文档持有；本书提供解释与可检查的方法。
 
 <!-- SOURCES -->
+
+[S117]: https://developers.cloudflare.com/changelog/post/2026-07-09-tunnel-routes-and-connections-api-changes/ "Tunnel routes 与 connections API 变更"
+[S118]: https://developers.cloudflare.com/fundamentals/api/reference/sdks/ "Cloudflare 官方 SDK 与 curl 使用入口"
+[S119]: https://github.com/cloudflare/cloudflare-go/blob/v7.12.0/README.md "Cloudflare Go v7.12.0：分页、超时与重试"
+[S120]: https://github.com/cloudflare/cloudflare-go/releases/tag/v7.12.0 "Cloudflare Go v7.12.0 release：管理接口与迁移"
+[S121]: https://github.com/cloudflare/api-schemas "Cloudflare API OpenAPI schemas"
+[S122]: https://developers.cloudflare.com/r2/api/ "R2 API：Workers、S3 与 REST 的职责"
+[S134]: https://developers.cloudflare.com/changelog/post/2026-10-10-cloudflare-mcp-skills/ "Cloudflare API MCP 的 Skills 扩展"
+[S142]: https://github.com/cloudflare/cloudflare-go/releases/tag/v7.13.0 "Cloudflare Go v7.13.0 release"

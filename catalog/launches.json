@@ -70,11 +70,13 @@
     "name": "Artifacts",
     "status": "public_beta",
     "access": "Workers Paid",
-    "announced_on": null,
-    "verified_on": "2026-10-02",
+    "announced_on": "2026-10-01",
+    "verified_on": "2026-10-13",
     "sources": [
       "S07",
-      "S08"
+      "S08",
+      "S135",
+      "S136"
     ],
     "effective_events": [
       {
@@ -97,11 +99,15 @@
           {
             "date": "2026-10-15",
             "source": "S07"
+          },
+          {
+            "date": "2026-10-14",
+            "source": "S135"
           }
         ]
       }
     ],
-    "next_check": "向官方价格文档及账户账单核实起算日冲突"
+    "next_check": "价格页及 changelog 为 2026-10-14、博客仍为 10-15；预算按较早日期准备，实际起算仍待账户证据；repo 留存与容量单独核对"
   },
   {
     "id": "ai-search",
@@ -125,19 +131,30 @@
   },
   {
     "id": "clef",
-    "name": "Clef / Clef-flash",
+    "name": "Clef / Clef-flash / Clef-omni",
     "status": "available_models",
     "access": "Workers AI；设计合作另行申请",
     "announced_on": null,
-    "verified_on": "2026-10-02",
+    "verified_on": "2026-10-13",
     "sources": [
       "S16",
       "S17",
-      "S18"
+      "S18",
+      "S123",
+      "S124"
     ],
-    "effective_events": [],
+    "effective_events": [
+      {
+        "kind": "flash_price_and_hosted_context_change",
+        "date": "2026-10-09"
+      },
+      {
+        "kind": "omni_available",
+        "date": "2026-10-09"
+      }
+    ],
     "conflicts": [],
-    "next_check": "核查开放条件与文档是否发生实质变化"
+    "next_check": "按模型卡分别检查 hosted context 与媒体/问题预算；中文长材料质量与截断影响尚未实测"
   },
   {
     "id": "autorouter",
@@ -568,5 +585,123 @@
       "report.2026-10-first-release"
     ],
     "next_check": "复查 Artifacts 示例模板与 Sandbox 1.0 迁移文档是否改动；未进行账户或云端调用"
+  },
+  {
+    "id": "workers-runtime-drain",
+    "name": "Workers 运行时更新排空",
+    "status": "available",
+    "access": "既有请求与连接；按旧进程的排空窗口",
+    "announced_on": "2026-10-12",
+    "verified_on": "2026-10-13",
+    "sources": [
+      "S125",
+      "S126"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "仍须检查断线重连与状态恢复；20 分钟不代表单请求保证或 waitUntil 延长"
+  },
+  {
+    "id": "markdown-streaming",
+    "name": "Markdown for Agents 流式转换",
+    "status": "available",
+    "access": "Markdown for Agents 适用流量",
+    "announced_on": "2026-10-09",
+    "verified_on": "2026-10-13",
+    "sources": [
+      "S127"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "消费者不得依赖已移除的 token headers 或 Content-Length；分别检查转换上限与实际读入上限"
+  },
+  {
+    "id": "agents-web-tools",
+    "name": "Agents SDK Web Search / Web Fetch",
+    "status": "released_sdk",
+    "access": "Agents SDK 0.28.0+；binding/HTTP 与 harness 适配分别选择",
+    "announced_on": "2026-10-12",
+    "verified_on": "2026-10-13",
+    "sources": [
+      "S128",
+      "S129",
+      "S130",
+      "S131"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "按任务核对 provider、费用、host、窗口和期限；登录与动态页面仍需对应读取方式"
+  },
+  {
+    "id": "opencode-harness",
+    "name": "OpenCodeHarness",
+    "status": "experimental",
+    "access": "Agents SDK 0.28.0+；SQLite-backed Durable Object",
+    "announced_on": "2026-10-12",
+    "verified_on": "2026-10-13",
+    "sources": [
+      "S132",
+      "S133"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "会话、外部工具与客户端 event replay 分开验收；未做模型或云端恢复实验"
+  },
+  {
+    "id": "mcp-skills",
+    "name": "Cloudflare API MCP Skills",
+    "status": "available",
+    "access": "MCP 客户端需支持 Skills over MCP 扩展",
+    "announced_on": "2026-10-10",
+    "verified_on": "2026-10-13",
+    "sources": [
+      "S134"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "分别验证扩展发现、技能读取与操作权限，不推定当前客户端兼容"
+  },
+  {
+    "id": "queues-jurisdiction",
+    "name": "Queues jurisdiction",
+    "status": "available",
+    "access": "创建时选择 eu / us / fedramp，之后不可变更",
+    "announced_on": "2026-10-12",
+    "verified_on": "2026-10-13",
+    "sources": [
+      "S137",
+      "S138"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "DLQ 需同 jurisdiction；生产/消费 Worker 执行地点另查"
+  },
+  {
+    "id": "d1-us-jurisdiction",
+    "name": "D1 US jurisdiction",
+    "status": "available",
+    "access": "新建数据库指定 us",
+    "announced_on": "2026-10-02",
+    "verified_on": "2026-10-13",
+    "sources": [
+      "S139"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "逐组件检查数据路径；未执行建库或迁移"
+  },
+  {
+    "id": "http3-cancellation-499",
+    "name": "HTTP/3 取消请求的 499 记录",
+    "status": "available",
+    "access": "HTTP/3 被取消请求的记录口径",
+    "announced_on": "2026-10-09",
+    "verified_on": "2026-10-13",
+    "sources": [
+      "S140"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "区分客户端取消、统计口径变化和服务端失败，不从 499 数量直接推断故障"
   }
 ]

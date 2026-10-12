@@ -24,6 +24,8 @@ scope: 不含邮件服务；通用示例与实际账户分离
 
 原有条目沿用 **2026-10-02** 的核验范围；本次新增观测、PiHarness、互联网搜索、临时分享及 R2 费用说明，来源查阅截至 **2026-10-03**。严格机器认证、Tunnel API 与 Sandbox 接口另于 **2026-10-05** 定向核验，不刷新全书事实。不同条目的核验范围见[来源说明](../docs/provenance.md)。决策模型的供应路径另见[Clef 与 Jev 比较](../comparisons/clef-vs-jev.md)，详细代码和状态约束见[实施参考](../reference/implementation.md)。邮件服务不在本期范围内。
 
+**2026-10-13 定向更新：** 决策模型价格与输入预算、运行时排空、agent 搜索／抓取与 OpenCodeHarness、Queues／D1 地点约束，以及 Artifacts 计费日期与容量限制。本次没有重核其他价格，观测费用表仍使用其固定的 10 月 3 日资料日期。变化及采用条件见[本期观察](../reports/2026-10-13.md)。
+
 <!-- chapter: start -->
 
 ## 01 / 从手边的事情开始
@@ -213,6 +215,10 @@ D1 Time Travel 有计划相关的保留期，原地恢复会改变数据库。�
 
 一个可用的演练是恢复到隔离目标，再检查代表性记录、原件 hash、版本与权限。数据库恢复成功但文件缺失，或文件齐全但权限回到旧状态，都不算恢复完了。
 
+### 有数据地点要求时，逐项检查
+
+D1 新建数据库已支持 `us` jurisdiction，数据库在美国运行并持久化；这个属性不会自动覆盖调用它的 Worker、队列、对象存储或模型服务。先画出实际数据路径，再逐项确认地点约束，不能从一个数据库设置推断整条路径。[S139]
+
 <!-- chapter: jobs -->
 
 ## 06 / 一次任务，可能执行不止一次
@@ -256,6 +262,8 @@ Outbox 可以理解为“准备寄出的任务清单”。它保住待投递意�
 
 Queues 可能重复投递；重试耗尽后，DLQ 可以保存需要调查的消息。Workflows 的步骤也可能重试，所以外部服务仍要有自己的幂等机制。[S53] [S54] [S55]
 
+Queues 自 10 月 12 日提供 `eu`、`us`、`fedramp` jurisdiction；只能在创建队列时选择，之后不能增删或更换，DLQ 须与源队列相同。它限定 Queues 存储和处理消息的地点，生产／消费 Worker 仍可在其他地点运行。已有队列需要改变约束时，应另外设计迁移和积压处理。[S137] [S138]
+
 ### 结果未知，应该有一个明确位置
 
 服务商支持 [idempotency / 幂等](../docs/glossary.md#idempotency--幂等) key 时，一次逻辑动作使用同一个 key，并按其契约查询或重试。不支持幂等、也无法查结果的外部动作，超时后先标为等待核对；离线模型将这一状态写作 [uncertain / 结果未知](../docs/glossary.md#uncertain--结果未知)。
@@ -275,6 +283,8 @@ Workflows 当前 Paid 包含每月 50 万步骤与 1 GB·月状态，步骤和�
 小资料架只有三份自备原件，问“哪份说明撤下规则”，需要检索自己的集合；问“今天上游改了什么”，才需要互联网搜索。AI Search / Vectorize 与 Web Search API 进入的是这两种不同位置。2026-10-02 发布的 Web Search API beta 经 AI Gateway 调用，不因为名字里有 Search 就读取你的私有 bucket。[S106]
 
 完整任务、来源回读与 provider 比较见[自己的材料，还是互联网上的新信息](../services/search.md)。搜索结果先是候选；应用读回原页、核对日期，再把引用放进答案。费用、ZDR 与实际效果分开判断。
+
+10 月 12 日的 Agents SDK 提供独立 search／fetch 函数及多种 harness 适配器。定时检查可以直接搜索、分窗读回来源，再交给编辑判断；无需为每次取网页先开一轮模型对话。抓取的大小、期限和主机范围仍由调用方控制，普通 fetch 不承担登录或 JavaScript 页面交互。[S128] [S129] [S130] [S131]
 
 ### 托管检索与自己的管线
 
@@ -318,9 +328,11 @@ Workers AI 提供模型推理；AI Gateway 组织经过它的调用、凭据、�
 
 先记录模型、时间、结果、token 和费用。确实需要正文调试时，再限定内容和保留期。首次创建 Gateway 在 2026-09-24 或之后的账户走新的 Workers Logs 规则；Unified Billing 充值另收 5%。[S15]
 
-### 小判断可以比较三款模型，不必先换平台
+### 小判断可以先在现有入口比较
 
-Clef、Clef-flash 与 Jev 都可以从 Cloudflare 接入，但前两款是 CF 托管模型，Jev 是第三方 TypeSafe 模型。先挑一个明确判断：例如下一步读标题、读原文，还是材料不足。模型只提建议，程序按照允许的操作集合执行。[S17] [S18] [S73]
+Clef、Clef-flash、Clef-omni 与 Jev 都有 Cloudflare 接入路线；Clef 家族由 CF 托管，Jev 是第三方 TypeSafe 模型。先挑一个明确判断：例如下一步读标题、读原文，还是材料不足。模型只提建议，程序按照允许的操作集合执行。[S17] [S18] [S73] [S124]
+
+10 月 9 日 Clef-flash 降价，同时把托管窗口收至 **24,576 tokens**；媒体与 questions 先占预算，过长 `state` 可能被截断。把较便宜的模型接入长材料流程之前，要检查决定所需的上下文是否完整。Clef-omni 新增音视频输入；精确规格与同任务比较见[专题](../comparisons/clef-vs-jev.md)。[S18] [S123] [S124]
 
 用同一份材料和题目比较，记录实际响应版本、错误、延迟与计费输入。第一轮不要同时换模型、换平台、改题目，否则不知道变化从哪里来。下一轮固定 Jev，再比较原厂、CF 或已有 Gateway，才是在比较接入路线。[S74] [S76] [S79]
 
@@ -330,7 +342,8 @@ Clef、Clef-flash 与 Jev 都可以从 Cloudflare 接入，但前两款是 CF �
 | 路线（接入 → 模型） | 模型选择器 | 输入 USD / 百万 token | 来源 |
 |---|---|---:|---|
 | Cloudflare → Jev | `typesafe/jev` | 0.042 | [S73](https://developers.cloudflare.com/ai/models/typesafe/jev/) |
-| Cloudflare → Clef-flash | `@cf/cloudflare/clef-flash` | 0.09 | [S18](https://developers.cloudflare.com/workers-ai/models/clef-flash/) |
+| Cloudflare → Clef-flash | `@cf/cloudflare/clef-flash` | 0.038 | [S18](https://developers.cloudflare.com/workers-ai/models/clef-flash/) [S123](https://developers.cloudflare.com/changelog/post/2026-10-09-clef-omni-workers-ai/) |
+| Cloudflare → Clef-omni | `@cf/cloudflare/clef-omni` | 0.150 | [S124](https://developers.cloudflare.com/workers-ai/models/clef-omni/) [S123](https://developers.cloudflare.com/changelog/post/2026-10-09-clef-omni-workers-ai/) |
 | Cloudflare → Clef | `@cf/cloudflare/clef` | 0.24 | [S17](https://developers.cloudflare.com/workers-ai/models/clef/) |
 <!-- /facts -->
 
@@ -372,11 +385,17 @@ Clef 系列适合分类、筛选和下一步建议，不一定要为一个小判
 
 PiHarness 为 beta，Pi Durable 为 experimental。官方工具示例的 `replay: "safe"` 用在无副作用的字数统计，不能推导邮件、付款或发布都可随意重放。把它和第 6 章的[未知结果](#结果未知应该有一个明确位置)一起读，再看[agent 运行分工](../services/agent-runtime.md)，选择是否研究这条实现，而不是因新 SDK 自动迁移。[S104]
 
+Agents SDK 0.28.0 又加入 experimental OpenCodeHarness：OpenCode 在普通 SQLite Durable Object 中保存会话，由 Lifecycle 唤醒中断工作。原生工具仍须替换或交给外部环境；持久事件回放也不重放尚未提交的实时文字增量。选型时分别验收会话恢复、工具执行和客户端显示。[S132] [S133]
+
+运行环境本身也会更新。Workers 例行更新时，旧进程现在最多有 **20 分钟**排空已有请求与连接；崩溃等情况仍可更早中断。这个窗口与响应后 `waitUntil()` 最多 30 秒是不同限制；客户端重连、稳定任务身份和结果核对仍要保留。[S125] [S126]
+
 ### 同一个工作区，先核对 SDK 版本
 
 Artifacts 保存可审查的文件历史，Sandbox 提供 Linux 工具环境。当前 Artifacts 的组合示例固定模板 `#v0`，使用旧 Sandbox SDK 的 `getSandbox()` 与 `setEnvVars()`；Sandbox 1.0 则要求应用自己的 Durable Object 与 `this.ctx.container`。这些是两代 Sandbox 运行接口，不能混写。核验于 2026-10-05。[S114] [S115]
 
 可以按任务建立仓库，向获准运行会话提供短期、限仓库的写入 token。Builds 与 Preview 要明确配置，推送文件不等于成果被接受。版本历史、文件系统快照与 agent 任务状态分别保存不同事实，需要定义衔接。[S07] [S114]
+
+Artifacts 当前每 repo 上限 **1 GB**，单个 file／blob 上限 **32 MB**。将视频、安装包等大文件放入对应对象存储；任务结束后单独决定仓库保留多久、何时删除，避免把容器停止误当作文件历史已经清理。[S136] [S08]
 
 ### 1.0 要重新看生命周期
 
@@ -489,7 +508,9 @@ R2 Standard 的标价为 $0.015 / GB-month、Class A $4.50 / 百万次、Class B
 
 ### 免费也有三种含义
 
-免费计划可能在达到上限后停止；Paid 包含量之外可能继续计费；beta 免费可能有未来起算日。Artifacts 的来源存在 10 月 14／15 日一天冲突，AI Search 新计费自 11 月 1 日开始，要把核验日与生效日同时留下。[S07] [S08] [S10]
+免费计划可能在达到上限后停止；Paid 包含量之外可能继续计费；beta 免费可能有未来起算日。10 月 13 日复核时，Artifacts 价格页与 changelog 均写 **10 月 14 日**起算，博客仍写 15 日；冲突继续登记，预算按较早日期准备。AI Search 的 11 月 1 日起算沿用既有来源范围。[S07] [S08] [S135] [S10]
+
+Artifacts 限 Workers Paid，每月含 10,000 operations 与 1 GB 存储；超额分别为 $0.15／1,000 operations 与 $0.50／GB-month。仓库保留会继续计入存储，不能只统计任务活跃时长；这里给出公开计价单位，没有实际账户账单测量。[S08]
 
 普通 KV 与 KV Instant 也不能混看。后者面向特殊读重型负载，写入、删除、列举每次 $0.10，存储每 MB·月 $100，不适合作为普通个人状态库的默认选项。[S42] [S25]
 
@@ -719,3 +740,19 @@ GitHub：[github.com/IndelibleVivi](https://github.com/IndelibleVivi)
 [S99]: https://blog.cloudflare.com/cloudflare-tracing/ "Cloudflare Traces 发布"
 
 [S111]: https://developers.cloudflare.com/workers/platform/pricing/ "当前 Workers Logs 计费"
+
+[S123]: https://developers.cloudflare.com/changelog/post/2026-10-09-clef-omni-workers-ai/ "Clef-omni 发布与 Clef-flash 降价／上下文收缩"
+[S124]: https://developers.cloudflare.com/workers-ai/models/clef-omni/ "Clef-omni 模型卡与媒体输入预算"
+[S125]: https://developers.cloudflare.com/changelog/post/2026-10-12-longer-runtime-update-grace-period/ "Workers 运行时更新排空窗口"
+[S126]: https://developers.cloudflare.com/workers/platform/limits/ "Workers 平台限制：执行、等待与运行时更新"
+[S128]: https://developers.cloudflare.com/changelog/post/2026-10-12-web-search/ "Agents SDK web search 工具发布"
+[S129]: https://developers.cloudflare.com/agents/tools/web-search/ "Agents SDK Web Search 调用与适配器"
+[S130]: https://developers.cloudflare.com/changelog/post/2026-10-11-web-fetch/ "Agents SDK web fetch 工具发布"
+[S131]: https://developers.cloudflare.com/agents/tools/web-fetch/ "Agents SDK Web Fetch 的窗口、期限与抓取边界"
+[S132]: https://developers.cloudflare.com/changelog/post/2026-10-12-opencode-harness/ "OpenCodeHarness 发布"
+[S133]: https://developers.cloudflare.com/agents/harnesses/opencode/ "OpenCodeHarness 生命周期与事件回放"
+[S135]: https://developers.cloudflare.com/changelog/post/2026-10-01-artifacts-open-beta/ "Artifacts open beta 与计费起算公告"
+[S136]: https://developers.cloudflare.com/artifacts/platform/limits/ "Artifacts 仓库、对象与账户限制"
+[S137]: https://developers.cloudflare.com/changelog/post/2026-09-18-queues-jurisdictions/ "Queues jurisdiction 发布"
+[S138]: https://developers.cloudflare.com/queues/configuration/data-location/ "Queues 数据地点与死信队列约束"
+[S139]: https://developers.cloudflare.com/changelog/post/2026-10-02-us-jurisdiction/ "D1 美国 jurisdiction"

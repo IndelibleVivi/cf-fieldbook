@@ -84,6 +84,16 @@ class FieldbookTests(unittest.TestCase):
   got=fb.impact_source(self.root,self.cat,['S01'])
   self.assertEqual(got['changed'],['data.a'])
   self.assertEqual(fb.entry_sources(self.root,self.cat['entries'][0]),{'S01','S02'})
+ def test_actual_observability_pricing_scalar_sources_are_direct_consumers(self):
+  cat=fb.load(ROOT)
+  for source in ['S100','S111']:
+   with self.subTest(source=source):
+    got=fb.impact_source(ROOT,cat,[source])
+    self.assertIn({'id':'data.observability-pricing','path':'catalog/observability-pricing.json','sources':[source]},got['direct_citations'])
+ def test_structured_scalar_sources_require_explicit_field_and_valid_id(self):
+  self.source_fixture();(self.root/'a.json').write_text(json.dumps({'description':'S03','items':[{'source':'S01'},{'nested':{'source':'S02','sources':['S01']}},{'source':'S03 trailing'},{'source':['S03']},{'source':{'id':'S03'}}]}))
+  self.cat['entries'][0]['path']='a.json'
+  self.assertEqual(fb.entry_sources(self.root,self.cat['entries'][0]),{'S01','S02'})
  def test_known_unused_source_returns_empty_and_unknown_source_rejected(self):
   self.source_fixture();got=fb.impact_source(self.root,self.cat,['S03'])
   self.assertEqual(got['direct_citations'],[]);self.assertEqual(got['current_review_candidates'],[])

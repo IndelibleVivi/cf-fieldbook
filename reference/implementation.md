@@ -15,6 +15,8 @@ scope: 不含邮件；示例与实际账户分离
 
 本文件集中保存实现说明、代码、恢复语义和来源；按用途阅读可从[实践手册](../guides/handbook.md)开始。本文按资料截止日阅读，实际部署需要验证自己的环境。
 
+2026-10-13 仅定向补充 Workers 排空、Queues／D1 地点约束、Clef 输入预算和 Artifacts 计费／限制；其余内容保留原查阅范围。较新的 API／SDK 维护入口见[维护参考](api-maintenance.md)，本期变化见[10 月 13 日观察](../reports/2026-10-13.md)。
+
 个人基础设施的难处通常不是少一种服务。一个网站能打开之后，还要知道谁能写入、文件存在哪里、任务失败后怎么继续，以及几个月不用时是否仍在付费。本手册围绕这些工作展开，选择服务只是其中一步。
 
 本参考把入口、身份、数据、执行和恢复分开处理。产品状态以截至 **2026-10-02** 的来源记录为界，不同条目的核验范围见[来源说明](../docs/provenance.md)；文中的操作路线是设计与检查建议，不是作者的云端实测。邮件服务不纳入本版。
@@ -302,6 +304,10 @@ Queues 解决接收与消费解耦、削峰和重投；Durable Objects 适合按
 
 队列是至少一次投递的工作环境，不能因为常见请求只收到一次，就把 consumer 写成单次运行程序。DLQ 是重试耗尽后的存放与调查入口，仍需要有人或程序处理；未配置时要认真确认消息在重试耗尽后的行为。[S53] [S54]
 
+**地点约束（2026-10-13 核查）：** 创建 Queues 时可指定 `jurisdiction` 为 `eu`、`us` 或 `fedramp`，之后不可更改或移除；DLQ 必须同 jurisdiction。限制覆盖队列侧存储／处理，Worker 的执行地点须另查。D1 新建库支持 `--jurisdiction=us`，同样不能从数据库的约束推出整条外部调用链的约束。[S137] [S138] [S139]
+
+**长请求与恢复：** Workers 例行 runtime 更新给旧进程最多 20 分钟排空；窗口按进程计算，结束后仍未完成的请求／连接会被终止，其他故障也可提前中断。响应结束或客户端断开后的 `waitUntil()` 仍最多延续 30 秒。需要持久完成的任务继续登记结果与恢复位置；流式连接恢复不等于重新执行整个业务动作。[S125] [S126]
+
 ### 一个常见陷阱：去重记录比工作先完成
 
 一种有缺口的简化流程是先登记 `event_id`，发现已经登记就直接 ACK，否则执行工作。如果登记之后、工作之前进程退出，下一次投递看见“已登记”就跳过，任务永远丢失。
@@ -427,6 +433,8 @@ User Insights 可以帮助按归属观察请求和成本，但只能看见流经
 
 Clef 系列输出定义好选项的概率，适合分类、选择或排序任务。它可用于决定“下一步还需不需要更多材料”，不需要为每次小判断生成长段解释。模型输出概率仍需在自己的材料上校准，不能直接当正确率。[S16] [S17] [S18]
 
+10 月 9 日的 hosted Clef-flash 将窗口从 64K 收为 24,576 tokens，输入价格同步下降。调用方应先确认问题与必要证据的预算：媒体和 questions 超窗会失败，否则 text state 可能被截断。新增 Clef-omni 的精确窗口为 64,000，Clef 为 65,536；别把公告的“64K”统一换算成同一个数字。选择器和当前价格共用[决策路线目录](../catalog/decision-routes.json)，请求外壳见[离线例子](../examples/decision-routing/README.md)。[S123] [S17] [S18] [S124]
+
 一种有用的试验是：准备真实正例、容易混淆的反例与无法判断项，先让它只推荐，不实际触发外部动作。统计漏判和误判的不同代价，再决定是否接入流程。关键不在它能不能给出一个选项，而在错的时候是否可见、可纠正。
 
 ## 11 / Agent 执行：持久身份、Linux 环境与文件历史分开
@@ -452,6 +460,8 @@ Clef 系列输出定义好选项的概率，适合分类、选择或排序任务
 准备完成后保存文件系统快照。它绑定镜像版本，只保存文件，不保存内存与运行中的程序；当前 30 天期限会在恢复时刷新。若快照包含凭据、下载的私有材料或本地工具配置，这些内容也会被一起保存，应在建立基线前清理并核查。[S05]
 
 从基线生成两个环境，分别做一个有限修改，交回补丁、测试输出和可保存产物。需要留历史的文件可以进入 Artifacts；大型媒体可进入对象存储。正式源码是否接受这些修改，仍走原来的审阅过程。[S07]
+
+Artifacts 单 repo 目前最多 1 GB，单个 file／blob 最多 32 MB。文件历史与运行中的容器有各自生命周期，退出 Sandbox 后仍须按保留政策处理对应 repo；不要把大媒体推入 Git 后才发现容量不适合。[S136] [S08]
 
 完成后关闭执行环境，重新启动并恢复，确认：输入与镜像身份正确；结果可读；旧任务不会自动重复；临时凭据已失效；成本指标反映了实际运行时长。只有这轮通过，“可恢复”才有具体含义。
 
@@ -539,7 +549,7 @@ Workers 侧的观测不会自动看到所有本机脚本、第三方平台和离
 
 ### 免费、包含、测试期间不收费是三种承诺
 
-免费计划可能达到上限就失败；Paid 包含量之外可能继续计费；beta 免费则可能有明确未来起算日。Artifacts 的官方来源目前存在 10 月 14/15 日一天冲突，AI Search 新计费明确从 11 月 1 日开始。发布文档需要同时保留核验日期与生效日期，不能只写“现在免费”。[S07] [S08] [S10]
+免费计划可能达到上限就失败；Paid 包含量之外可能继续计费；beta 免费则可能有明确未来起算日。10 月 13 日复核后，Artifacts 价格页和 changelog 都写 10 月 14 日计费，博客仍写 15 日；保留冲突并按较早日期准备预算。AI Search 的 11 月 1 日起算沿用原来源。核验日期与生效日期分别记录。[S07] [S08] [S135] [S10]
 
 ## 15 / 排障、恢复与停用
 
@@ -842,3 +852,13 @@ Workers 侧的观测不会自动看到所有本机脚本、第三方平台和离
 
 GitHub：[github.com/IndelibleVivi](https://github.com/IndelibleVivi)  
 *made by Faye & Cove*
+
+[S123]: https://developers.cloudflare.com/changelog/post/2026-10-09-clef-omni-workers-ai/ "Clef-omni 发布与 Clef-flash 降价／上下文收缩"
+[S124]: https://developers.cloudflare.com/workers-ai/models/clef-omni/ "Clef-omni 模型卡与媒体输入预算"
+[S125]: https://developers.cloudflare.com/changelog/post/2026-10-12-longer-runtime-update-grace-period/ "Workers 运行时更新排空窗口"
+[S126]: https://developers.cloudflare.com/workers/platform/limits/ "Workers 平台限制：执行、等待与运行时更新"
+[S135]: https://developers.cloudflare.com/changelog/post/2026-10-01-artifacts-open-beta/ "Artifacts open beta 与计费起算公告"
+[S136]: https://developers.cloudflare.com/artifacts/platform/limits/ "Artifacts 仓库、对象与账户限制"
+[S137]: https://developers.cloudflare.com/changelog/post/2026-09-18-queues-jurisdictions/ "Queues jurisdiction 发布"
+[S138]: https://developers.cloudflare.com/queues/configuration/data-location/ "Queues 数据地点与死信队列约束"
+[S139]: https://developers.cloudflare.com/changelog/post/2026-10-02-us-jurisdiction/ "D1 美国 jurisdiction"

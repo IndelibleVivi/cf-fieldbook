@@ -1,12 +1,14 @@
 ---
 title: 自己的材料，还是互联网上的新信息
 subtitle: AI Search、Vectorize 与 Web Search API 分别搜什么
-source_cutoff: 2026-10-03
+source_cutoff: 2026-10-13
 ---
 
 # 自己的材料，还是互联网上的新信息
 
 问“这三份资料哪份写了撤下规则”，证据在自己持有的集合；问“今天官方更新了什么”，证据在当前互联网。先确定需要哪一边，才选择检索入口。网页搜索不会因同属 Cloudflare 就读取私有 R2 内容。
+
+2026-10-13 定向复核 Agents SDK 的搜索、读页接口与 Markdown 流式转换。AI Search、Vectorize 及下方 provider 价格和保留表仍按 2026-10-03 的资料范围阅读。
 
 ## 让自己的集合回到原件
 
@@ -29,6 +31,22 @@ const results = await response.json();
 ```
 
 需要 AI binding、Gateway 及 credits 或相应 provider key；REST 入口是 `/accounts/{account_id}/ai/websearch/`。返回 `items` 中的 URL、title、description，以及 metadata；最多 10 个结果，query 最长 1,024 字符。[S108]
+
+## 把搜索与读页接进任务
+
+2026-10-12，Agents SDK 提供了配套的 `web_search` 与 `web_fetch` 工具；前者要求 SDK ≥ 0.27.0，后者 ≥ 0.28.0。除了 Pi、AI SDK 和 TanStack AI adapters，也可直接调用 `createAIWebSearch()` / `createHTTPWebSearch()` 做定时查询，再用 `fetchWeb()` 读取来源，不必先让模型发起一次工具调用。[S128] [S130]
+
+搜索时，模型选择 query 与结果数；应用固定 provider、Gateway 和用量边界。SDK 默认最多返回 5 项，可配置的上限为 1–10。默认 Gateway 是 `default`；省略 `byokAlias` 时，先使用该 provider 的 `default` key，没有该 key 才使用 AI Gateway credits；显式指定的 alias 不存在时会失败。接入任务前应明确这条费用归属。[S129]
+
+读页会返回最终 URL、HTTP status、content type 与正文窗口。默认每窗最多 20,000 字符，以 offset 继续；整个响应最多读取 5,000,000 bytes，包含重定向与转换的 deadline 为 30 秒。这些值由应用配置，模型不能通过要求“全文”绕过边界。PDF 与支持的 Office 文档可转换为文本；直接读取不带浏览器 cookie、凭据或自定义请求头，也不执行页面 JavaScript。需要登录、动态页面或交互时，再选择 browser 路线。[S131]
+
+自定义 `WebSearchSource` 接管 provider 与计费；自定义 `WebFetchSource` 接管 URL、host、bytes 和重定向控制。更换来源时要保留这些责任，不能只保留同名工具。工具返回的来源仍须经过上面的原页核对；一次 SDK 调用成功不证明内容已经完整或适用于问题。[S129] [S131]
+
+## Markdown 流式转换改变了哪些读取约定
+
+2026-10-09，Markdown for Agents 改为边缘进程内流式转换，HTML 上限增至解压后 6 MiB。转换响应不再生成 `x-markdown-tokens`、`x-original-tokens`，并移除 `Content-Length`。依赖这些头的读页程序应自行计算所需计量，按实际读取的 body 执行上限，并保留中断状态；不能用 header 缺失判定失败或用已有正文判定完整。[S127]
+
+网站转换的 6 MiB 上限与 SDK 读页的 5,000,000 bytes 默认预算约束不同环节。调整其中一项不会自动放宽另一项；处理长文时应一起检查转换、传输和返回给模型的窗口。
 
 ## Provider 比较：费用、返回材料和保留分开看
 
@@ -58,3 +76,8 @@ const results = await response.json();
 [S107]: https://developers.cloudflare.com/web-search/providers/ "Web Search API providers"
 [S108]: https://developers.cloudflare.com/web-search/how-to-use/ "Web Search API 调用与响应"
 [S40]: https://developers.cloudflare.com/vectorize/platform/pricing/ "Vectorize 价格"
+[S127]: https://developers.cloudflare.com/changelog/post/2026-10-09-markdown-for-agents-in-process-conversion/ "Markdown for Agents 流式转换与响应头变更"
+[S128]: https://developers.cloudflare.com/changelog/post/2026-10-12-web-search/ "Agents SDK web_search 发布"
+[S129]: https://developers.cloudflare.com/agents/tools/web-search/ "Agents SDK 搜索工具与费用归属"
+[S130]: https://developers.cloudflare.com/changelog/post/2026-10-11-web-fetch/ "Agents SDK web_fetch 发布"
+[S131]: https://developers.cloudflare.com/agents/tools/web-fetch/ "Agents SDK 读页窗口与请求边界"

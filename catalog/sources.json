@@ -51,17 +51,17 @@
     "id": "S07",
     "title": "Artifacts 公开测试发布",
     "url": "https://blog.cloudflare.com/next-git-platform-on-cloudflare/",
-    "accessed": "2026-10-02",
+    "accessed": "2026-10-13",
     "kind": "official_primary",
-    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+    "verification_scope": "targeted_artifacts_billing_date_recheck; pricing_and_changelog_say_10_14_blog_still_10_15; no_account_or_billing_execution"
   },
   {
     "id": "S08",
     "title": "Artifacts 价格",
     "url": "https://developers.cloudflare.com/artifacts/platform/pricing/",
-    "accessed": "2026-10-02",
+    "accessed": "2026-10-13",
     "kind": "official_primary",
-    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+    "verification_scope": "targeted_artifacts_billing_date_recheck; pricing_and_changelog_say_10_14_blog_still_10_15; no_account_or_billing_execution"
   },
   {
     "id": "S09",
@@ -131,17 +131,17 @@
     "id": "S17",
     "title": "Clef 模型卡",
     "url": "https://developers.cloudflare.com/workers-ai/models/clef/",
-    "accessed": "2026-10-02",
+    "accessed": "2026-10-13",
     "kind": "official_primary",
-    "verification_scope": "revision_3_public_document_rechecked; no_live_model_calls"
+    "verification_scope": "targeted_hosted_model_price_context_and_input_budget; no_model_calls"
   },
   {
     "id": "S18",
     "title": "Clef-flash 模型卡",
     "url": "https://developers.cloudflare.com/workers-ai/models/clef-flash/",
-    "accessed": "2026-10-02",
+    "accessed": "2026-10-13",
     "kind": "official_primary",
-    "verification_scope": "revision_3_public_document_rechecked; no_live_model_calls"
+    "verification_scope": "targeted_hosted_model_price_context_and_input_budget; no_model_calls"
   },
   {
     "id": "S19",
@@ -958,5 +958,181 @@
     "accessed": "2026-10-08",
     "kind": "official_primary",
     "verification_scope": "workers_s3_rest_routes_and_high_throughput_recommendation; public_document_consulted; no_sdk_install_account_or_live_deployment"
+  },
+  {
+    "id": "S123",
+    "title": "Clef-omni 发布与 Clef-flash 降价／上下文收缩",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-09-clef-omni-workers-ai/",
+    "accessed": "2026-10-13",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-09"
+  },
+  {
+    "id": "S124",
+    "title": "Clef-omni 模型卡与媒体输入预算",
+    "url": "https://developers.cloudflare.com/workers-ai/models/clef-omni/",
+    "accessed": "2026-10-13",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution"
+  },
+  {
+    "id": "S125",
+    "title": "Workers 运行时更新排空窗口",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-12-longer-runtime-update-grace-period/",
+    "accessed": "2026-10-13",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-12"
+  },
+  {
+    "id": "S126",
+    "title": "Workers 平台限制：执行、等待与运行时更新",
+    "url": "https://developers.cloudflare.com/workers/platform/limits/",
+    "accessed": "2026-10-13",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution"
+  },
+  {
+    "id": "S127",
+    "title": "Markdown for Agents 流式转换与响应头变更",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-09-markdown-for-agents-in-process-conversion/",
+    "accessed": "2026-10-13",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-09"
+  },
+  {
+    "id": "S128",
+    "title": "Agents SDK web search 工具发布",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-12-web-search/",
+    "accessed": "2026-10-13",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-12"
+  },
+  {
+    "id": "S129",
+    "title": "Agents SDK Web Search 调用与适配器",
+    "url": "https://developers.cloudflare.com/agents/tools/web-search/",
+    "accessed": "2026-10-13",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution"
+  },
+  {
+    "id": "S130",
+    "title": "Agents SDK web fetch 工具发布",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-11-web-fetch/",
+    "accessed": "2026-10-13",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-12",
+    "date_note": "公告页显示日期；URL 中的日期不作为公布日期"
+  },
+  {
+    "id": "S131",
+    "title": "Agents SDK Web Fetch 的窗口、期限与抓取边界",
+    "url": "https://developers.cloudflare.com/agents/tools/web-fetch/",
+    "accessed": "2026-10-13",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution"
+  },
+  {
+    "id": "S132",
+    "title": "OpenCodeHarness 发布",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-12-opencode-harness/",
+    "accessed": "2026-10-13",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-12"
+  },
+  {
+    "id": "S133",
+    "title": "OpenCodeHarness 生命周期与事件回放",
+    "url": "https://developers.cloudflare.com/agents/harnesses/opencode/",
+    "accessed": "2026-10-13",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution"
+  },
+  {
+    "id": "S134",
+    "title": "Cloudflare API MCP 的 Skills 扩展",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-10-cloudflare-mcp-skills/",
+    "accessed": "2026-10-13",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-10"
+  },
+  {
+    "id": "S135",
+    "title": "Artifacts open beta 与计费起算公告",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-01-artifacts-open-beta/",
+    "accessed": "2026-10-13",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-01"
+  },
+  {
+    "id": "S136",
+    "title": "Artifacts 仓库、对象与账户限制",
+    "url": "https://developers.cloudflare.com/artifacts/platform/limits/",
+    "accessed": "2026-10-13",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution"
+  },
+  {
+    "id": "S137",
+    "title": "Queues jurisdiction 发布",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-09-18-queues-jurisdictions/",
+    "accessed": "2026-10-13",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-12",
+    "date_note": "公告页显示日期；URL 中的日期不作为公布日期"
+  },
+  {
+    "id": "S138",
+    "title": "Queues 数据地点与死信队列约束",
+    "url": "https://developers.cloudflare.com/queues/configuration/data-location/",
+    "accessed": "2026-10-13",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution"
+  },
+  {
+    "id": "S139",
+    "title": "D1 美国 jurisdiction",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-02-us-jurisdiction/",
+    "accessed": "2026-10-13",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-02"
+  },
+  {
+    "id": "S140",
+    "title": "HTTP/3 取消请求的 499 记录改进",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-09-http3-499-reporting-improvement/",
+    "accessed": "2026-10-13",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-09"
+  },
+  {
+    "id": "S141",
+    "title": "Logpush Transformers 的转换与失败交付语义",
+    "url": "https://blog.cloudflare.com/transformers-on-logpush/",
+    "accessed": "2026-10-13",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-12"
+  },
+  {
+    "id": "S142",
+    "title": "Cloudflare Go v7.13.0 release",
+    "url": "https://github.com/cloudflare/cloudflare-go/releases/tag/v7.13.0",
+    "accessed": "2026-10-13",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-12",
+    "date_note": "GitHub 发布时间为 10-12；release notes 标注 10-09；未运行此版本 SDK"
   }
 ]
