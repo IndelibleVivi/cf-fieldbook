@@ -1,7 +1,8 @@
 ---
 title: 沿着一条请求，找到问题发生的地方
 subtitle: Cloudflare Traces、SQL 调查、采样与保留
-source_cutoff: 2026-10-03
+source_cutoff: 2026-10-13
+observability_as_of: 2026-10-03
 ---
 
 # 沿着一条请求，找到问题发生的地方

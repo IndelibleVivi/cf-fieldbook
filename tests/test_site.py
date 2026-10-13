@@ -566,7 +566,13 @@ GitHub · [https://github.com/IndelibleVivi](https://github.com/IndelibleVivi)
                 self.assertEqual(len(soup.select('meta[name="twitter:description"]')), 1)
                 self.assertEqual((output / ('assets/share/' + key + '.png')).read_bytes(),
                                  (ROOT / ('assets/share/' + key + '.png')).read_bytes())
-            self.assertIn('2026-10-03', BeautifulSoup((output / 'guides/handbook.html').read_text(), 'html.parser').select_one('meta[name="description"]')['content'])
+            for path in ('guides/handbook.html', 'comparisons/clef-vs-jev.html', 'services/observability.html',
+                         'reference/implementation.html', 'reference/api-maintenance.html'):
+                soup = BeautifulSoup((output / path).read_text(), 'html.parser')
+                self.assertIn('资料截至 2026-10-13', soup.select_one('meta[name="description"]')['content'])
+            for path in ('guides/handbook.html', 'services/observability.html'):
+                soup = BeautifulSoup((output / path).read_text(), 'html.parser')
+                self.assertIn('固定资料日期：2026-10-03', soup.get_text('', strip=True))
 
 
 if __name__ == '__main__':

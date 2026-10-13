@@ -1,7 +1,7 @@
 ---
 title: 用程序维护 Cloudflare 资源
 subtitle: 选择调用入口，取得完整结果，再判断变更是否完成
-source_cutoff: 2026-10-08
+source_cutoff: 2026-10-13
 ---
 
 # 用程序维护 Cloudflare 资源

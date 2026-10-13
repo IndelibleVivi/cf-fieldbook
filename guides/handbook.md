@@ -2,7 +2,8 @@
 title: Cloudflare 个人基础设施实践手册
 subtitle: 从一个入口到可恢复的应用与自动化
 edition: 2026.10 · 持续阅读修订
-source_cutoff: 2026-10-03
+source_cutoff: 2026-10-13
+observability_as_of: 2026-10-03
 presentation_revision: 3
 author: Faye & Cove
 github: https://github.com/IndelibleVivi

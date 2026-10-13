@@ -91,7 +91,9 @@ def project_markdown(root: Path, relative_path: str, *, as_of: str | None = None
     blocks = tables(root) if 'cf-routes' in markers or 'all-routes' in markers else {}
     if 'observability-costs' in markers:
         cutoff = re.search(r'^source_cutoff: (\d{4}-\d{2}-\d{2})$', text, re.M)[1]
-        blocks['observability-costs'] = observability_costs(root, as_of or cutoff)
+        fixed = re.search(r'^observability_as_of:[ \t]*([^\n]*)$', text, re.M)
+        pricing_date = fixed[1].strip() if fixed else cutoff
+        blocks['observability-costs'] = observability_costs(root, as_of if as_of is not None else pricing_date)
     return BLOCK.sub(lambda m: f'<!-- facts: {m[1]} -->\n{blocks[m[1]]}\n<!-- /facts -->', text)
 
 

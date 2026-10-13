@@ -1,5 +1,8 @@
 from pathlib import Path
+import re
+import shutil
 import sys
+import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -11,6 +14,33 @@ from bs4 import BeautifulSoup
 
 
 class ContentEvolutionTests(unittest.TestCase):
+    def test_partial_update_keeps_pricing_date_and_explicit_override(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            shutil.copytree(ROOT / 'catalog', root / 'catalog')
+            (root / 'examples/decision-routing').mkdir(parents=True)
+            shutil.copyfile(ROOT / 'examples/decision-routing/payloads.py',
+                            root / 'examples/decision-routing/payloads.py')
+            for relative in ('guides/handbook.md', 'services/observability.md'):
+                with self.subTest(page=relative):
+                    original = (ROOT / relative).read_text()
+                    updated = re.sub(r'^source_cutoff: .*$', 'source_cutoff: 2026-12-01', original, flags=re.M)
+                    target = root / relative
+                    target.parent.mkdir(exist_ok=True)
+                    target.write_text(updated)
+                    def block(text):
+                        return text.split('<!-- facts: observability-costs -->', 1)[1].split('<!-- /facts -->', 1)[0]
+                    self.assertEqual(block(project_markdown(root, relative)), block(original))
+                    future = block(project_markdown(root, relative, as_of='2026-12-01'))
+                    self.assertIn('固定资料日期：**2026-12-01**', future)
+                    self.assertNotIn('当前 Workers Logs', future)
+                    target.write_text(re.sub(r'^observability_as_of: .*\n', '', updated, flags=re.M))
+                    self.assertEqual(block(project_markdown(root, relative)), future)
+                    target.write_text(updated.replace('observability_as_of: 2026-10-03',
+                                                      'observability_as_of: 2026-13-99'))
+                    with self.assertRaises(ValueError):
+                        project_markdown(root, relative)
+
     def test_announced_pricing_does_not_apply_early(self):
         before = observability_costs(ROOT, '2026-11-30')
         after = observability_costs(ROOT, '2026-12-01')

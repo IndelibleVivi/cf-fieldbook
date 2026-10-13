@@ -2,7 +2,7 @@
 title: Clef 与 Jev：模型、入口与判断成本
 subtitle: 一份面向个人开发者的决策模型比较
 edition: 2026.10 · 专题 01 · 阅读版 3
-source_cutoff: 2026-10-02
+source_cutoff: 2026-10-13
 reviewed_on: 2026-10-13
 review_scope: Clef 系列标价、托管上下文与输入字段；其余来源保留原核对范围
 presentation_revision: 3
