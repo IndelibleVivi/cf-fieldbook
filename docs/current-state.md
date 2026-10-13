@@ -1,6 +1,12 @@
 # 当前状态
 
-2026-10-08 · [公共源码](https://github.com/IndelibleVivi/cf-fieldbook)，默认分支 `main`。
+2026-10-13 · [公共源码](https://github.com/IndelibleVivi/cf-fieldbook)，默认分支 `main`。
+
+- 本轮更新见 [PR #1](https://github.com/IndelibleVivi/cf-fieldbook/pull/1)。当前手册、专题及本轮更新页的资料截止日已对齐 10 月 13 日；固定费用表仍为 10 月 3 日，逐来源核验范围保留。网页与新冻结候选共用正文截止日，手册／专题分享卡随之重建；站点由主分支既有流程发布，部署结果以 [Actions](https://github.com/IndelibleVivi/cf-fieldbook/actions) 为准，没有新增 PDF Release。
+
+- 本轮[10 月 13 日观察](../reports/2026-10-13.md)与当前页一并收录：Clef-flash 降价／缩窗及 Omni、Workers 排空、SDK 搜索／读页与 OpenCodeHarness、Markdown 响应头、Queues／D1 地点约束、Artifacts 条款、499 调查口径与 SDK／MCP 入口。来源 S123–S142 定向查阅；既有事实未因编辑日期整体刷新。
+- 更新接口实际处理了来源→数据→正文→例子传播；修复 JSON `source` 单值漏检，仍支持 `sources` 数组。决策例子补齐 S79 的正文引用，并覆盖四款模型的文本／JSON 外壳。`sync/check` 只同步登记事实块；表外建议另做编辑审阅，`due` 仍只检查登记复核日。
+- Artifacts 10-14／15 的官方来源冲突保留，预算建议按较早日期准备；没有实际账单或云端调用。新观察作为独立阅读页纳入目录与搜索，原首发作品编排、`dist/` 与旧报告正文不重出、不覆盖。部署仍由主分支既有 Actions 接住。
 
 - 三部作品为[个人基础设施实践手册](../guides/handbook.md)、[Clef / Jev 专题](../comparisons/clef-vs-jev.md)、[2026.10 新发布观察首发选编](../reports/2026-10-first-release.md)。选编保留完整发布主题并整合后续四组变化；10 月 2 日、10 月 3 日观察保持历史身份，不自动同步新价格。服务与实践仍可独立阅读。
 - 新增[API／SDK 维护](../reference/api-maintenance.md)、[项目判断指南](../use-cases/project-context.md)与[任务单](../templates/project-context-task.md)，以及第五个[离线操作例子](../examples/api-operations/README.md)。`impact-source` 从登记正文引用与 JSON 来源字段定位，再沿原有依赖查询生成候选；项目实际用法仍须另查。指南使用合成 VPS 迁移、发布变慢和静态官网场景，当前理由与配置由各项目已有文档持有，没有跨项目状态表或自动监控。

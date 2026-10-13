@@ -19,7 +19,7 @@
   ],
   "input_kind": "synthetic",
   "observation_scope": [
-    "payload shape",
+    "text/JSON payload shape (no media)",
     "cost arithmetic",
     "route boundaries"
   ],

@@ -133,6 +133,8 @@ def entry_sources(root:Path,entry:dict)->set[str]:
     found=set()
     def visit(value):
         if isinstance(value,dict):
+            ref=value.get('source')
+            if isinstance(ref,str) and re.fullmatch(r'S\d{2,3}',ref):found.add(ref)
             refs=value.get('sources',[])
             if isinstance(refs,list):
                 found.update(s for s in refs if isinstance(s,str) and re.fullmatch(r'S\d{2,3}',s))

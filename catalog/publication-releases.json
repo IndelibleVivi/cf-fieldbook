@@ -4,6 +4,20 @@
   "releases": [],
   "updates": [
     {
+      "date": "2026-10-13",
+      "families": [
+        "handbook",
+        "comparison"
+      ],
+      "kind": "content",
+      "topics": [
+        "clef-price-context",
+        "runtime-web-tools",
+        "publication-cutoff"
+      ],
+      "summary": "纳入 Clef-flash 降价／缩窗与 Clef-omni；手册另补运行时、网页读取、harness、地点与 Artifacts 条款。当前资料截止与分享卡对齐 10-13，来源仅作定向复核，Observability 费用表仍固定 10-03；未重出已分发 PDF。"
+    },
+    {
       "date": "2026-10-05",
       "families": [
         "launches"

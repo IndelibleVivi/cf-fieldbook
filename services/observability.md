@@ -1,12 +1,15 @@
 ---
 title: 沿着一条请求，找到问题发生的地方
 subtitle: Cloudflare Traces、SQL 调查、采样与保留
-source_cutoff: 2026-10-03
+source_cutoff: 2026-10-13
+observability_as_of: 2026-10-03
 ---
 
 # 沿着一条请求，找到问题发生的地方
 
 一页资料架的搜索昨天很快，今天却要十二秒。先保留请求身份、部署版本、时间范围与路径，比较一条慢请求和一条正常请求；再决定要调查入口、程序还是依赖。这里使用合成问题解释调查方法，没有对实际账户发起查询。
+
+2026-10-13 定向补查 HTTP/3 取消记录与 Logpush Transformers 的失败语义。其他机制与费用表仍保留 2026-10-03 的资料日期；这次补查不表示重新核验了价格或账户可用范围。
 
 ## 请求经过哪里，时间就在哪里分段
 
@@ -20,6 +23,12 @@ Trace Rules 可覆盖 baseline sampling。官方配置采用第一条匹配规�
 
 平台支持 W3C trace context 与 OTLP 导出。默认拒绝入站 trace context；允许后，传入的 trace 身份仍不证明可信调用者。平台 spans 与自己 instrument 的 spans 可以送到相同 backend，是否保存于 Cloudflare 与是否外送分别选择。[S101]
 
+## HTTP/3 的 499 增多，先检查取消口径
+
+2026-10-09，Cloudflare 调整了 HTTP/3 客户端取消的处理与记录：受影响的请求会更早停止，并记录为 `499`；此前部分请求仍继续到源站，最终记录的是上游状态。因此更新后的 `499` 增多可能来自记录更完整，不能直接判断服务端故障增加。[S140]
+
+调查时将客户端取消与服务端错误分开统计，并保留取消所对应的路径、耗时和时间范围。若取消集中在慢请求上，仍需继续追查等待原因；仅把 `499` 从 server error rate 移出不能证明体验正常。
+
 ## 一次查询，先选一份 dataset
 
 SQL API beta 给受支持数据集共同的调查入口。当前每个 statement 只允许一个 dataset、一个 account，并需要时间下界；dataset 的字段、保留期与可查范围各有条件。不要把统一 API 读成已经允许任意跨数据集 JOIN。[S103]
@@ -27,6 +36,10 @@ SQL API beta 给受支持数据集共同的调查入口。当前每个 statement
 可重复的调查顺序是：选择 dataset 与短时间窗 → 按请求身份定位 → 比较成功与失败 → 查对应版本代码 → 缩小候选原因 → 修复后用同条件复查。API 的字段与查询格式沿[官方查询文档](https://developers.cloudflare.com/analytics/sql-api/query-api/)取得，不猜字段名。[S102]
 
 官方 Observability MCP 可以把有权限的遥测交给 agent；Workers 的 SQL binding 可省一套外部 API client。调查工具的读取资格与改生产配置的权限是两件事，接入前限定账号、时间窗和所需字段。[S98]
+
+## 导出前转换，要检查失败时送出了什么
+
+10 月 12 日的官方机制说明进一步解释了 Logpush Transformers：SQL 在导出前过滤记录、调整字段，交付转换后的 NDJSON。转换失败时不发送原始 batch，也不推进 delivery offset；系统重试并报告错误，长期失败的 job 可能被自动禁用。因此接收端没出现新日志时，也应检查转换健康状态。这是对先前已发布能力的机制补充，不记作 10 月 12 日首次开放。[S141]
 
 ## Issues 与 Alerts 接住下一次故障
 
@@ -61,3 +74,5 @@ Workers Issues 将错误与部署版本、源码上下文连起来。Alerts 用�
 [S99]: https://blog.cloudflare.com/cloudflare-tracing/ "Cloudflare Traces 发布"
 
 [S111]: https://developers.cloudflare.com/workers/platform/pricing/ "当前 Workers Logs 计费"
+[S140]: https://developers.cloudflare.com/changelog/post/2026-10-09-http3-499-reporting-improvement/ "HTTP/3 客户端取消的 499 记录变化"
+[S141]: https://blog.cloudflare.com/transformers-on-logpush/ "Logpush Transformers 转换与失败恢复机制"

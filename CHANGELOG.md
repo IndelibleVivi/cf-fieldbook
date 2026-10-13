@@ -1,5 +1,14 @@
 # 变更记录
 
+## 2026-10-13 · 来源更新实跑与当前边界修订
+
+- 更新 Clef-flash 输入价与托管窗口，新增 Clef-omni；目录、当前表格、正文建议和离线文本请求保持对应，旧报告与固定出版物保留。
+- 补充 Workers 排空、Agents SDK search／fetch、Markdown 流式响应契约、experimental OpenCodeHarness、Queues／D1 地点约束、Artifacts 容量与临近计费、499 调查及 SDK／MCP 入口；新增独立的 10 月 13 日观察。
+- 修复 `impact-source` 漏读 JSON `source` 单值的缺陷，保留 `sources` 数组与历史传播终点；统一 REST 的决策例子补正式来源引用。维护方法明确同 URL 来源、复核日与生效事件、事实块与表外解释的边界；局部复核保留未复核内容的原期限。
+- 补充 Artifacts 何时收费、Markdown 响应头缺失的自然问法，让搜索抵达已有说明，并保留附加查询条件。
+- 新增 S123–S142，仅对指定来源与段落记定向核查。Artifacts 10-14／15 冲突继续保留，没有账户操作、云端／模型实测或新 PDF Release。
+- 对齐当前手册、专题及更新页的资料截止日和出版身份，重建两册分享卡；Observability 费用表通过独立固定日期保留 10 月 3 日口径。
+
 ## 2026-10-08 · API 维护与项目判断
 
 - 新增 API／SDK 维护指南，区分 CLI、REST、SDK 与 binding 的职责；固定 Go `v7.12.0` 的默认值与迁移证据，不泛化到其他语言。

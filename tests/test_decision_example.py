@@ -21,16 +21,30 @@ class DecisionPreparationTests(unittest.TestCase):
         self.assertNotIn("model", body["input"])
 
     def test_clef_selectors_are_consistent(self):
-        for route, inner in [("cf-clef", "clef"), ("cf-clef-flash", "clef-flash")]:
-            body = mod.prepare_cf(route, "synthetic", self.questions)
-            self.assertEqual(body["input"]["model"], inner)
-            self.assertEqual(body["model"], "@cf/cloudflare/" + inner)
+        for route, inner in [("cf-clef", "clef"), ("cf-clef-flash", "clef-flash"), ("cf-clef-omni", "clef-omni")]:
+            with self.subTest(route=route):
+                body = mod.prepare_cf(route, "synthetic", self.questions)
+                self.assertEqual(body["input"], {"state": "synthetic", "questions": self.questions, "model": inner})
+                self.assertEqual(body["model"], "@cf/cloudflare/" + inner)
+
+    def test_all_cf_catalog_routes_have_matching_request_selectors(self):
+        rows = json.loads((ROOT / "catalog/decision-routes.json").read_text())["routes"]
+        catalog_selectors = {row["id"]: row["selector"] for row in rows if row["id"].startswith("cf-")}
+        self.assertEqual(set(mod.CF_MODELS), set(catalog_selectors))
+        for route, selector in catalog_selectors.items():
+            with self.subTest(route=route):
+                self.assertEqual(mod.prepare_cf(route, "synthetic", self.questions)["model"], selector)
 
     def test_input_does_not_mutate(self):
-        original = deepcopy(self.questions)
-        body = mod.prepare_cf("cf-clef", {"text": "synthetic"}, self.questions)
-        body["input"]["questions"]["need_source"]["instructions"] = "changed"
-        self.assertEqual(self.questions, original)
+        for route in mod.CF_MODELS:
+            with self.subTest(route=route):
+                original = deepcopy(self.questions)
+                state = {"records": ["synthetic"]}
+                body = mod.prepare_cf(route, state, self.questions)
+                body["input"]["questions"]["need_source"]["instructions"] = "changed"
+                body["input"]["state"]["records"].append("changed")
+                self.assertEqual(self.questions, original)
+                self.assertEqual(state, {"records": ["synthetic"]})
 
     def test_unknown_route_rejected(self):
         with self.assertRaises(ValueError):
@@ -44,12 +58,34 @@ class DecisionPreparationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             mod.prepare_cf("cf-jev", "x" * 17000, self.questions)
 
-    def test_known_costs(self):
-        expected = {"cf-jev": Decimal("2.10"), "cf-clef-flash": Decimal("4.50"), "cf-clef": Decimal("12.00")}
+    def test_cost_arithmetic_with_fixed_inputs(self):
+        # Fixed mathematical fixtures, independent of a provider's current price.
+        for tokens, unit_price, expected in [
+            (0, "0.09", "0"),
+            (50_000_000, "0.09", "4.50"),
+            (1_234_567, "0.038", "0.046913546"),
+            (1, "0.150", "0.00000015"),
+        ]:
+            with self.subTest(tokens=tokens, unit_price=unit_price):
+                self.assertEqual(mod.input_cost(tokens, unit_price), Decimal(expected))
+
+    def test_current_cf_catalog_costs(self):
+        # Current source-backed values: all CF routes must be covered, including
+        # a newly catalogued model that could otherwise be silently skipped.
+        expected = {
+            "cf-jev": ("0.042", "2.10"),
+            "cf-clef-flash": ("0.038", "1.90"),
+            "cf-clef-omni": ("0.150", "7.50"),
+            "cf-clef": ("0.24", "12.00"),
+        }
         rows = json.loads((ROOT / "catalog/decision-routes.json").read_text())["routes"]
-        for row in rows:
-            if row["id"] in expected:
-                self.assertEqual(mod.input_cost(50_000_000, row["input_usd_per_million"]), expected[row["id"]])
+        cf_rows = {row["id"]: row for row in rows if row["id"].startswith("cf-")}
+        self.assertEqual(set(cf_rows), set(expected))
+        for route, (unit_price, charge) in expected.items():
+            with self.subTest(route=route):
+                catalog_price = cf_rows[route]["input_usd_per_million"]
+                self.assertEqual(Decimal(catalog_price), Decimal(unit_price))
+                self.assertEqual(mod.input_cost(50_000_000, catalog_price), Decimal(charge))
 
     def test_invalid_cost_inputs(self):
         for tokens, price in [(-1, "0.1"), (True, "0.1"), (1, "NaN"), (1, "-1")]:

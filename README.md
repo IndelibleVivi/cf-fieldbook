@@ -19,7 +19,7 @@
 | 理解任务为什么登记了却没完成 | [任务中断与恢复](use-cases/recoverable-jobs.md) | 看见租约恢复、迟到拒绝与未知结果，知道哪些动作不能盲目重试 |
 | 让模型建议下一步，而由程序控制执行 | [有限决策与下一步动作](use-cases/bounded-decision.md) | 区分模型建议、允许的动作与需要检验的误判 |
 | 比较 Clef、Jev 与接入路线 | [服务页](services/decision-models.md) · [Clef / Jev 专题](comparisons/clef-vs-jev.md) | 在同一任务下比较模型与供应路径，不把价格当作正确率 |
-| 判断本期产品变化是否影响自己 | [2026.10 首发选编](reports/2026-10-first-release.md) | 从执行环境、文件历史与图片检索，读到观测、agent、费用与开放状态 |
+| 判断近期产品变化是否影响自己 | [10 月 13 日观察](reports/2026-10-13.md) · [2026.10 首发选编](reports/2026-10-first-release.md) | 先检查模型输入预算、恢复和读页契约，再回看完整产品地图 |
 | 用程序盘点或维护 CF 资源 | [API 与 SDK 维护](reference/api-maintenance.md) · [可靠操作例子](examples/api-operations/README.md) | 选择调用入口，识别完整分页、总期限、部分失败与未知写结果 |
 | 找回项目为什么这样选，判断变化是否相关 | [把变化接到当前项目](use-cases/project-context.md) · [项目判断任务单](templates/project-context-task.md) | 由 agent 读取已有理由与具体用法，区分命中、已查范围未发现和未知 |
 | 先做完一个可读的小项目 | [三份文档的小资料架](examples/reading-shelf/README.md) | 直接阅读、下载合成文档，沿同一份材料继续理解权限、更新、任务与检索 |
@@ -75,11 +75,13 @@ node --test examples/health-worker/worker.test.mjs
 
 Node.js 20+ 用于 Worker 测试；Mermaid 只在修改图示时需要安装。[贡献与维护](CONTRIBUTING.md)给出依赖、修改位置与验证方法；[出版流程](docs/publication.md)说明共源数据和冻结版次的构建。
 
-`impact-source` 从登记条目的正文引用与 JSON `sources` 字段定位，复用依赖查询生成复查候选。它不判定项目受影响、不读取外部 repo 或刷新核验日期。项目自身的目标、运行位置或功能改变时，也可用项目判断任务单取回相应机制；当前配置和采用理由仍由各项目自己的已有文档持有，私人证据留在仓库外。
+`impact-source` 从登记条目的正文引用与 JSON `source` 单值／`sources` 数组定位，复用依赖查询生成复查候选。它不判定项目受影响、不读取外部 repo 或刷新核验日期。项目自身的目标、运行位置或功能改变时，也可用项目判断任务单取回相应机制；当前配置和采用理由仍由各项目自己的已有文档持有，私人证据留在仓库外。
+
+10 月 13 日更新实际走过这条路径：Clef 价格与上下文进入目录，再同步当前表格、审阅表外建议并检查离线请求；同时补齐单值来源漏检。`due` 只查登记的复核日，事实块检查也不证明整页说法正确；操作顺序与边界见[贡献与维护](CONTRIBUTING.md#完成一次来源更新)。
 
 ## 状态与边界
 
-这是持续编辑的 source-available 参考仓库；具体实现、验证和未启用能力见[当前状态](docs/current-state.md)。[2026.10 首发选编](reports/2026-10-first-release.md)按主题整合 10 月 2 日完整报告与 10 月 3 日四组更新，两篇历史观察仍可独立阅读。手册与报告按各自来源范围阅读；10 月 5 日的认证、API 与 SDK 定向核查不表示全书重新核验。[实践记录](practice/README.md)匿名重构作者维护过的系统，保留历史观察日期，并链接相关官方机制文档。旧三册 Markdown / HTML / PDF 固定保留在 `dist/`，用于历史阅读；新构建进入 `.build/`，不覆盖旧版。新版 PDF 为本地首发候选，尚未发布为 Release。
+这是持续编辑的 source-available 参考仓库；具体实现、验证和未启用能力见[当前状态](docs/current-state.md)。[10 月 13 日观察](reports/2026-10-13.md)记录本轮定向更新；[2026.10 首发选编](reports/2026-10-first-release.md)继续保留 10 月 2 日主体和 10 月 3 日四组更新的时间位置。手册与报告按各自来源范围阅读，局部核查不表示全书重新核验。[实践记录](practice/README.md)匿名重构作者维护过的系统，保留历史观察日期，并链接相关官方机制文档。旧三册 Markdown / HTML / PDF 固定保留在 `dist/`，用于历史阅读；新构建进入 `.build/`，不覆盖旧版。新版 PDF 为本地首发候选，尚未发布为 Release。
 
 公共例子使用合成输入，没有账号凭据或真实运行数据。阅读站由 GitHub Pages 托管，主分支通过检查后自动更新。搜索在浏览器内完成，不向搜索服务发送查询；站点不嵌入统计脚本或远程字体。云端实验、定期上游监控和新版出版物 Release 独立于网站部署。
 

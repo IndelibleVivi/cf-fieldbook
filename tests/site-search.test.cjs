@@ -37,6 +37,35 @@ test('project questions reach reasons, applicability and task scenarios', () => 
   assert.match(first('以前为什么不用').section, /采用理由/);
   assert.equal(search(index, '这次更新影响我吗 完全不存在的词').length, 0);
 });
+test('Artifacts billing questions find the actual start-date explanation and keep extra constraints', () => {
+  for (const query of ['Artifacts 什么时候收费', 'Artifacts什么时候收费']) {
+    const item = first(query);
+    assert.ok(item.url.startsWith('guides/handbook.html#'), item.url);
+    assert.match(item.text, /Artifacts.*\d+ 月 \d+ 日.*起算/s);
+    for (const result of search(index, query)) {
+      assert.ok(normalize([result.title, result.section, result.text].join(' ')).includes('artifacts'));
+    }
+    const constrained = search(index, query + ' 博客');
+    assert.ok(constrained.length);
+    for (const result of constrained) assert.ok(result.text.includes('博客'));
+    assert.deepEqual(search(index, query + ' 不存在这个词987'), []);
+  }
+});
+test('missing Markdown headers lead to the documented removal and keep extra constraints', () => {
+  for (const query of ['Markdown 响应头不见了', 'Markdown响应头不见了']) {
+    const item = first(query);
+    assert.ok(item.url.startsWith('services/search.html#'), item.url);
+    assert.match(item.text, /不再生成.*x-markdown-tokens/s);
+    assert.match(item.text, /移除.*Content-Length/s);
+    for (const result of search(index, query)) {
+      assert.ok(normalize([result.title, result.section, result.text].join(' ')).includes('markdown'));
+    }
+    const constrained = search(index, query + ' 中断');
+    assert.ok(constrained.length);
+    for (const result of constrained) assert.ok(result.text.includes('中断'));
+    assert.deepEqual(search(index, query + ' 不存在这个词987'), []);
+  }
+});
 test('real index contains h2 and h3 records with stable section links', () => {
   assert.ok(index.some(item => item.url.startsWith('guides/handbook.html#') && item.section.startsWith('06 /')));
   assert.ok(index.some(item => item.section.startsWith('绑定：') && item.url.includes('#')));

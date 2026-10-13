@@ -116,6 +116,18 @@ class PublicationTests(unittest.TestCase):
 
     # --- build identity, report adaptivity, tamper -------------------------
 
+    def test_updated_books_freeze_and_render_the_current_cutoff(self):
+        for family in ('comparison', 'handbook'):
+            with self.subTest(family=family):
+                target = editions.freeze(self.root, 'current-' + family, family)
+                self.assertEqual(json.loads((target / 'edition.json').read_text())['as_of'], '2026-10-13')
+                output = editions.build(self.root, 'current-' + family, ['md', 'html'])
+                soup = BeautifulSoup(next(output.glob('*.html')).read_text(), 'html.parser')
+                self.assertIn('资料截至 2026-10-13', soup.select_one('.cover-bottom').get_text(' ', strip=True))
+                self.assertIn('Clef-omni', next(output.glob('*.md')).read_text())
+                if family == 'handbook':
+                    self.assertIn('固定资料日期：**2026-10-03**', next(output.glob('*.md')).read_text())
+
     def test_report_stem_and_date_come_from_identity_not_renderer(self):
         editions.freeze(self.root, 'report-a', 'launches')
         output = editions.build(self.root, 'report-a', ['md'])
