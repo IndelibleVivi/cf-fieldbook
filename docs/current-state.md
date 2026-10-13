@@ -2,7 +2,7 @@
 
 2026-10-13 · [公共源码](https://github.com/IndelibleVivi/cf-fieldbook)，默认分支 `main`。
 
-- 本轮更新目前在 [Draft PR #1](https://github.com/IndelibleVivi/cf-fieldbook/pull/1)，尚未合入或更新正式站点。当前手册、专题及本轮更新页的资料截止日已对齐 10 月 13 日；固定费用表仍为 10 月 3 日，逐来源核验范围保留。网页与新冻结候选共用正文截止日，手册／专题分享卡随之重建；没有新增 PDF Release。
+- 本轮更新见 [PR #1](https://github.com/IndelibleVivi/cf-fieldbook/pull/1)。当前手册、专题及本轮更新页的资料截止日已对齐 10 月 13 日；固定费用表仍为 10 月 3 日，逐来源核验范围保留。网页与新冻结候选共用正文截止日，手册／专题分享卡随之重建；站点由主分支既有流程发布，部署结果以 [Actions](https://github.com/IndelibleVivi/cf-fieldbook/actions) 为准，没有新增 PDF Release。
 
 - 本轮[10 月 13 日观察](../reports/2026-10-13.md)与当前页一并收录：Clef-flash 降价／缩窗及 Omni、Workers 排空、SDK 搜索／读页与 OpenCodeHarness、Markdown 响应头、Queues／D1 地点约束、Artifacts 条款、499 调查口径与 SDK／MCP 入口。来源 S123–S142 定向查阅；既有事实未因编辑日期整体刷新。
 - 更新接口实际处理了来源→数据→正文→例子传播；修复 JSON `source` 单值漏检，仍支持 `sources` 数组。决策例子补齐 S79 的正文引用，并覆盖四款模型的文本／JSON 外壳。`sync/check` 只同步登记事实块；表外建议另做编辑审阅，`due` 仍只检查登记复核日。
