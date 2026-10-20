@@ -24,7 +24,7 @@
   "input_kind": "synthetic",
   "observation_scope": [
     "offline reading",
-    "download without a server",
+    "original Markdown links; download over local HTTP",
     "portable relative links"
   ],
   "cloud_resources_created": [],

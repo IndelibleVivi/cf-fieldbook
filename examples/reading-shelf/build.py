@@ -14,7 +14,7 @@ def build() -> Path:
         title, _, body = path.read_text(encoding='utf-8').partition('\n')
         paragraphs = ''.join(f'<p>{escape(block)}</p>' for block in body.strip().split('\n\n'))
         cards.append(f'<article id="{name}"><h2>{escape(title.removeprefix("# "))}</h2>'
-                     f'{paragraphs}<a href="materials/{name}.md" download>下载原文 Markdown ↗</a></article>')
+                     f'{paragraphs}<a href="materials/{name}.md" download>下载／打开原文 Markdown ↗</a></article>')
     page = '''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>三份文档的小资料架 · CF Fieldbook 离线例子</title>

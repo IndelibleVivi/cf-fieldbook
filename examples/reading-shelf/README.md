@@ -18,13 +18,15 @@ credits: made by Faye & Cove
 
 ## 本地查看
 
-直接打开 `index.html`，或用任意静态服务器托管这个目录：
+直接打开 `index.html` 可以阅读与跳转到三份原件；在 `file://` 下，浏览器可能忽略链接的 `download` 属性而打开 Markdown 文本。需要触发文件下载时，用本地静态服务器托管这个目录：
 
 ```sh
 python3 -m http.server 8768 --bind 127.0.0.1 --directory examples/reading-shelf
 ```
 
-打开 `http://127.0.0.1:8768/`。三份文档都在页面内，下载链接指向对应 Markdown 原件；关闭 JavaScript 后仍可阅读和下载。结束查看时用 Ctrl+C 停止本地服务器，不产生云端资源。
+打开 `http://127.0.0.1:8768/`。三份文档都在页面内，“下载／打开原文”链接指向对应 Markdown 原件；经本地 HTTP 提供时可下载，关闭 JavaScript 后仍可阅读和下载。结束查看时用 Ctrl+C 停止本地服务器，不产生云端资源。
+
+`example.meta.json` 的 `check_command` 只确认页面与三份原件存在，不证明渲染、导航或下载成功。实际核对时，分别打开页面内的三份文档、点击目录，并把下载内容与 `materials/` 的原件比较；直接打开文件与本地 HTTP 的链接行为应分开观察。
 
 ## 修改并重建
 

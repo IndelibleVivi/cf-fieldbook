@@ -24,7 +24,7 @@
 | 控制程序发出的云 API 或 HTTP 请求 | [云 API 与 HTTP 出站控制](services/egress-controls.md) | 确认代理、Gateway 与 Worker 实际检查的流量和条件 |
 | 用程序盘点或维护 CF 资源 | [API 与 SDK 维护](reference/api-maintenance.md) · [可靠操作例子](examples/api-operations/README.md) | 选择调用入口，识别完整分页、总期限、部分失败与未知写结果 |
 | 找回项目为什么这样选，判断变化是否相关 | [把变化接到当前项目](use-cases/project-context.md) · [项目判断任务单](templates/project-context-task.md) | 由 agent 读取已有理由与具体用法，区分命中、已查范围未发现和未知 |
-| 先做完一个可读的小项目 | [三份文档的小资料架](examples/reading-shelf/README.md) | 直接阅读、下载合成文档，沿同一份材料继续理解权限、更新、任务与检索 |
+| 先做完一个可读的小项目 | [三份文档的小资料架](examples/reading-shelf/README.md) | 本地阅读合成文档，经本地 HTTP 下载，沿同一份材料继续理解权限、更新、任务与检索 |
 | 运行例子，或把检查交给 agent | [五个离线例子](examples/README.md) · [恢复任务单](templates/job-recovery-task.md) | 用合成输入取得实际输出、失败证据与清理结果 |
 
 不熟悉的词可以先查[术语小词表](docs/glossary.md)。需要精确配置、命令或完整状态约束时，从对应例子进入[实施参考](reference/implementation.md)。

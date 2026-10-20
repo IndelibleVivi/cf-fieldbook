@@ -4,7 +4,7 @@
 
 ```bash
 python3 examples/decision-routing/payloads.py
-python3 -m unittest discover -s tests -v
+python3 -m unittest discover -s tests -p 'test_decision_example.py' -v
 ```
 
 输出四份 CF 统一 `/ai/run` 请求体：`typesafe/jev`、`@cf/cloudflare/clef-flash`、`@cf/cloudflare/clef-omni`、`@cf/cloudflare/clef`。统一 REST 使用外层 `{ model, input }`。[S79] 三款 Clef 在 input 内保留对应的 `model` 字段；Jev 无此内层字段。[S17] [S18] [S73] [S124]

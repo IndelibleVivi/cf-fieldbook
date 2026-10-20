@@ -2,6 +2,7 @@
 
 ## 2026-10-20 · 检索、字段抽取与出站控制
 
+- 收齐离线例子的入口说明：资料架区分直接打开原件与经本地 HTTP 下载，生成页与 README／手册同步；决策例子明确运行命令和自身的检查入口。原材料、云端执行边界与事实核验日期不变。
 - 将 Observability 12 月公布包含量修正为 10 GB-month，费用登记、当前表格和表外说明同步；保留官方算例的算术差异。Artifacts 改为公开计费期已到，10-14／15 来源冲突继续登记；AI Search 11-01 生效条件复核。
 - 补充 CJK trigram、两字短词、and／or、全量重建与同组查询样本；模型页新增 Clairic preview、输出空间、短材料验证与 65,536／8,192 文档疑点，另记 DeepSeek V4.1 Flash 1017 路线。
 - 更新 Browser 跨轮存活与取消边界、Issues MCP Events、按需增权和 cf docs search；新增 CWS／Gateway Forward 出站主题页及第七张机制图。补齐 Cron、SSH、Tunnel 额度和 Builds 工具链条件。

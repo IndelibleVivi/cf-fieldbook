@@ -6,6 +6,10 @@
   "credentials_required": false,
   "live_supported": false,
   "run_from": "repository-root",
+  "run_command": [
+    "python3",
+    "examples/decision-routing/payloads.py"
+  ],
   "check_command": [
     "python3",
     "-m",
