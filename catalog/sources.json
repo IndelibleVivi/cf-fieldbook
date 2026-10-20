@@ -51,17 +51,17 @@
     "id": "S07",
     "title": "Artifacts 公开测试发布",
     "url": "https://blog.cloudflare.com/next-git-platform-on-cloudflare/",
-    "accessed": "2026-10-13",
+    "accessed": "2026-10-20",
     "kind": "official_primary",
-    "verification_scope": "targeted_artifacts_billing_date_recheck; pricing_and_changelog_say_10_14_blog_still_10_15; no_account_or_billing_execution"
+    "verification_scope": "targeted_public_pricing_terms_consulted; no_account_or_live_cloud_or_bill_verification"
   },
   {
     "id": "S08",
     "title": "Artifacts 价格",
     "url": "https://developers.cloudflare.com/artifacts/platform/pricing/",
-    "accessed": "2026-10-13",
+    "accessed": "2026-10-20",
     "kind": "official_primary",
-    "verification_scope": "targeted_artifacts_billing_date_recheck; pricing_and_changelog_say_10_14_blog_still_10_15; no_account_or_billing_execution"
+    "verification_scope": "targeted_public_pricing_terms_consulted; no_account_or_live_cloud_or_bill_verification"
   },
   {
     "id": "S09",
@@ -75,9 +75,9 @@
     "id": "S10",
     "title": "AI Search 限制与价格",
     "url": "https://developers.cloudflare.com/ai-search/platform/limits-pricing/",
-    "accessed": "2026-10-02",
+    "accessed": "2026-10-20",
     "kind": "official_primary",
-    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+    "verification_scope": "targeted_public_pricing_terms_consulted; no_account_or_live_cloud_or_bill_verification"
   },
   {
     "id": "S11",
@@ -779,9 +779,9 @@
     "id": "S100",
     "title": "Cloudflare Observability 价格",
     "url": "https://developers.cloudflare.com/observability/pricing/",
-    "accessed": "2026-10-03",
+    "accessed": "2026-10-20",
     "kind": "official_primary",
-    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+    "verification_scope": "targeted_public_pricing_terms_consulted; no_account_or_live_cloud_or_bill_verification"
   },
   {
     "id": "S101",
@@ -867,9 +867,9 @@
     "id": "S111",
     "title": "Workers Logs 迁移前计费",
     "url": "https://developers.cloudflare.com/workers/platform/pricing/",
-    "accessed": "2026-10-03",
+    "accessed": "2026-10-20",
     "kind": "official_primary",
-    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+    "verification_scope": "targeted_public_pricing_terms_consulted; no_account_or_live_cloud_or_bill_verification"
   },
   {
     "id": "S112",
@@ -1134,5 +1134,229 @@
     "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
     "published_on": "2026-10-12",
     "date_note": "GitHub 发布时间为 10-12；release notes 标注 10-09；未运行此版本 SDK"
+  },
+  {
+    "id": "S143",
+    "title": "Agents SDK 跨 turn 的 Browser/browserTool",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-13-persistent-browser/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_official_document_text_or_excerpt_consulted; no_account_or_live_cloud_execution",
+    "published_on": "2026-10-13"
+  },
+  {
+    "id": "S144",
+    "title": "Browser 会话、tab、中断与 Live View",
+    "url": "https://developers.cloudflare.com/agents/tools/browser/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_official_document_text_or_excerpt_consulted; no_account_or_live_cloud_execution"
+  },
+  {
+    "id": "S145",
+    "title": "Cloudflare API MCP 作为 MCP Events 发送 Workers Issues",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-13-cloudflare-mcp-events/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_official_document_text_or_excerpt_consulted; no_account_or_live_cloud_execution",
+    "published_on": "2026-10-13"
+  },
+  {
+    "id": "S146",
+    "title": "Cloudflare API MCP 的 step-up authorization",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-19-cloudflare-mcp-step-up/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_official_document_text_or_excerpt_consulted; no_account_or_live_cloud_execution",
+    "published_on": "2026-10-19"
+  },
+  {
+    "id": "S149",
+    "title": "cf CLI changelog：文档搜索与 kebab-case 命令",
+    "url": "https://github.com/cloudflare/cf/blob/main/packages/cli/CHANGELOG.md",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_official_document_text_or_excerpt_consulted; no_account_or_live_cloud_execution"
+  },
+  {
+    "id": "S150",
+    "title": "cf 1.0.0-beta.15 release：docs search",
+    "url": "https://github.com/cloudflare/cf/releases/tag/cf%401.0.0-beta.15",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_official_document_text_or_excerpt_consulted; no_account_or_live_cloud_execution",
+    "published_on": "2026-10-13"
+  },
+  {
+    "id": "S151",
+    "title": "Cloud Workload Security Beta 发布",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-19-cloud-workload-security-beta/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_official_document_text_or_excerpt_consulted; no_account_or_live_cloud_execution",
+    "published_on": "2026-10-19"
+  },
+  {
+    "id": "S152",
+    "title": "Cloud Workload Security：workloads、policies 与 Rego",
+    "url": "https://developers.cloudflare.com/cloudflare-one/cloud-workload-security/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_official_document_text_or_excerpt_consulted; no_account_or_live_cloud_execution"
+  },
+  {
+    "id": "S153",
+    "title": "Cloud Workload Security proxy 部署与平台条件",
+    "url": "https://developers.cloudflare.com/cloudflare-one/cloud-workload-security/platform/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_official_document_text_or_excerpt_consulted; no_account_or_live_cloud_execution"
+  },
+  {
+    "id": "S154",
+    "title": "Cloud Workload Security 本地 proxy 入门",
+    "url": "https://developers.cloudflare.com/cloudflare-one/cloud-workload-security/get-started/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_official_document_text_or_excerpt_consulted; no_account_or_live_cloud_execution"
+  },
+  {
+    "id": "S155",
+    "title": "Cloud Workload Security proxy、CA 与未分类隧道排错",
+    "url": "https://developers.cloudflare.com/cloudflare-one/cloud-workload-security/troubleshooting/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_official_document_text_or_excerpt_consulted; no_account_or_live_cloud_execution"
+  },
+  {
+    "id": "S156",
+    "title": "Gateway Forward traffic：执行顺序、限制与故障",
+    "url": "https://developers.cloudflare.com/cloudflare-one/traffic-controls/integrate-workers/forward-traffic/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_official_document_text_or_excerpt_consulted; no_account_or_live_cloud_execution"
+  },
+  {
+    "id": "S157",
+    "title": "Gateway 与 Workers 集成进入 public beta",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-15-gateway-workers-public-beta/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_official_document_text_or_excerpt_consulted; no_account_or_live_cloud_execution",
+    "published_on": "2026-10-15"
+  },
+  {
+    "id": "S158",
+    "title": "可编程 Gateway 与 DLP 示例",
+    "url": "https://blog.cloudflare.com/programmable-gateway-dlp/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_official_document_text_or_excerpt_consulted; no_account_or_live_cloud_execution",
+    "published_on": "2026-10-15"
+  },
+  {
+    "id": "S160",
+    "title": "使用 Cloudflare CLI 搜索文档",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-16-docs-search/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_official_document_text_or_excerpt_consulted; no_account_or_live_cloud_execution",
+    "published_on": "2026-10-16"
+  },
+  {
+    "id": "S161",
+    "title": "AI Search 中日韩关键词查询修复",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-16-cjk-keyword-search/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-16"
+  },
+  {
+    "id": "S162",
+    "title": "AI Search keyword tokenizer、匹配模式与索引限制",
+    "url": "https://developers.cloudflare.com/ai-search/configuration/indexing/keyword-search/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution"
+  },
+  {
+    "id": "S163",
+    "title": "Clairic preview：有类型的字段抽取",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-19-clairic-workers-ai/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-19"
+  },
+  {
+    "id": "S164",
+    "title": "Clairic 模型卡、输入字段与上下文说明",
+    "url": "https://developers.cloudflare.com/workers-ai/models/clairic/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution"
+  },
+  {
+    "id": "S165",
+    "title": "Clairic 抽取、决策与生成的输出空间",
+    "url": "https://blog.cloudflare.com/clairic-extraction-model/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-19"
+  },
+  {
+    "id": "S166",
+    "title": "Local Explorer 单次调用 Cron Triggers",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-17-local-explorer-cron-triggers/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-17"
+  },
+  {
+    "id": "S167",
+    "title": "Access infrastructure application 会话时长",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-14-infrastructure-ssh-session-duration/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-14"
+  },
+  {
+    "id": "S168",
+    "title": "Tunnel 与 Mesh 的五万 routes 和 Tunnels for Platforms",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-16-tunnels-for-platforms-and-50k-routes/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-16"
+  },
+  {
+    "id": "S169",
+    "title": "Workers Builds 默认工具链升级",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-14-workers-builds-default-tooling/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-14"
+  },
+  {
+    "id": "S170",
+    "title": "DeepSeek V4.1 Flash 1017 模型卡",
+    "url": "https://developers.cloudflare.com/workers-ai/models/deepseek-v4.1-flash-1017/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution"
+  },
+  {
+    "id": "S171",
+    "title": "DeepSeek V4.1 Flash 1017 Workers AI 发布",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-19-deepseek-v4.1-flash-workers-ai/",
+    "accessed": "2026-10-20",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-19"
   }
 ]

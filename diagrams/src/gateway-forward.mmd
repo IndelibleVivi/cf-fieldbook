@@ -1,0 +1,19 @@
+flowchart TB
+  accTitle: Gateway Forward 检查顺序与继续请求
+  accDescr: HTTP request policy 允许且 Forward 首条匹配后，Gateway 可开始调用 Worker；原始 body 另经检查后交给 Worker，body 拒绝可中断已运行 Worker。Worker 调 next 零或一次到原目标，最终响应仍经检查。图不表示真实账户已经部署。
+  A[进入 Gateway 的 HTTP 请求]:::content --> B{HTTP request policy<br/>允许？}:::gate
+  B -->|拒绝| X[拒绝请求]:::gate
+  B -->|允许| C{首条 Forward policy<br/>匹配？}:::gate
+  C -->|不匹配| N[沿普通 Gateway 路径<br/>不调用此 Worker]:::content
+  C -->|匹配：可开始调用| W[选中的 Worker<br/>调用成功不证明 body 通过]:::content
+  C -->|原始 body| I{Body policies<br/>与 inspection}:::gate
+  I -->|检查后的流| W
+  I -->|拒绝| X
+  I -. 拒绝可中断 .-> W
+  W -->|next：零或一次| O[原始目标<br/>URL 与 host 不可改变]:::content
+  O -->|上游响应| R[Worker 返回最终响应<br/>或不调用 next 生成响应]:::content
+  W -->|合成响应| R
+  R --> F[Gateway 最终响应检查]:::gate
+  F --> U[返回给用户]:::content
+  classDef content fill:#EFF9FB,stroke:#007F93,color:#183544,stroke-width:1.3px
+  classDef gate fill:#FFF4EC,stroke:#BE4B13,color:#183544,stroke-width:1.3px

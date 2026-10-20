@@ -234,3 +234,8 @@ table.keep-table {break-inside:avoid;}
 
 .document-edition{string-set:editionName content();position:absolute;width:0;height:0;overflow:hidden}
 .edition-footer{border-top:1px solid var(--rule);margin-top:8mm;padding-top:4mm;font-size:8pt;color:var(--muted);display:flex;justify-content:space-between;gap:5mm}
+
+/* Keep the final navigation line with the compact publication end matter. */
+@media print {
+ .edition-footer {margin-top:3mm;padding-top:2mm;line-height:1.4;}
+}

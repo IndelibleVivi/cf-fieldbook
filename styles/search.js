@@ -21,6 +21,12 @@
       words: ['起算', '开始计费'], required: ['artifacts'], intent: 'artifacts-billing' },
     { phrases: ['markdown 响应头不见了', 'markdown响应头不见了'],
       words: ['x-markdown-tokens', 'x-original-tokens', 'content-length'], required: ['markdown'], intent: 'markdown-headers' },
+    { phrases: ['中文搜不到', '中文明明在原文里为什么搜不到', '中文明明在原文里，为什么搜不到'],
+      words: ['tokenizer', 'trigram'], intent: 'cjk-keyword' },
+    { phrases: ['clairic怎么用', 'clairic 怎么用', '从通知里抽字段'],
+      words: ['字段', 'fields', 'typed'], required: ['clairic'], intent: 'extraction' },
+    { phrases: ['停止对话会取消浏览器吗', '停止对话浏览器还在运行'],
+      words: ['停止', 'conversation'], required: ['browser'], intent: 'browser-cancel' },
     { phrases: ['网页搜索', '搜索网页', '联网搜索'], words: ['web search', '搜索'], intent: 'websearch' },
     { phrases: ['临时执行环境', '跑 linux', '系统包'], words: ['containers', 'sandbox', '容器'], intent: 'workspace' },
     { phrases: ['sdk 分页', '盘点不完整'], words: ['分页', '迭代', '后页'], intent: 'api' },
@@ -34,7 +40,7 @@
   // Product/Works queries: prefer the whole-work or whole-section entry.
   const products = ['clef', 'jev', 'workers', 'worker', 'r2', 'd1', 'tunnel', 'access', 'queues',
     'workflows', 'durable objects', 'vectorize', 'ai gateway', 'workers ai', 'containers', 'sandbox',
-    'observability', 'mcp', 'ai search'];
+    'observability', 'mcp', 'ai search', 'clairic', 'cws'];
   // Stable chapter IDs (from `<!-- chapter: -->` markers) that answer an intent.
   const stable = {
     repeat: ['jobs'], recover: ['recovery'],
@@ -116,6 +122,9 @@
       if (parsed.intents.includes('lease') && mechanism && item.section && body.includes('租约')) score += 18;
       if (parsed.intents.includes('api') && url.startsWith('reference/api-maintenance.html#')) score += 90;
       if (parsed.intents.includes('project') && url.startsWith('use-cases/project-context.html#')) score += 90;
+      if (parsed.intents.includes('cjk-keyword') && url.startsWith('services/search.html#')) score += 90;
+      if (parsed.intents.includes('extraction') && url.startsWith('services/decision-models.html#')) score += 90;
+      if (parsed.intents.includes('browser-cancel') && url.startsWith('services/agent-runtime.html#')) score += 90;
       if (url.startsWith('use-cases/project-context.html#')) {
         if (parsed.intents.includes('migration') && heading.includes('vps')) score += 110;
         if (parsed.intents.includes('publishing') && heading.includes('发布')) score += 110;

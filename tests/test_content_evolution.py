@@ -36,7 +36,7 @@ class ContentEvolutionTests(unittest.TestCase):
                     self.assertNotIn('当前 Workers Logs', future)
                     target.write_text(re.sub(r'^observability_as_of: .*\n', '', updated, flags=re.M))
                     self.assertEqual(block(project_markdown(root, relative)), future)
-                    target.write_text(updated.replace('observability_as_of: 2026-10-03',
+                    target.write_text(updated.replace(re.search(r'^observability_as_of: .*$', original, re.M)[0],
                                                       'observability_as_of: 2026-13-99'))
                     with self.assertRaises(ValueError):
                         project_markdown(root, relative)
@@ -48,7 +48,8 @@ class ContentEvolutionTests(unittest.TestCase):
         self.assertIn('将在 2026-12-01 生效', before)
         self.assertNotIn('当前 Workers Logs', after)
         self.assertIn('未因此刷新核验', after)
-        self.assertIn('12 GB-month', after)
+        self.assertIn('10 GB-month', after)
+        self.assertNotIn('12 GB-month', after)
         self.assertEqual(before, observability_costs(ROOT, '2026-11-30'))
 
     def test_current_projection_and_historical_report_are_separate(self):

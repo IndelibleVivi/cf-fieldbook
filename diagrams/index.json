@@ -34,5 +34,11 @@
     "source": "diagrams/src/reading-shelf.mmd",
     "output": "assets/diagrams/reading-shelf.svg",
     "title": "资料架：更新与撤下怎样分工"
+  },
+  {
+    "id": "gateway-forward",
+    "title": "Gateway Forward：调用、检查与实际出站",
+    "source": "diagrams/src/gateway-forward.mmd",
+    "output": "assets/diagrams/gateway-forward.svg"
   }
 ]

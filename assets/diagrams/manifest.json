@@ -87,6 +87,14 @@
       "title": "资料架：更新与撤下怎样分工",
       "source_sha256": "77d1ba15cb40a623baf34181086ce9737887f99946bbe6d6fc0c1ea3dcbeaf3a",
       "svg_sha256": "2a15695d592f149955a0fa04b6e523ca86d1bada82a382840a71c50e533c4189"
+    },
+    {
+      "id": "gateway-forward",
+      "title": "Gateway Forward：调用、检查与实际出站",
+      "source": "diagrams/src/gateway-forward.mmd",
+      "output": "assets/diagrams/gateway-forward.svg",
+      "source_sha256": "3411f25b2f7ab2620ca9b4ea145f43473544accce13f7225d0cc91209686930a",
+      "svg_sha256": "a0ac0fe37db6afbc58e3435f94201f2f768c60c69c5c66d59a97e065481789ae"
     }
   ]
 }

@@ -71,7 +71,7 @@
     "status": "public_beta",
     "access": "Workers Paid",
     "announced_on": "2026-10-01",
-    "verified_on": "2026-10-13",
+    "verified_on": "2026-10-20",
     "sources": [
       "S07",
       "S08",
@@ -107,7 +107,8 @@
         ]
       }
     ],
-    "next_check": "价格页及 changelog 为 2026-10-14、博客仍为 10-15；预算按较早日期准备，实际起算仍待账户证据；repo 留存与容量单独核对"
+    "next_check": "10-14／15 均已过去，按公开计费期预算；保留来源日期冲突，未核对实际账单",
+    "verification_scope": "pricing and stated billing dates only; limits and account billing not reverified"
   },
   {
     "id": "ai-search",
@@ -115,10 +116,12 @@
     "status": "ga",
     "access": "账号额度与模型条件分别检查",
     "announced_on": "2026-10-01",
-    "verified_on": "2026-10-02",
+    "verified_on": "2026-10-20",
     "sources": [
       "S09",
-      "S10"
+      "S10",
+      "S161",
+      "S162"
     ],
     "effective_events": [
       {
@@ -127,7 +130,8 @@
       }
     ],
     "conflicts": [],
-    "next_check": "11 月新账单与内部/额外模型费用归属"
+    "next_check": "11-01 计费、tokenizer 重建与短词召回；真实用量和质量仍须另行验证",
+    "verification_scope": "S10 pricing/limits and S161/S162 CJK keyword retrieval only; no cloud benchmark"
   },
   {
     "id": "clef",
@@ -373,7 +377,7 @@
     "status": "public_beta",
     "access": "Cloudflare Traces 与 SQL API 为 beta；dataset 与账号条件分别核对",
     "announced_on": "2026-10-02",
-    "verified_on": "2026-10-03",
+    "verified_on": "2026-10-20",
     "sources": [
       "S98",
       "S99",
@@ -390,22 +394,14 @@
     ],
     "conflicts": [
       {
-        "topic": "included_storage",
+        "topic": "pricing_example_arithmetic",
         "claims": [
           {
-            "value": "12 GB-month",
+            "value": "20−10 GB-month at $0.10, but subtotal $0.80 and total $7.05",
             "source": "S100"
-          },
-          {
-            "value": "10 GB-month",
-            "source": "S98"
-          },
-          {
-            "value": "10 GB-month",
-            "source": "S99"
           }
         ],
-        "resolution": "采用当前 pricing docs S100；Enterprise 在续约时迁移"
+        "resolution": "按现行条款重算存储 $1.00、总额 $7.25；已解决原 12/10 包含量差异，不推断正式变更日"
       }
     ],
     "topics": [
@@ -417,7 +413,8 @@
       "guide.handbook",
       "report.2026-10-03"
     ],
-    "next_check": "开放条件、来源差异与生效条款；未进行云端调用"
+    "next_check": "12-01 新计费及官方算例修正；未核对实际账单",
+    "verification_scope": "S100 pricing terms only; tracing/SQL/access retain earlier scope"
   },
   {
     "id": "pi-harness",
@@ -703,5 +700,230 @@
     "effective_events": [],
     "conflicts": [],
     "next_check": "区分客户端取消、统计口径变化和服务端失败，不从 499 数量直接推断故障"
+  },
+  {
+    "id": "ai-search-cjk",
+    "name": "AI Search 中日韩关键词查询",
+    "status": "available",
+    "access": "trigram；更换 tokenizer 全量重建",
+    "announced_on": "2026-10-16",
+    "verified_on": "2026-10-20",
+    "sources": [
+      "S161",
+      "S162"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "两字短词、and/or、重建成本与 query 质量"
+  },
+  {
+    "id": "clairic",
+    "name": "Clairic 字段抽取",
+    "status": "preview",
+    "access": "Workers AI；字段值与有限决策分开",
+    "announced_on": "2026-10-19",
+    "verified_on": "2026-10-20",
+    "sources": [
+      "S163",
+      "S164",
+      "S165"
+    ],
+    "effective_events": [],
+    "conflicts": [
+      {
+        "topic": "context_vs_pass",
+        "claims": [
+          {
+            "value": "65,536-token context",
+            "source": "S164"
+          },
+          {
+            "value": "8,192-token pass beside state and fields",
+            "source": "S164"
+          }
+        ],
+        "resolution": "同页关系未解释；保留疑点，短材料先测 truncated、尾部证据和实际 usage"
+      }
+    ],
+    "next_check": "澄清 context/pass、usage计量与输入完整性；preview质量需另测"
+  },
+  {
+    "id": "local-explorer-cron",
+    "name": "Local Explorer 单次 Cron 调用",
+    "status": "available",
+    "access": "本地开发；不自动按 cron 表运行",
+    "announced_on": "2026-10-17",
+    "verified_on": "2026-10-20",
+    "sources": [
+      "S166"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "按真实使用版本和条件复查；没有账号或云端实测"
+  },
+  {
+    "id": "infrastructure-session-duration",
+    "name": "Access infrastructure application 会话时长",
+    "status": "available",
+    "access": "默认24小时；多应用取最短",
+    "announced_on": "2026-10-14",
+    "verified_on": "2026-10-20",
+    "sources": [
+      "S167"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "按真实使用版本和条件复查；没有账号或云端实测"
+  },
+  {
+    "id": "tunnel-route-capacity",
+    "name": "Tunnel/Mesh routes 与额外 tunnels",
+    "status": "available",
+    "access": "50,000 CIDR/hostname routes；public hostnames另计",
+    "announced_on": "2026-10-16",
+    "verified_on": "2026-10-20",
+    "sources": [
+      "S168"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "按真实使用版本和条件复查；没有账号或云端实测"
+  },
+  {
+    "id": "workers-builds-tooling",
+    "name": "Workers Builds 默认工具链",
+    "status": "available",
+    "access": "显式版本固定继续生效",
+    "announced_on": "2026-10-14",
+    "verified_on": "2026-10-20",
+    "sources": [
+      "S169"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "按真实使用版本和条件复查；没有账号或云端实测"
+  },
+  {
+    "id": "deepseek-v41-flash-1017",
+    "name": "DeepSeek V4.1 Flash 1017",
+    "status": "available",
+    "access": "Workers Paid 或 prepaid AI Gateway credits",
+    "announced_on": "2026-10-19",
+    "verified_on": "2026-10-20",
+    "sources": [
+      "S170",
+      "S171"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "按真实使用版本和条件复查；没有账号或云端实测"
+  },
+  {
+    "id": "persistent-browser",
+    "name": "Agents SDK 跨轮 Browser",
+    "status": "released_sdk",
+    "access": "SDK >=0.28；浏览器需保持存活",
+    "announced_on": "2026-10-13",
+    "verified_on": "2026-10-20",
+    "sources": [
+      "S143",
+      "S144"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "10分钟保活、cookie隔离、停止不取消和不可自动重放"
+  },
+  {
+    "id": "mcp-events",
+    "name": "Workers Issues MCP Events",
+    "status": "available",
+    "access": "Issues启用、Notifications Write/Workers Observability Write、兼容客户端",
+    "announced_on": "2026-10-13",
+    "verified_on": "2026-10-20",
+    "sources": [
+      "S145"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "签名webhook、事件身份、订阅scope与处理结果"
+  },
+  {
+    "id": "mcp-step-up",
+    "name": "API MCP step-up authorization",
+    "status": "available",
+    "access": "支持step-up的客户端",
+    "announced_on": "2026-10-19",
+    "verified_on": "2026-10-20",
+    "sources": [
+      "S146"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "insufficient_scope与追加授权；已有scope保留"
+  },
+  {
+    "id": "docs-search",
+    "name": "cf docs search",
+    "status": "released_sdk",
+    "access": "无需Cloudflare登录；需要网络；查询telemetry",
+    "announced_on": "2026-10-16",
+    "verified_on": "2026-10-20",
+    "sources": [
+      "S149",
+      "S150",
+      "S160"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "beta.15已存在，beta.16公告/命令改名，不能从摘要猜接口"
+  },
+  {
+    "id": "cloud-workload-security",
+    "name": "Cloud Workload Security",
+    "status": "public_beta",
+    "access": "Zero Trust Free足够；用户运行proxy",
+    "announced_on": "2026-10-19",
+    "verified_on": "2026-10-20",
+    "sources": [
+      "S151",
+      "S152",
+      "S153",
+      "S154",
+      "S155"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "实际路由、CA、分类、Enforce、日志与provider权限"
+  },
+  {
+    "id": "gateway-forward-workers",
+    "name": "Gateway Forward Workers",
+    "status": "public_beta",
+    "access": "所有ZT plans；Workers用量另计",
+    "announced_on": "2026-10-15",
+    "verified_on": "2026-10-20",
+    "sources": [
+      "S156",
+      "S157",
+      "S158"
+    ],
+    "effective_events": [],
+    "conflicts": [
+      {
+        "topic": "dlp_selects_worker",
+        "claims": [
+          {
+            "value": "DLP profile match triggers bound Forward Worker example",
+            "source": "S158"
+          },
+          {
+            "value": "DLP/body inspection results cannot select Worker",
+            "source": "S156"
+          }
+        ],
+        "resolution": "具体实现按接口文档；保留博客应用示例差异，实际策略另行验证"
+      }
+    ],
+    "next_check": "HTTPS解密、body时序、next限制与排除协议"
   }
 ]

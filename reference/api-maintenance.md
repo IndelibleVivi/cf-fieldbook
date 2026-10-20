@@ -1,7 +1,7 @@
 ---
 title: 用程序维护 Cloudflare 资源
 subtitle: 选择调用入口，取得完整结果，再判断变更是否完成
-source_cutoff: 2026-10-13
+source_cutoff: 2026-10-20
 ---
 
 # 用程序维护 Cloudflare 资源
@@ -11,6 +11,8 @@ source_cutoff: 2026-10-13
 本文于 2026-10-08 定向查阅官方 SDK、Go `v7.12.0`、OpenAPI 仓库与 R2 API 文档；Tunnel 变更另复看已有来源。没有安装 SDK、访问账号或执行云端请求。下面的可靠操作方法是编辑建议；Go 的默认值只适用于所标版本。
 
 10 月 13 日另核查 `v7.13.0` release 与 API MCP 的 Skills 扩展，下文补充具体触发点。原先 `v7.12.0` 的客户端默认值继续按固定版本阅读，没有据新 release 推断它们已重新验收。
+
+10 月 20 日补充 `cf docs search`、Cloudflare API MCP 的事件与 step-up 调查，以及 Gateway／CWS 作为变更执行边界的入口。没有安装 CLI、发出搜索请求或使用账户执行这些动作。
 
 ## 控制台、CLI、REST、SDK、binding 各接哪一段
 
@@ -79,6 +81,47 @@ Go `v7.12.0` release 增加 Containers application、instance、version、rollou
 10 月 10 日起，Cloudflare API MCP 在 `https://mcp.cloudflare.com/mcp` 提供 Skills over MCP：支持该扩展的客户端可用 `skills/list` 发现，再从 `skill://<name>/<path>` 读取。客户端具备 MCP 工具能力不自动说明它支持 Skills 扩展；接线时分别确认资源发现、内容读取和实际操作权限。本书没有连接真实账户验证此入口。[S134]
 
 
+## 先搜文档，再读取原页
+
+2026-10-16 公告介绍 CLI `1.0.0-beta.16` 的 `cf docs search`：它搜索 guides、tutorials、examples 和产品文档，返回**最多五条按相关度排序的 JSON**，每项含 title、description 与 documentation URL。该命令需要互联网连接；公告示例未要求 Cloudflare 登录。[S160]
+
+下面的查询只使用公共主题，不携带私人项目名、账号或凭据。以下命令是查询形状，不是本次已执行的结果：
+
+```sh
+cf docs search "schedule a worker"
+cf docs search "Gateway Forward Workers"
+cf docs search "R2 bucket public access"
+```
+
+从结果中先取 documentation URL，再核对页面日期、适用计划、返回字段与操作权限。搜索成功只表示文档索引返回了候选；它不能证明账号开放了功能，也不能证明当前客户端支持某个命令。搜索 query 会进入 telemetry，官方说明采用与 CLI command search 相同的长度限制与 opt-out 行为；在受限环境里先查项目的遥测设置。[S150]
+
+公告还给出读取完整页面的方式：用 `.[0].url` 取首个结果，再带 `Accept: text/markdown` 请求该 URL。这里使用公共查询形状，不携带私人项目名、账号或凭据；没有在本页执行它。
+
+```sh
+url=$(cf docs search "proxy a DNS record" | jq -r '.[0].url')
+curl -H "Accept: text/markdown" "$url"
+```
+
+### Kebab-case 与生成命令面
+
+同一 beta.16 公告说明生成命令统一为 kebab-case；CLI changelog 记录了从 camelCase／snake_case 迁移的示例：
+
+```text
+cf accounts billing getCredits          -> cf accounts billing get-credits
+cf addressing regional_hostnames list   -> cf addressing regional-hostnames list
+cf analytics_engine sql query           -> cf analytics-engine sql query
+```
+
+这只是迁移示例，不应从名称变化推断 API 行为改变。项目应先查锁定的 CLI 版本、帮助输出与现有脚本，再决定迁移；其余 breaking command 与 flag 变化参考 CLI release notes。[S149] [S160]
+
+### 搜索之后的事件与授权
+
+10 月 13 日，Cloudflare API MCP 开始把 Workers Issues 作为首个 MCP Event 交给客户端。客户端用 `events/list` 发现 `cloudflare.alert.workers_observability_real_time_issue`，用 `events/subscribe` 按 account 或单个 Worker 订阅；Issues 检测到新故障或复发故障时，服务器把签名事件发到客户端 webhook，agent 不必轮询就能开始调查。使用前要在 Worker 启用 Issues，并以 Notifications Write 和 Workers Observability Write 权限连接支持 MCP Events webhook 的客户端。[S145]
+
+10 月 19 日，API MCP 加入 step-up authorization：连接 `https://mcp.cloudflare.com/mcp` 时先在 consent page 选择 Minimal，工具调用需要尚未授予的 scope 时，服务器返回点名该 scope 的 `insufficient_scope` challenge，由 client 请求用户追加授权；已经授予的 scopes 会保留。该能力要求客户端支持 step-up；工具错误不会被自动视为已获授权。[S146]
+
+一条可复核的操作记录应写成：搜索了哪个公共 query → 读了哪个 URL 与版本 → 当前 token／MCP 授权是否覆盖动作 → 写请求返回了什么 → 读回哪个资源。事件、搜索摘要与工具错误都只能把调查带到下一步，不能替代读回。产品页面的观察与授权模式见[云 API 与 HTTP 出站控制](../services/egress-controls.md)。
+
 ## 把这次操作交回项目工作
 
 一份可继续使用的结果应连在一起说明：当前任务、目标范围、现有采用理由、命中的变化、已得到的证据、仍未知的部分和下一项验证。检查失败时保留部分观察；技术选择的条件没变时复用它。
@@ -95,3 +138,8 @@ Go `v7.12.0` release 增加 Containers application、instance、version、rollou
 [S122]: https://developers.cloudflare.com/r2/api/ "R2 API：Workers、S3 与 REST 的职责"
 [S134]: https://developers.cloudflare.com/changelog/post/2026-10-10-cloudflare-mcp-skills/ "Cloudflare API MCP 的 Skills 扩展"
 [S142]: https://github.com/cloudflare/cloudflare-go/releases/tag/v7.13.0 "Cloudflare Go v7.13.0 release"
+[S145]: https://developers.cloudflare.com/changelog/post/2026-10-13-cloudflare-mcp-events/ "Cloudflare API MCP 作为 MCP Events 发送 Workers Issues"
+[S146]: https://developers.cloudflare.com/changelog/post/2026-10-19-cloudflare-mcp-step-up/ "Cloudflare API MCP 的 step-up authorization"
+[S149]: https://github.com/cloudflare/cf/blob/main/packages/cli/CHANGELOG.md "cf CLI changelog：文档搜索与 kebab-case 命令"
+[S150]: https://github.com/cloudflare/cf/releases/tag/cf%401.0.0-beta.15 "cf 1.0.0-beta.15 release：docs search"
+[S160]: https://developers.cloudflare.com/changelog/post/2026-10-16-docs-search/ "使用 Cloudflare CLI 搜索文档"

@@ -2,7 +2,7 @@
 title: Clef 与 Jev：模型、入口与判断成本
 subtitle: 一份面向个人开发者的决策模型比较
 edition: 2026.10 · 专题 01 · 阅读版 3
-source_cutoff: 2026-10-13
+source_cutoff: 2026-10-20
 reviewed_on: 2026-10-13
 review_scope: Clef 系列标价、托管上下文与输入字段；其余来源保留原核对范围
 presentation_revision: 3
@@ -39,6 +39,8 @@ status: source-verified-comparison-not-live-benchmark
 ```
 
 这是我们自己的语义输入；各平台外壳见第 4 章。返回的选项分布表达模型建议，程序只允许执行上述动作，并记录实际选择与回读结果；这里没有伪造响应概率或实测表现。[S17] 对照的中英文、材料不足与选项扰动样本见[试验章节](#experiment)，真实模型测评仍须独立授权。
+
+如果问题变成“部署版本号、发生时间、错误代码分别是什么”，答案无法预先列成有限选项。10 月 19 日 preview 的 Clairic 把它作为 typed extraction，输入标价 $0.10／M、无生成输出 token 费；它没有进入本篇的有限决策价格表。字段抽取、缺失值、原文位置及 65,536／8,192 文档疑点见[模型页](../services/decision-models.md#clairic有类型的值与可定位原文)。本次只补用途边界，未重新核验下方 Clef／Jev 价格或做模型实测。[S163] [S164]
 
 <!-- chapter: models -->
 
@@ -231,3 +233,7 @@ GitHub：[github.com/IndelibleVivi](https://github.com/IndelibleVivi)
 [S83]: https://huggingface.co/Cloudflare/clef-flash "Cloudflare Clef-flash：开放模型权重与模型卡"
 [S123]: https://developers.cloudflare.com/changelog/post/2026-10-09-clef-omni-workers-ai/ "Clef-omni 上线、Flash 降价与托管窗口调整"
 [S124]: https://developers.cloudflare.com/workers-ai/models/clef-omni/ "Clef-omni 模型卡"
+
+[S163]: https://developers.cloudflare.com/changelog/post/2026-10-19-clairic-workers-ai/ "Clairic preview：有类型的字段抽取"
+
+[S164]: https://developers.cloudflare.com/workers-ai/models/clairic/ "Clairic 模型卡、输入字段与上下文说明"

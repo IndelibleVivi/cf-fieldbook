@@ -19,13 +19,17 @@
 | 理解任务为什么登记了却没完成 | [任务中断与恢复](use-cases/recoverable-jobs.md) | 看见租约恢复、迟到拒绝与未知结果，知道哪些动作不能盲目重试 |
 | 让模型建议下一步，而由程序控制执行 | [有限决策与下一步动作](use-cases/bounded-decision.md) | 区分模型建议、允许的动作与需要检验的误判 |
 | 比较 Clef、Jev 与接入路线 | [服务页](services/decision-models.md) · [Clef / Jev 专题](comparisons/clef-vs-jev.md) | 在同一任务下比较模型与供应路径，不把价格当作正确率 |
-| 判断近期产品变化是否影响自己 | [10 月 13 日观察](reports/2026-10-13.md) · [2026.10 首发选编](reports/2026-10-first-release.md) | 先检查模型输入预算、恢复和读页契约，再回看完整产品地图 |
+| 判断近期产品变化是否影响自己 | [10 月 20 日观察](reports/2026-10-20.md) · [10 月 13 日](reports/2026-10-13.md) · [首发选编](reports/2026-10-first-release.md) | 检查费用、中文检索、字段抽取与执行边界，再回看完整产品地图 |
+| 中文原文搜不到，或想从通知里抽字段 | [检索与样本](services/search.md) · [决策与字段抽取](services/decision-models.md) | 检查 tokenizer、短词和索引；区分有限选项、typed values 与生成 |
+| 控制程序发出的云 API 或 HTTP 请求 | [云 API 与 HTTP 出站控制](services/egress-controls.md) | 确认代理、Gateway 与 Worker 实际检查的流量和条件 |
 | 用程序盘点或维护 CF 资源 | [API 与 SDK 维护](reference/api-maintenance.md) · [可靠操作例子](examples/api-operations/README.md) | 选择调用入口，识别完整分页、总期限、部分失败与未知写结果 |
 | 找回项目为什么这样选，判断变化是否相关 | [把变化接到当前项目](use-cases/project-context.md) · [项目判断任务单](templates/project-context-task.md) | 由 agent 读取已有理由与具体用法，区分命中、已查范围未发现和未知 |
 | 先做完一个可读的小项目 | [三份文档的小资料架](examples/reading-shelf/README.md) | 直接阅读、下载合成文档，沿同一份材料继续理解权限、更新、任务与检索 |
 | 运行例子，或把检查交给 agent | [五个离线例子](examples/README.md) · [恢复任务单](templates/job-recovery-task.md) | 用合成输入取得实际输出、失败证据与清理结果 |
 
 不熟悉的词可以先查[术语小词表](docs/glossary.md)。需要精确配置、命令或完整状态约束时，从对应例子进入[实施参考](reference/implementation.md)。
+
+三册之后的变化集中在[独立更新增补](reports/2026-10-update-supplement.md)：汇集 10 月 8 日、13 日与 20 日的资料，按检索、模型、执行、出站控制与维护连贯阅读。增补 PDF 已完成本地候选与检查，尚未发布为 GitHub Release。
 
 ## 先运行一个真实机制
 
@@ -58,7 +62,7 @@ python3 -m http.server 8767 --bind 127.0.0.1 --directory .build/site
 
 ![来源与重新构造的实践进入 Markdown、事实登记和示例代码；检查后生成阅读网站和版本化出版物，私人运行环境留在仓库外。](assets/diagrams/architecture.svg)
 
-[Mermaid 源码](diagrams/src/architecture.mmd) · [全部六张图](diagrams/README.md)
+[Mermaid 源码](diagrams/src/architecture.mmd) · [全部七张图](diagrams/README.md)
 
 解释归 Markdown，跨页精确数据归 `catalog/`，执行行为归 `examples/`。三部作品的源条目、封面、章节类型与服务阅读入口归 `catalog/publications.json`；稳定章节 ID 与可见编号分开维护。网站与 PDF 读取这些来源；事实核验、代码测试和云端实测分别记录。服务页持续维护，带截止日期的报告保留当时判断。后来的改价不自动回写历史报告。
 
@@ -77,11 +81,11 @@ Node.js 20+ 用于 Worker 测试；Mermaid 只在修改图示时需要安装。[
 
 `impact-source` 从登记条目的正文引用与 JSON `source` 单值／`sources` 数组定位，复用依赖查询生成复查候选。它不判定项目受影响、不读取外部 repo 或刷新核验日期。项目自身的目标、运行位置或功能改变时，也可用项目判断任务单取回相应机制；当前配置和采用理由仍由各项目自己的已有文档持有，私人证据留在仓库外。
 
-10 月 13 日更新实际走过这条路径：Clef 价格与上下文进入目录，再同步当前表格、审阅表外建议并检查离线请求；同时补齐单值来源漏检。`due` 只查登记的复核日，事实块检查也不证明整页说法正确；操作顺序与边界见[贡献与维护](CONTRIBUTING.md#完成一次来源更新)。
+10 月 13 日更新用它处理 Clef 价格／上下文与单值来源漏检；10 月 20 日再次从 S100 定位费用登记与当前正文，将 Observability 公布包含量同步为 10 GB-month，并审阅表外日期、解释与算例。`due` 只查登记的复核日，事实块检查也不证明整页说法正确；操作顺序与边界见[贡献与维护](CONTRIBUTING.md#完成一次来源更新)。
 
 ## 状态与边界
 
-这是持续编辑的 source-available 参考仓库；具体实现、验证和未启用能力见[当前状态](docs/current-state.md)。[10 月 13 日观察](reports/2026-10-13.md)记录本轮定向更新；[2026.10 首发选编](reports/2026-10-first-release.md)继续保留 10 月 2 日主体和 10 月 3 日四组更新的时间位置。手册与报告按各自来源范围阅读，局部核查不表示全书重新核验。[实践记录](practice/README.md)匿名重构作者维护过的系统，保留历史观察日期，并链接相关官方机制文档。旧三册 Markdown / HTML / PDF 固定保留在 `dist/`，用于历史阅读；新构建进入 `.build/`，不覆盖旧版。新版 PDF 为本地首发候选，尚未发布为 Release。
+这是持续编辑的 source-available 参考仓库；具体实现、验证和未启用能力见[当前状态](docs/current-state.md)。[10 月 20 日观察](reports/2026-10-20.md)记录本轮定向更新；[10 月 13 日观察](reports/2026-10-13.md)保留上一轮资料；[2026.10 首发选编](reports/2026-10-first-release.md)继续保留 10 月 2 日主体和 10 月 3 日四组更新的时间位置。手册与报告按各自来源范围阅读，局部核查不表示全书重新核验。[实践记录](practice/README.md)匿名重构作者维护过的系统，保留历史观察日期，并链接相关官方机制文档。旧三册 Markdown / HTML / PDF 固定保留在 `dist/`，用于历史阅读；新构建进入 `.build/`，不覆盖旧版。新版 PDF 为本地首发候选，尚未发布为 Release。
 
 公共例子使用合成输入，没有账号凭据或真实运行数据。阅读站由 GitHub Pages 托管，主分支通过检查后自动更新。搜索在浏览器内完成，不向搜索服务发送查询；站点不嵌入统计脚本或远程字体。云端实验、定期上游监控和新版出版物 Release 独立于网站部署。
 

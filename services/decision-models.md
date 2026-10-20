@@ -1,7 +1,7 @@
 ---
 id: service.decision-models
-reviewed_on: 2026-10-13
-review_scope: Clef 系列标价、托管上下文与输入字段；Jev 保留 2026-10-02 核对范围
+reviewed_on: 2026-10-20
+review_scope: 10-20 新增 Clairic preview 和 DS V4.1 Flash；Clef 保留 10-13、Jev 保留 10-02 范围
 evidence: official-documents-only
 ---
 
@@ -24,6 +24,58 @@ Cloudflare 自有的 Clef／Clef-flash／Clef-omni 与第三方 Jev 都能进入
 
 核对依据、模型价格、上下文限制与来源，集中在[Clef／Jev 比较](../comparisons/clef-vs-jev.md)，结构化字段在[路由目录](../catalog/decision-routes.json)，不在多页手工重复全部价格。
 
+## 先看需要哪一种输出
+
+| 想得到什么 | 候选能力 | 验收关注什么 |
+|---|---|---|
+| 从列好的动作或类别中选择 | Clef／Jev 有限决策 | 选项误判、输入完整性与阈值校准 |
+| 取得未事先枚举的编号、日期、数值或原文片段 | Clairic 字段抽取 | 字段缺失、原文位置、截断与数值正确性 |
+| 写解释、代码或长文，做开放式推理 | 通用生成模型 | 事实与推理、工具调用、生成内容 |
+
+这个区分围绕输出空间；同为小模型不表示任务相同。Clairic 也支持计算、估计与预测，但类型正确并不证明内容正确，长算式宜抽取输入后交给代码。[S163] [S165]
+
+## Clairic：有类型的值与可定位原文
+
+Clairic 于 **2026-10-19** 进入 preview，Workers AI 选择器为 `@cf/cloudflare/clairic`。传入 `state` 和 `fields`，返回每个字段的 typed value；`text` 可附原文字符位置，缺少依据时 `value` 可为 `null`。输入标价 **$0.10／百万 tokens**，没有生成输出 token 费用。[S163] [S164]
+
+例如下面的合成部署通知可以定义版本、时间、错误代码和缺失的负责人字段。这只是供另行授权试验使用的 binding 输入形状，没有发出模型请求：
+
+```json
+{
+  "model": "clairic",
+  "state": "部署通知：版本 v2.4.1 于 2026-10-19T09:30:00Z 发布。错误代码 E_TIMEOUT。",
+  "fields": {
+    "version": {"type": "text"},
+    "occurred_at": {"type": "datetime"},
+    "error_code": {"type": "text"},
+    "owner": {"type": "text", "instructions": "通知明确写出的负责人"}
+  }
+}
+```
+
+先检查 `answers.*.value` 与已知材料相符、缺失负责人返回 `null`；字符 span 能定位回原文。把错误代码移至材料尾部，再检查 `truncated` 和尾部证据是否仍可见，记录 `p_null`、confidence 与实际失败。中文、emoji 的 offset 应以返回位置回读确认，不能假定所有语言运行时的字符串索引等价。[S164]
+
+### 65,536 与 8,192：暂不能合并成一个输入承诺
+
+10 月 20 日查阅时，同一模型页的表格写 **65,536-token context**，`fields` 说明却写字段和材料装入 **8,192-token pass**。两者关系没有解释清楚，本书保留疑点；先用短材料验证，不把较大的数字当成完整读取保证。字段会拆分为多个 pass，费用看响应的 `usage.input_tokens` 和 `usage.passes`，不能仅以原文长度乘单价。多 pass 可能重复计入材料是费用核查理由，具体计量仍以实际响应与后续官方澄清为准。[S164]
+
+从长聊天判断一个人重视什么，还涉及语境、修订和评价标准；字段类型齐全不能替代这类质量验证。本页没有把抽取能力写成已经通过的记忆理解实验。
+
+## 通用生成路线的一个新入口
+
+Workers AI 新增 `@cf/deepseek-ai/deepseek-v4.1-flash-1017`，模型卡列 **1,048,576 tokens**，输入 **$0.30／M**、输出 **$1.20／M**、缓存输入 **$0.006／M**。需要 Workers Paid 或预付 AI Gateway credits。它提供生成、视觉、reasoning 与 function calling，属于上表的生成路线；没有与 Clef／Clairic 做本仓库质量对比。[S170] [S171]
+
+
 从实际问题进入：[材料到来后，下一步做什么](../use-cases/bounded-decision.md)。准备请求：[离线适配示例](../examples/decision-routing/README.md)。
 
-本次于 2026-10-13 定向核对 Clef 系列的标价、托管上下文与输入字段；Jev 沿用 2026-10-02 的来源范围。此条目只说明公开接口和用途，不声称任何个人账户已取得全部模型权限或完成实测。
+本页 2026-10-20 新增 Clairic 与 DeepSeek 路线；Clef 系列的标价、托管上下文与输入字段保留 2026-10-13 核对范围，Jev 沿用 2026-10-02。此条目只说明公开接口和用途，不声称任何个人账户已取得全部模型权限或完成实测。
+
+[S163]: https://developers.cloudflare.com/changelog/post/2026-10-19-clairic-workers-ai/ "Clairic preview：有类型的字段抽取"
+
+[S164]: https://developers.cloudflare.com/workers-ai/models/clairic/ "Clairic 模型卡、输入字段与上下文说明"
+
+[S165]: https://blog.cloudflare.com/clairic-extraction-model/ "Clairic 抽取、决策与生成的输出空间"
+
+[S170]: https://developers.cloudflare.com/workers-ai/models/deepseek-v4.1-flash-1017/ "DeepSeek V4.1 Flash 1017 模型卡"
+
+[S171]: https://developers.cloudflare.com/changelog/post/2026-10-19-deepseek-v4.1-flash-workers-ai/ "DeepSeek V4.1 Flash 1017 Workers AI 发布"

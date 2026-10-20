@@ -2,8 +2,8 @@
 title: Cloudflare 个人基础设施实践手册
 subtitle: 从一个入口到可恢复的应用与自动化
 edition: 2026.10 · 持续阅读修订
-source_cutoff: 2026-10-13
-observability_as_of: 2026-10-03
+source_cutoff: 2026-10-20
+observability_as_of: 2026-10-20
 presentation_revision: 3
 author: Faye & Cove
 github: https://github.com/IndelibleVivi
@@ -25,7 +25,9 @@ scope: 不含邮件服务；通用示例与实际账户分离
 
 原有条目沿用 **2026-10-02** 的核验范围；本次新增观测、PiHarness、互联网搜索、临时分享及 R2 费用说明，来源查阅截至 **2026-10-03**。严格机器认证、Tunnel API 与 Sandbox 接口另于 **2026-10-05** 定向核验，不刷新全书事实。不同条目的核验范围见[来源说明](../docs/provenance.md)。决策模型的供应路径另见[Clef 与 Jev 比较](../comparisons/clef-vs-jev.md)，详细代码和状态约束见[实施参考](../reference/implementation.md)。邮件服务不在本期范围内。
 
-**2026-10-13 定向更新：** 决策模型价格与输入预算、运行时排空、agent 搜索／抓取与 OpenCodeHarness、Queues／D1 地点约束，以及 Artifacts 计费日期与容量限制。本次没有重核其他价格，观测费用表仍使用其固定的 10 月 3 日资料日期。变化及采用条件见[本期观察](../reports/2026-10-13.md)。
+**2026-10-13 定向更新：** 决策模型价格与输入预算、运行时排空、agent 搜索／抓取与 OpenCodeHarness、Queues／D1 地点约束，以及 Artifacts 计费日期与容量限制。当时没有重核其他价格；变化及采用条件保留在[10 月 13 日观察](../reports/2026-10-13.md)。
+
+**2026-10-20 定向更新：** 中文关键词检索、Clairic 字段抽取、浏览器跨轮运行、MCP 事件与增权、出站请求控制，以及 Cron、SSH、Tunnel 和构建条件。观测费用表本次单独复核，固定日期更新为 10 月 20 日，12 月新方案改用 10 GB-month。其余旧事实保留各自日期，完整范围见[本期观察](../reports/2026-10-20.md)。
 
 <!-- chapter: start -->
 
@@ -175,6 +177,16 @@ ingress:
 
 普通 HTTP ingress 不受 2026 年私有路由与连接端点变更影响；若另有脚本自行维护私有网段路由或读取 tunnel 连接，见[实施参考的维护提示](../reference/implementation.md#私有路由与连接维护api-变更核验于-2026-10-05)。该提示不新增可执行集成。[S117]
 
+### SSH 连接寿命与路由额度分别核对
+
+10 月 14 日起，Access infrastructure application 支持会话时长，默认 **24 小时**，到期关闭该应用的活跃 SSH 连接；目标匹配多个应用时采用最短值。长任务要分别验证断开后进程是否继续、重连怎样取得结果，不能从连接保活推断任务恢复。[S167]
+
+10 月 16 日 Tunnel／Mesh 的默认 CIDR 与 hostname routes 上限由 1,000 增至 **50,000／账户**；published applications（public hostnames）不属于这项 route 额度。每账户仍包含 **1,000 tunnels**，额外 tunnel **$4.50／月**。routes、tunnels 与公开 hostname 是三个不同计数，具体路径见[实施参考](../reference/implementation.md)。[S168]
+
+### 出站请求还经过什么检查
+
+想约束部署脚本或 agent 发出的请求，继续读[云 API 与 HTTP 出站控制](../services/egress-controls.md)。CWS 在用户运行的代理中检查云 API 操作及参数；Gateway Forward 将符合条件的 HTTP 流量交给 Worker。先确认实际路由与检查范围，再谈策略是否有效。[S151] [S156]
+
 ### MCP 与私网各有自己的入口
 
 远程 MCP 的 OAuth 发现、授权与 token 验证不是普通浏览器登录。Workers OAuth Provider v1 可作为授权服务与资源服务拆分的实现候选；连接成功后，仍要检验错误受众、过期令牌与跨资源请求。[S71]
@@ -231,6 +243,10 @@ D1 新建数据库已支持 `us` jurisdiction，数据库在美国运行并持�
 用户上传文档后，网页可以先显示“已接收”，后台再生成预览或索引。Queues 适合将接收与处理分开；Workflows 适合有多个步骤、等待与恢复的流程；Durable Objects 适合按实体协调；Cron 负责按时间触发。[S53] [S55] [S56] [S58]
 
 不是每个应用都需要四种。一次短请求就能完成的事，可以继续直接执行。
+
+### 本地测试 Cron，不等于定时表已经在跑
+
+10 月 17 日 Local Explorer 新增 `scheduled()` 的单次调用：启动既有本地 dev server，打开 `/cdn-cgi/local/explorer` 的 Cron Triggers，选择 cron 与触发时间，检查返回结果。也可从本地 HTTP API 调用同一操作。本地不会自动按 cron 表执行；界面保存的临时触发与时间预设不修改配置或生产计划。[S166]
 
 ### 为什么只记一个“处理过”会丢任务
 
@@ -295,6 +311,14 @@ AI Search 可以接管一部分摄取、分块、索引和检索；Workers AI �
 
 10 月 GA 的 AI Search 已支持图片和 OCR。图片检索可用多模态路线，也可用文字描述路线；效果要用自己的材料比较。文件上限、字段数与模型条件仍需按本期来源核对。[S09] [S10]
 
+### 中文检索先检查 tokenizer、短词与索引状态
+
+10 月 16 日 AI Search 修复无空格中日韩问句的 `trigram` 匹配。中文内容应检查 `indexing_options.keyword_tokenizer`；更换它会全量重建索引。trigram 的三个字符窗口不能独立匹配两字名字；默认 `and` 与可选 `or` 的召回也不同。[S161] [S162]
+
+用同一套长问句、两字人名、代码标识、语义改写与无答案题比较 keyword／hybrid；先核对入库、分块和重建状态，再决定是否更换 embedding。具体合成原件与查询样本见[检索页](../services/search.md#用同一组问题比较-keyword-与-hybrid)。Workers Paid 的 keyword 实例上限为 500,000 文件，vector-only 为 1,000,000。[S162]
+
+11 月 1 日开始计费后，包含量之外 full-text 查询 $0.10／千次，semantic／vector／hybrid $0.75／千次；内部 Workers AI embedding／reranking 已包含，生成、query rewriting 和外部模型另计。[S10]
+
 ### 让每个结果带着回原处的路
 
 自建索引时，留下来源 ID、来源版本、chunk ID、内容 hash、embedding 模型和索引版本。升级模型建立新索引代，避免将不同语义空间里的向量混在一起比较。[S64]
@@ -349,6 +373,12 @@ Clef、Clef-flash、Clef-omni 与 Jev 都有 Cloudflare 接入路线；Clef 家�
 <!-- /facts -->
 
 完整比较与可离线检查的请求形状，分别在 `comparisons/clef-vs-jev.md` 和 `examples/decision-routing/`。这些材料没有冒充真实推理验收。
+
+### 字段抽取与有限决策分开选择
+
+Clairic 的 preview 接收材料与字段定义，输出编号、日期、数值、列表或可定位原文；不必先枚举所有答案。它适合把合成部署通知整理成版本、时间、错误代码，再交给后续判断。输入价 $0.10／M，无生成输出 token 费；缺失值、截断、原文位置与 confidence 仍须逐项核对。[S163] [S164]
+
+模型卡的 65,536-token context 与参数中的 8,192-token pass 目前关系不明；字段分 pass 后实际费用应看返回用量。短材料试验与完整疑点放在[模型页](../services/decision-models.md)。复杂语义解释继续使用适合的生成模型，不能只因 typed value 合法就认定内容成立。[S164]
 
 ### “缓存命中”究竟复用了什么
 
@@ -424,6 +454,10 @@ Containers 的 CPU 按实际活跃使用计，内存和磁盘按配置及运行�
 
 Cloudflare OS 则适合观察更完整的文件、工具与工作空间。当前自部署源码和托管候补是两种状态，研究 Gatekeeper、导出与升级即可，不必立即承载关键工作。[S20]
 
+### 跨轮次浏览器仍有失效和取消边界
+
+Agents SDK 的 Browser／browserTool 可以重连仍然存活的远端浏览器，保留 tabs、cookies 和登录态；默认空闲保活 10 分钟，到期或崩溃会丢失旧状态。Pi 不自动重放中断的浏览器调用；停止对话也不取消已经开始的调用，完成与超时须另行确认。登录隔离、Live View 与接入条件见[Agent runtime](../services/agent-runtime.md)。[S143] [S144]
+
 <!-- chapter: release -->
 
 ## 10 / 发布以后，真的用一遍
@@ -433,6 +467,8 @@ Cloudflare OS 则适合观察更完整的文件、工具与工作空间。当前
 生产发布保留一条明确负责的路径：可以是 GitHub Actions，也可以是 Workers Builds；另一边提供检查或预览。这样不容易出现两个系统同时发布，或检查的是 A、上线的却是 B。
 
 Workers Builds 当前 Paid 包含每月 6,000 分钟、6 并发，单次限 20 分钟；设备专属和不同操作系统的测试，仍放在对应环境。[S35] [S65]
+
+10 月 14 日 Workers Builds 更新默认工具链，包括 Node.js 24.21.0、Python 3.14.8。固定的环境变量或版本文件继续生效；代码没变而构建结果变了，先比构建镜像、runtime 与 lockfile，再决定修依赖还是固定版本。[S169]
 
 ### 预览也会使用真实资源
 
@@ -491,15 +527,15 @@ R2 Standard 的标价为 $0.015 / GB-month、Class A $4.50 / 百万次、Class B
 ### Observability：当前与已公布的费用分开读
 
 <!-- facts: observability-costs -->
-固定资料日期：**2026-10-03**。
+固定资料日期：**2026-10-20**。
 
 | 条款 | Free | Paid |
 |---|---|---|
 | 当前 Workers Logs [S111] | 200,000 events / 日；3 天 | 20,000,000 events / 月；超出 $0.60 / 百万；7 天 |
-| 已公布；将在 2026-12-01 生效 [S100] | 0.5 GB 摄取 / 日；7 天 | 50 GB 摄取 + 12 GB-month / billing cycle；超出 $0.25 / GB + $0.10 / GB-month |
+| 已公布；将在 2026-12-01 生效 [S100] | 0.5 GB 摄取 / 日；7 天 | 50 GB 摄取 + 10 GB-month / billing cycle；超出 $0.25 / GB + $0.10 / GB-month |
 <!-- /facts -->
 
-上表共用 [费用记录](../catalog/observability-pricing.json)与[生效事件](../catalog/launches.json)。当前 pricing docs 的 Paid 存储包含量为 12 GB-month，发布博客仍写 10；采用文档口径并保留差异。未采样安全 dataset 不消费共享包含量；Enterprise 在合同续约时迁移。按字节计费后，大 attributes 和完整正文也增加摄取量，不只数 span。[S100]
+上表共用 [费用记录](../catalog/observability-pricing.json)与[生效事件](../catalog/launches.json)。10 月 20 日复核的 pricing docs 将 Paid 存储包含量列为 **10 GB-month**，原 12／10 冲突已不再是当前口径；生效日仍为 **12 月 1 日**。文档算例尚未同步：20 GB-month 存储超额应为 $1.00，与 75 GB 摄取的 $6.25 合计 $7.25。Log Explorer dataset 不消费共享包含量；Enterprise 在合同续约时迁移。按字节计费后，大 attributes 和完整正文也增加摄取量，不只数 span。[S100]
 
 ### 给每次实验记一笔小账
 
@@ -509,7 +545,7 @@ R2 Standard 的标价为 $0.015 / GB-month、Class A $4.50 / 百万次、Class B
 
 ### 免费也有三种含义
 
-免费计划可能在达到上限后停止；Paid 包含量之外可能继续计费；beta 免费可能有未来起算日。10 月 13 日复核时，Artifacts 价格页与 changelog 均写 **10 月 14 日**起算，博客仍写 15 日；冲突继续登记，预算按较早日期准备。AI Search 的 11 月 1 日起算沿用既有来源范围。[S07] [S08] [S135] [S10]
+免费计划可能在达到上限后停止；Paid 包含量之外可能继续计费；beta 免费可能有未来起算日。10 月 20 日复核时，Artifacts 价格页写 **10 月 14 日**起算，博客仍写 15 日；两日均已过去，应按已经进入公开计费期安排预算，具体账号扣款未验证，来源冲突继续登记。AI Search 的 **11 月 1 日**起算本次重新核对，仍属临近生效事项。[S07] [S08] [S135] [S10]
 
 Artifacts 限 Workers Paid，每月含 10,000 operations 与 1 GB 存储；超额分别为 $0.15／1,000 operations 与 $0.50／GB-month。仓库保留会继续计入存储，不能只统计任务活跃时长；这里给出公开计价单位，没有实际账户账单测量。[S08]
 
@@ -757,3 +793,27 @@ GitHub：[github.com/IndelibleVivi](https://github.com/IndelibleVivi)
 [S137]: https://developers.cloudflare.com/changelog/post/2026-09-18-queues-jurisdictions/ "Queues jurisdiction 发布"
 [S138]: https://developers.cloudflare.com/queues/configuration/data-location/ "Queues 数据地点与死信队列约束"
 [S139]: https://developers.cloudflare.com/changelog/post/2026-10-02-us-jurisdiction/ "D1 美国 jurisdiction"
+
+[S161]: https://developers.cloudflare.com/changelog/post/2026-10-16-cjk-keyword-search/ "AI Search 中日韩关键词查询修复"
+
+[S162]: https://developers.cloudflare.com/ai-search/configuration/indexing/keyword-search/ "AI Search keyword tokenizer、匹配模式与索引限制"
+
+[S163]: https://developers.cloudflare.com/changelog/post/2026-10-19-clairic-workers-ai/ "Clairic preview：有类型的字段抽取"
+
+[S164]: https://developers.cloudflare.com/workers-ai/models/clairic/ "Clairic 模型卡、输入字段与上下文说明"
+
+[S166]: https://developers.cloudflare.com/changelog/post/2026-10-17-local-explorer-cron-triggers/ "Local Explorer 单次调用 Cron Triggers"
+
+[S167]: https://developers.cloudflare.com/changelog/post/2026-10-14-infrastructure-ssh-session-duration/ "Access infrastructure application 会话时长"
+
+[S168]: https://developers.cloudflare.com/changelog/post/2026-10-16-tunnels-for-platforms-and-50k-routes/ "Tunnel 与 Mesh 的五万 routes 和 Tunnels for Platforms"
+
+[S169]: https://developers.cloudflare.com/changelog/post/2026-10-14-workers-builds-default-tooling/ "Workers Builds 默认工具链升级"
+
+[S143]: https://developers.cloudflare.com/changelog/post/2026-10-13-persistent-browser/ "Agents SDK 跨 turn 的 Browser/browserTool"
+
+[S144]: https://developers.cloudflare.com/agents/tools/browser/ "Browser 会话、tab、中断与 Live View"
+
+[S151]: https://developers.cloudflare.com/changelog/post/2026-10-19-cloud-workload-security-beta/ "Cloud Workload Security Beta 发布"
+
+[S156]: https://developers.cloudflare.com/cloudflare-one/traffic-controls/integrate-workers/forward-traffic/ "Gateway Forward traffic：执行顺序、限制与故障"

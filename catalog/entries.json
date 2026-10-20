@@ -12,7 +12,7 @@
       "review": {
         "state": "inherited",
         "checked_on": "2026-10-02",
-        "scope": "继承 r3 来源记录；10-05 增补 S114–S117 定点来源，核验范围见来源说明；10-08 增补 S118–S122 定向 SDK／API 来源，原日期不作为全库重新核验；10-13 新增 S123–S142；仅复看 S07/S08/S17/S18；其他来源保留原核验日",
+        "scope": "继承 r3 来源记录；10-05 增补 S114–S117 定点来源，核验范围见来源说明；10-08 增补 S118–S122 定向 SDK／API 来源，原日期不作为全库重新核验；10-13 新增 S123–S142；仅复看 S07/S08/S17/S18；其他来源保留原核验日；10-20 增补定向官方来源；复看 S07/S08/S10/S100/S111，仅相应条款；未整库重核",
         "next_review_on": "2026-11-01"
       },
       "evidence": [
@@ -39,7 +39,7 @@
       "review": {
         "state": "inherited",
         "checked_on": "2026-10-02",
-        "scope": "继承 r3 来源记录，核验范围见来源说明；10-13 定向登记运行时、网页读取、harness、地点约束与模型变化，Artifacts 10-14/15 冲突仍保留；其他 launch 未重核",
+        "scope": "继承 r3 来源记录，核验范围见来源说明；10-13 定向登记运行时、网页读取、harness、地点约束与模型变化，Artifacts 10-14/15 冲突仍保留；其他 launch 未重核；10-20 登记费用、CJK、Clairic、runtime/MCP、出站控制与运维变化；其他发布保留原范围",
         "next_review_on": "2026-10-14"
       },
       "evidence": [
@@ -95,8 +95,8 @@
       ],
       "review": {
         "state": "inherited",
-        "checked_on": "2026-10-13",
-        "scope": "继承 r3 来源记录，核验范围见来源说明；10-13 定向更新 Clef-flash 缩窗/降价与 Clef-omni，其他接口沿用既有范围",
+        "checked_on": "2026-10-20",
+        "scope": "继承 r3 来源记录，核验范围见来源说明；10-13 定向更新 Clef-flash 缩窗/降价与 Clef-omni，其他接口沿用既有范围；10-20 仅 Clairic preview、输出空间和DS V4.1 Flash；Clef 10-13、Jev 10-02价格范围保留",
         "next_review_on": "2026-10-16"
       },
       "evidence": [
@@ -125,8 +125,8 @@
       ],
       "review": {
         "state": "inherited",
-        "checked_on": "2026-10-13",
-        "scope": "继承 r3 来源记录，核验范围见来源说明；10-13 定向查阅 S17/S18/S123/S124 并审阅价格排序、输入预算与表外建议；其他 provider 和原性能表保留旧核验范围",
+        "checked_on": "2026-10-20",
+        "scope": "继承 r3 来源记录，核验范围见来源说明；10-13 定向查阅 S17/S18/S123/S124 并审阅价格排序、输入预算与表外建议；其他 provider 和原性能表保留旧核验范围；10-20 仅补 Clairic 字段抽取边界与指向；既有模型价/上下文/性能未重核",
         "next_review_on": "2026-10-16"
       },
       "evidence": [
@@ -246,7 +246,8 @@
         "service.search",
         "service.agent-runtime",
         "usecase.temporary-sharing",
-        "example.reading-shelf"
+        "example.reading-shelf",
+        "service.egress-controls"
       ],
       "related": [
         "example.job-state",
@@ -255,7 +256,7 @@
       "review": {
         "state": "inherited",
         "checked_on": "2026-10-02",
-        "scope": "继承 r3 来源记录，核验范围见来源说明；10-03 新主题及 R2/脚手架的局部官方查阅见来源说明；10-05 仅对严格 Service Token、Tunnel routes/connections 与 Artifacts/Sandbox API 区分做定点官方核验，不刷新全部历史事实；10-13 定向吸收模型预算、运行时排空、SDK 读取/harness、Queues/D1 地点与 Artifacts 费用/容量；其余原日期不刷新",
+        "scope": "继承 r3 来源记录，核验范围见来源说明；10-03 新主题及 R2/脚手架的局部官方查阅见来源说明；10-05 仅对严格 Service Token、Tunnel routes/connections 与 Artifacts/Sandbox API 区分做定点官方核验，不刷新全部历史事实；10-13 定向吸收模型预算、运行时排空、SDK 读取/harness、Queues/D1 地点与 Artifacts 费用/容量；其余原日期不刷新；10-20 定向吸收当前主题及四项运维条件；Observability费用单独复核，其余旧事实不刷新",
         "next_review_on": "2026-11-01"
       },
       "evidence": [
@@ -284,7 +285,7 @@
       "review": {
         "state": "inherited",
         "checked_on": "2026-10-02",
-        "scope": "继承 r3 来源记录，核验范围见来源说明；10-05 仅 Tunnel routes/connections 维护提示做定点官方核验，不刷新全部历史事实；10-13 定向补充模型输入、运行时排空、Queues/D1 地点与 Artifacts 条款；其余原日期不刷新",
+        "scope": "继承 r3 来源记录，核验范围见来源说明；10-05 仅 Tunnel routes/connections 维护提示做定点官方核验，不刷新全部历史事实；10-13 定向补充模型输入、运行时排空、Queues/D1 地点与 Artifacts 条款；其余原日期不刷新；10-20 同步 CJK、Clairic、Artifacts时间与四项运维条件；其余旧实现说明沿原范围",
         "next_review_on": "2026-11-01"
       },
       "evidence": [
@@ -482,8 +483,8 @@
       "related": [],
       "review": {
         "state": "checked",
-        "checked_on": "2026-10-03",
-        "scope": "S98–S113 官方资料查阅与编辑整合；没有账户、付费调用或云端实测",
+        "checked_on": "2026-10-20",
+        "scope": "S98–S113 官方资料查阅与编辑整合；没有账户、付费调用或云端实测；10-20 复核 S100 新方案与 S111 迁移前价格；固定资料日期单独推进，无账单验收",
         "next_review_on": "2026-11-02"
       },
       "evidence": [
@@ -507,8 +508,8 @@
       ],
       "review": {
         "state": "checked",
-        "checked_on": "2026-10-13",
-        "scope": "S98–S113 官方资料查阅与编辑整合；没有账户、付费调用或云端实测；10-13 仅核 S140/S141 的 499 与 Logpush 机制；费用表与其他来源保留 10-03 范围",
+        "checked_on": "2026-10-20",
+        "scope": "S98–S113 官方资料查阅与编辑整合；没有账户、付费调用或云端实测；10-13 仅核 S140/S141 的 499 与 Logpush 机制；费用表与其他来源保留 10-03 范围；10-20 定向核对 S100/S111费用与S145/S146事件/授权；其他观测机制保留原范围",
         "next_review_on": "2026-11-02"
       },
       "evidence": [
@@ -530,8 +531,8 @@
       ],
       "review": {
         "state": "checked",
-        "checked_on": "2026-10-13",
-        "scope": "S98–S113 官方资料查阅与编辑整合；没有账户、付费调用或云端实测；10-13 仅核 S127–S131 的 SDK 读取与 Markdown 流式契约；原 provider 价格/ZDR 保留 10-03 范围",
+        "checked_on": "2026-10-20",
+        "scope": "S98–S113 官方资料查阅与编辑整合；没有账户、付费调用或云端实测；10-13 仅核 S127–S131 的 SDK 读取与 Markdown 流式契约；原 provider 价格/ZDR 保留 10-03 范围；10-20 仅 S10/S161/S162 的 CJK keyword、重建/短词、限制与11月价格；原provider/ZDR/SDK范围不刷新",
         "next_review_on": "2026-11-02"
       },
       "evidence": [
@@ -553,8 +554,8 @@
       ],
       "review": {
         "state": "checked",
-        "checked_on": "2026-10-13",
-        "scope": "S98–S113 官方资料查阅与编辑整合；没有账户、付费调用或云端实测；10-13 仅核 S125/S126/S132/S133 的运行时与 OpenCodeHarness；Pi 原核验范围不变",
+        "checked_on": "2026-10-20",
+        "scope": "S98–S113 官方资料查阅与编辑整合；没有账户、付费调用或云端实测；10-13 仅核 S125/S126/S132/S133 的运行时与 OpenCodeHarness；Pi 原核验范围不变；10-20 定向核对 Browser 活会话、中断、Events 与 step-up；原 harness 范围不刷新",
         "next_review_on": "2026-11-02"
       },
       "evidence": [
@@ -654,8 +655,8 @@
       ],
       "review": {
         "state": "checked",
-        "checked_on": "2026-10-13",
-        "scope": "2026-10-08 定向查阅 S118–S122 与复看 S117；Go 默认值固定 v7.12.0，没有 SDK／账户或云端实测；10-13 增补 S134/S142；Go 默认值仍固定 v7.12.0，v7.13.0 仅 release 查阅，无 SDK 或账户实测",
+        "checked_on": "2026-10-20",
+        "scope": "2026-10-08 定向查阅 S118–S122 与复看 S117；Go 默认值固定 v7.12.0，没有 SDK／账户或云端实测；10-13 增补 S134/S142；Go 默认值仍固定 v7.12.0，v7.13.0 仅 release 查阅，无 SDK 或账户实测；10-20 定向核对 docs search beta.15/16、telemetry、MCP Events 与按需增权；Go 固定版本说明未重核",
         "next_review_on": "2026-11-07"
       },
       "evidence": [
@@ -742,6 +743,97 @@
         "state": "checked",
         "checked_on": "2026-10-13",
         "scope": "S123–S142 定向官方查阅及 S07/S08/S17/S18 复看；接口与例子只做本地验证，无账户/模型/云端验收",
+        "next_review_on": null
+      },
+      "evidence": [
+        {
+          "kind": "source-reviewed",
+          "ref": "docs/provenance.md"
+        }
+      ]
+    },
+    {
+      "id": "service.egress-controls",
+      "kind": "service",
+      "path": "services/egress-controls.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [],
+      "related": [
+        "guide.handbook",
+        "reference.api-maintenance"
+      ],
+      "review": {
+        "state": "checked",
+        "checked_on": "2026-10-20",
+        "scope": "CWS/Gateway Forward 官方文档定向查阅；无代理安装、账号操作或云端验收",
+        "next_review_on": "2026-11-03"
+      },
+      "evidence": [
+        {
+          "kind": "source-reviewed",
+          "ref": "docs/provenance.md"
+        }
+      ]
+    },
+    {
+      "id": "report.2026-10-20",
+      "kind": "report",
+      "path": "reports/2026-10-20.md",
+      "track": "edition",
+      "status": "current",
+      "depends_on": [
+        "data.launches",
+        "data.observability-pricing",
+        "service.search",
+        "service.decision-models",
+        "service.agent-runtime",
+        "service.observability",
+        "service.egress-controls",
+        "reference.api-maintenance"
+      ],
+      "related": [
+        "guide.handbook",
+        "compare.clef-jev"
+      ],
+      "review": {
+        "state": "checked",
+        "checked_on": "2026-10-20",
+        "scope": "近期官方来源定向查阅与本地构建；没有账户、模型、账单或云端执行验收",
+        "next_review_on": null
+      },
+      "evidence": [
+        {
+          "kind": "source-reviewed",
+          "ref": "docs/provenance.md"
+        }
+      ]
+    },
+    {
+      "id": "report.2026-10-update-supplement",
+      "kind": "report",
+      "path": "reports/2026-10-update-supplement.md",
+      "track": "edition",
+      "status": "current",
+      "depends_on": [
+        "data.sources",
+        "data.launches",
+        "reference.api-maintenance",
+        "service.search",
+        "service.agent-runtime",
+        "service.decision-models",
+        "service.observability",
+        "service.egress-controls"
+      ],
+      "related": [
+        "guide.handbook",
+        "report.2026-10-13",
+        "report.2026-10-20"
+      ],
+      "review": {
+        "state": "checked",
+        "checked_on": "2026-10-20",
+        "scope": "汇集10-08/13既有核验范围与10-20定向官方查阅；独立增补、无账户/模型/账单/云端实测",
         "next_review_on": null
       },
       "evidence": [

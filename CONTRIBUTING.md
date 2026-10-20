@@ -19,7 +19,7 @@ macOS 已安装 Homebrew Pango/GLib、却遇到 `cannot load library libgobject-
 
 正文解释归各自 Markdown；来源登记归 `catalog/sources.json`；决策模型路线与价格归 `catalog/decision-routes.json`；内容关系归 `catalog/entries.json`。请求外壳、任务状态等行为改 `examples/` 源码。图形结构改 `diagrams/src/*.mmd`，导出方法见 [图示说明](diagrams/README.md)。
 
-作品编排改 `catalog/publications.json`；章节身份用正文的稳定 `chapter` 标记，改标题、插章或重排不要改掉已发布的锚点。Observability 费用数值改 `catalog/observability-pricing.json`，未来计费日期归 `catalog/launches.json`；`tools/content.py` 根据 source_cutoff 或明确 as-of 生成对应时间的说明。报告新增为独立条目，历史报告不参与同步。资料架例子改三份 `materials/` 原件后，运行 `python3 examples/reading-shelf/build.py` 重建页面。
+作品编排改 `catalog/publications.json`；章节身份用正文的稳定 `chapter` 标记，改标题、插章或重排不要改掉已发布的锚点。Observability 费用数值改 `catalog/observability-pricing.json`，未来计费日期归 `catalog/launches.json`；`tools/content.py` 按显式 as-of、正文 `observability_as_of`、`source_cutoff` 的优先级生成对应时间的说明。报告新增为独立条目，历史报告不参与同步。资料架例子改三份 `materials/` 原件后，运行 `python3 examples/reading-shelf/build.py` 重建页面。
 
 先查一项变更影响哪里，再判断哪些候选真的需要修改：
 
@@ -36,6 +36,15 @@ python3 tools/fieldbook.py due --as-of 2026-11-01
 ## 完成一次来源更新
 
 先核对官方原文的公布日期、实际生效日和条件，再登记本次查阅范围。URL 里的日期可能与页面公布日不同；已有 source ID 继续使用。若同一 URL 有多个来源 ID，应合并查询这些 ID，例如 `impact-source S34 S111`；它们可能保留不同历史核查范围，不直接合并记录。
+
+也可以先用官方 CLI 找原页（需要另行安装 `cf`，本仓库没有在检查中执行它）：
+
+```sh
+cf docs search "AI Search keyword tokenizer"
+cf docs search "persist browser session between agent turns"
+```
+
+命令返回最多五条排序 JSON，含标题、简介与 URL；继续读取对应 Markdown 原页，再核对价格、限制和生效日。源码 changelog 在 beta.15 已登记 docs search，10-16 公告介绍的是 beta.16；beta.16 也把部分旧命令改为 kebab-case。无需 Cloudflare 登录不代表查询留在本机：不要放私人项目内容，CLI changelog 明示查询会进入 telemetry；具体版本与入口见[API 维护](reference/api-maintenance.md)。
 
 以 Clef-flash 为例，先查 `impact-source S18` 和 `impact data.decision-routes`；核对候选后改价格目录，同时审阅比较、手册、服务页与例子的文字。降价伴随缩窗时，“哪款更便宜”“长材料能否直接送入”都要重新判断，只有改表格还不够。新增来源在登记并被正文引用后才能找到使用点，首次纳入时仍须选择合适的当前页。
 

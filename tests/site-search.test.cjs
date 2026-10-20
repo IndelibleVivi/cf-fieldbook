@@ -164,3 +164,19 @@ test('R2 cost aliases retain the product constraint and related results group by
   assert.equal(new Set(groups.map(items => items[0].url.split('#')[0])).size, groups.length);
   assert.equal(groups[0][0].url, items[0].url);
 });
+
+test('new retrieval, extraction and browser questions reach their actual boundaries', () => {
+  for (const query of ['中文搜不到', '中文明明在原文里，为什么搜不到']) {
+    const item = first(query);
+    assert.ok(item.url.startsWith('services/search.html#'), item.url);
+    assert.match(item.text, /trigram/);
+    assert.match(item.text, /不足三个字符/);
+    assert.deepEqual(search(index, query + ' 未存在的条件987'), []);
+  }
+  const extraction = first('从通知里抽字段');
+  assert.ok(extraction.url.startsWith('services/decision-models.html#'), extraction.url);
+  assert.match(extraction.text, /fields/);
+  const browser = first('停止对话会取消浏览器吗');
+  assert.ok(browser.url.startsWith('services/agent-runtime.html#'), browser.url);
+  assert.match(browser.text, /不会取消/);
+});

@@ -1,18 +1,42 @@
 ---
 title: 自己的材料，还是互联网上的新信息
 subtitle: AI Search、Vectorize 与 Web Search API 分别搜什么
-source_cutoff: 2026-10-13
+source_cutoff: 2026-10-20
 ---
 
 # 自己的材料，还是互联网上的新信息
 
 问“这三份资料哪份写了撤下规则”，证据在自己持有的集合；问“今天官方更新了什么”，证据在当前互联网。先确定需要哪一边，才选择检索入口。网页搜索不会因同属 Cloudflare 就读取私有 R2 内容。
 
-2026-10-13 定向复核 Agents SDK 的搜索、读页接口与 Markdown 流式转换。AI Search、Vectorize 及下方 provider 价格和保留表仍按 2026-10-03 的资料范围阅读。
+2026-10-20 定向复核 AI Search 中日韩关键词查询、索引限制与 11 月计费；10 月 13 日的 SDK 搜索、读页与流式转换范围保留。Vectorize 及下方互联网 provider 价格／保留表仍按 2026-10-03 阅读，没有检索质量 benchmark。
 
 ## 让自己的集合回到原件
 
 AI Search 管一部分摄取、分块与检索，Vectorize 适合由应用自己安排管线。权限、版本、撤下状态与回读原文仍属于应用；索引只帮助找到候选。现有[手册的检索章节](../guides/handbook.md#retrieval)说明两条路线。[S09] [S10] [S40]
+
+## 中文明明在原文里，为什么搜不到
+
+10 月 16 日，AI Search 修复 `trigram` 对无空格中日韩问句的处理；此前这类输入容易被当成一个完整短语。中文集合先检查 `indexing_options.keyword_tokenizer`：默认 `porter` 不适合这类切词，官方建议使用 `trigram`。更换 tokenizer 会触发全量重建，等待索引完成后再比较结果。[S161] [S162]
+
+`trigram` 按重叠的三个字符切片，**不足三个字符的词不能独立匹配**。`retrieval_options.keyword_match_mode` 默认 `and`，改成 `or` 会扩大召回，也可能引入无关片段。Workers Paid 启用 keyword 时单实例最多 500,000 文件，vector-only 为 1,000,000；重建和容量都应纳入选择。[S162]
+
+### 用同一组问题比较 keyword 与 hybrid
+
+以下是合成材料与待验证样本，不是已经运行的云端结果。先给每题标出原件与期望证据，再固定材料版本比较 keyword／hybrid、`and`／`or`，记录命中片段、漏检、误召回、耗时和用量。
+
+| 合成原件中的已知证据 | 查询样本 | 重点检查 |
+|---|---|---|
+| 《撤下规则》：撤下后立即拒绝读取，随后清理索引 | “资料撤下后还能读到旧版本吗？”；“撤下后什么时候清理索引？” | 无空格长问句与完整证据，不只看有无结果 |
+| 《维护人》：维护人为“林岚” | “林岚”；“谁负责维护资料架？” | 两字名字的 trigram 边界；语义查询是否回到该原件 |
+| 《恢复接口》：保留 `job_id`、`lease_expires_at` | “lease_expires_at”；“job_id 租约” | 标识符切片、多个查询项的 and／or 差别 |
+| 《恢复规则》：先核对外部结果，再决定是否重试 | “回包丢了要再做一遍吗？”；“不确定有没有成功” | 语义改写；召回后是否真的回答了问题 |
+| 集合未说明资料售价 | “这份资料卖多少钱？” | 保留无答案样本，不能因有相近片段就编造 |
+
+出现漏检，先核对原件是否入库、分块是否含证据、索引是否完成，再检查 tokenizer 与匹配模式；然后才比较 embedding／reranking。权限和撤下状态仍由应用核验。
+
+### 11 月的两类查询费用
+
+AI Search 从 **2026-11-01** 开始计费。每月含 5M 摄取 tokens、10 GB-month 存储、各 1,000 次 semantic 和 full-text 查询。超出部分 full-text 为 **$0.10／千次**，semantic／vector／hybrid 为 **$0.75／千次**；Workers AI embedding 与 reranking 已包含，生成、query rewriting 与外部模型继续另计。比较检索路线时同时观察每题查询次数与额外模型调用。[S10]
 
 ## 当前互联网：先搜索，再读来源
 
@@ -81,3 +105,7 @@ const results = await response.json();
 [S129]: https://developers.cloudflare.com/agents/tools/web-search/ "Agents SDK 搜索工具与费用归属"
 [S130]: https://developers.cloudflare.com/changelog/post/2026-10-11-web-fetch/ "Agents SDK web_fetch 发布"
 [S131]: https://developers.cloudflare.com/agents/tools/web-fetch/ "Agents SDK 读页窗口与请求边界"
+
+[S161]: https://developers.cloudflare.com/changelog/post/2026-10-16-cjk-keyword-search/ "AI Search 中日韩关键词查询修复"
+
+[S162]: https://developers.cloudflare.com/ai-search/configuration/indexing/keyword-search/ "AI Search keyword tokenizer、匹配模式与索引限制"

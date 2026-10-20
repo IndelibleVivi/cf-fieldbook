@@ -95,8 +95,15 @@ class ReadingSiteTests(unittest.TestCase):
                      'examples/reading-shelf/README.html', 'diagrams/README.html'):
             self.assertTrue((self.output / path).is_file(), path)
         diagrams = BeautifulSoup((self.output / 'diagrams/README.html').read_text(), 'html.parser')
-        self.assertEqual(len(diagrams.select('img.technical-diagram')), 6)
+        self.assertEqual(len(diagrams.select('img.technical-diagram')), 7)
         self.assertIsNotNone(diagrams.find(id='diagram-reading-shelf'))
+        for path in ('reports/2026-10-20.html', 'reports/2026-10-update-supplement.html'):
+            self.assertIsNotNone(soup.find('a', href=path))
+        site = build_site.Site(self.root, self.root / '.build/home-status')
+        site.entries['reports/2026-10-update-supplement.md']['status'] = 'withdrawn'
+        hidden = BeautifulSoup(site.home(), 'html.parser')
+        self.assertIsNone(hidden.find('a', href='reports/2026-10-update-supplement.html'))
+
 
     def test_real_practice_is_discoverable_without_claiming_a_new_cloud_run(self):
         home = BeautifulSoup((self.output / 'index.html').read_text(), 'html.parser')
@@ -569,10 +576,10 @@ GitHub · [https://github.com/IndelibleVivi](https://github.com/IndelibleVivi)
             for path in ('guides/handbook.html', 'comparisons/clef-vs-jev.html', 'services/observability.html',
                          'reference/implementation.html', 'reference/api-maintenance.html'):
                 soup = BeautifulSoup((output / path).read_text(), 'html.parser')
-                self.assertIn('资料截至 2026-10-13', soup.select_one('meta[name="description"]')['content'])
+                self.assertIn('资料截至 2026-10-20', soup.select_one('meta[name="description"]')['content'])
             for path in ('guides/handbook.html', 'services/observability.html'):
                 soup = BeautifulSoup((output / path).read_text(), 'html.parser')
-                self.assertIn('固定资料日期：2026-10-03', soup.get_text('', strip=True))
+                self.assertIn('固定资料日期：2026-10-20', soup.get_text('', strip=True))
 
 
 if __name__ == '__main__':

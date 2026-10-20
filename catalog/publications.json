@@ -134,8 +134,8 @@
         {
           "id": "models",
           "category": "模型与入口",
-          "names": "Workers AI · AI Gateway",
-          "description": "分清模型、供应路径与判断成本；继续读 Clef / Jev 的比较。",
+          "names": "Workers AI · AI Gateway · Clairic",
+          "description": "按有限选项、字段值与生成选择模型，再分清供应路径与判断成本。",
           "chapter": "models",
           "action": "选择模型调用路线"
         },
@@ -171,6 +171,10 @@
             "label": "或从三篇真实实践开始 ↗",
             "target": "practice"
           }
+        ],
+        "updates": [
+          "report.2026-10-update-supplement",
+          "report.2026-10-20"
         ]
       },
       "share_image": "assets/share/handbook.png",

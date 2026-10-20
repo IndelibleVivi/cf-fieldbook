@@ -12,7 +12,7 @@ r3 重新核对来源 S16–S18，并补充 S73–S83，重点覆盖 Clef / Jev�
 
 2026-10-03 新增 S84–S97，供[三篇实践记录](../practice/README.md)解释 Workers、R2、Vectorize、Access、Tunnel、service worker 与 MCP 授权的通用机制。这些链接在编辑时查阅；各篇的实际系统观察仍使用正文标明的历史日期，没有新的云端验收。MDN 是浏览器技术参考，MCP 规范由协议项目维护，二者不是 Cloudflare 文档。
 
-2026-10-03 新增 S98–S113，核对 Observability、Traces/SQL、PiHarness、Web Search API、Protected Quick Tunnels，以及补充 R2 费用与新项目脚手架。12 GB-month / 10 GB-month 和 Exa ZDR 的官方页面差异保留在对应正文与 launch 记录。此范围不刷新旧条目或 10-02 历史报告的核验日期，没有账户或付费调用。
+2026-10-03 新增 S98–S113，核对 Observability、Traces/SQL、PiHarness、Web Search API、Protected Quick Tunnels，以及补充 R2 费用与新项目脚手架。当时观察到 12 GB-month / 10 GB-month 与 Exa ZDR 的官方页面差异；前者已在 10-20 按现行价格更新，历史报告保留，Exa 原核验范围未变。此范围不刷新旧条目或 10-02 历史报告的核验日期，没有账户或付费调用。
 
 2026-10-05 新增 S114–S117，定向核对 Artifacts 官方示例仍使用 Sandbox v0、Sandbox 1.0 的迁移接口、Access 严格 Service Token 认证，以及当日到达移除日期的 Tunnel 私网路由与连接查询 API。结论进入手册、实施参考与首发选编；没有执行账户配置、API 迁移或云端恢复实验。首发图文的三款 CF 模型输入单价另于当日核对，未由此刷新专题的全篇来源日期。
 
@@ -21,6 +21,10 @@ r3 重新核对来源 S16–S18，并补充 S73–S83，重点覆盖 Clef / Jev�
 2026-10-13 新增 S123–S142，定向查阅 Clef 模型变更、Workers 排空、agent search／fetch 和 OpenCodeHarness、Markdown 响应契约、MCP Skills、Queues／D1 地点约束、HTTP/3 499、Logpush 机制及 Go `v7.13.0` release；另复看 S07／S08／S17／S18。Artifacts 价格页／changelog 的 10-14 与博客的 10-15 仍保留冲突。Omni、Clef、Flash 的精确窗口分别按模型卡登记，不能把公告中的 K 一律换算。
 
 这批资料进入当前页与独立的[10 月 13 日观察](../reports/2026-10-13.md)。来源传播、单值／数组引用、事实块同步和四款模型的文本请求做本地检查；不包含真实模型请求、账号权限、harness 云端恢复或账单验收。原 provider 价格、旧性能表、观测费用及历史出版物保留各自核验范围，接口通过不构成全书事实认证。
+
+2026-10-20 定向查阅近期公开来源：AI Search 的 CJK tokenizer、匹配模式、限制与新计价；Clairic preview、typed extraction 与 context/pass 疑点；Browser 跨轮存活和中断、MCP Events 与 step-up、cf docs search；CWS／Gateway Forward 的实际请求路径；Local Explorer Cron、infrastructure SSH、Tunnel 额度与 Builds 工具链，以及 DeepSeek V4.1 Flash 1017。各来源的实际查阅范围由目录逐条记录，不因资料截止日推进就重核全部旧事实。
+
+另复看 S07／S08／S10／S100／S111 的相关价格与日期：Observability 公布方案现为 10 GB-month，仍在 12-01 生效，页面算例却未对齐；Artifacts 10-14／15 的日期冲突继续保留，但两日已过去。当前正文和费用表同步，原报告与冻结文件保留。中文查询样本、Clairic 短材料与出站路径是合成验收设计；没有调用模型、建立云索引、安装 CWS proxy、修改 Gateway、读取账号或核对真实账单。网页、本地测试与官方来源分别记录。
 
 [首发选编](../reports/2026-10-first-release.md)是独立的新编排，按主题吸收两篇历史观察，保留继承事实、后续增补和定向核查各自的范围。原 10 月 2 日和 10 月 3 日报告不被覆盖，构建日期也不作为它们的新事实日期。
 

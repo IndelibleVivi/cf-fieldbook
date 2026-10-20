@@ -2,7 +2,7 @@
 title: Cloudflare 实施参考
 subtitle: 从一个入口到可恢复的应用与自动化
 edition: 2026.10 · 修订 1
-source_cutoff: 2026-10-13
+source_cutoff: 2026-10-20
 author: Faye & Cove
 github: https://github.com/IndelibleVivi
 status: implementation-reference-snapshot
@@ -363,6 +363,10 @@ AI Search 负责托管摄取、索引与检索；Workers AI + Vectorize 则让�
 
 若自建 Vectorize，记录 `source_id`、`source_revision`、`chunk_id`、内容 hash、embedding 模型和索引版本。不同模型不只可能维度不同，即使维度相同也未必处在同一语义空间。模型升级应建立新索引代，而不是把新旧向量混写后继续比较分数。[S64]
 
+### 中文 keyword：先核对配置与重建
+
+AI Search 中日韩无空格问句在 10 月 16 日修复 trigram 查询处理。检查 `indexing_options.keyword_tokenizer: "trigram"`，改变 tokenizer 后等待全量重建；`retrieval_options.keyword_match_mode` 默认为 `and`，可改 `or`。两字名字不能独立匹配 trigram；固定同一原件版本，比较长问句、短词、代码与语义改写，样本见[检索页](../services/search.md)。这组验证尚未调用云端索引。[S161] [S162]
+
 ### 检索结果不能自己决定访问资格
 
 一个建议的读取链路是：
@@ -437,6 +441,11 @@ Clef 系列输出定义好选项的概率，适合分类、选择或排序任务
 
 一种有用的试验是：准备真实正例、容易混淆的反例与无法判断项，先让它只推荐，不实际触发外部动作。统计漏判和误判的不同代价，再决定是否接入流程。关键不在它能不能给出一个选项，而在错的时候是否可见、可纠正。
 
+### Clairic 抽取：字段结果仍须回到原文
+
+`@cf/cloudflare/clairic` 的输入使用 `model: "clairic"`、`state` 与 `fields`，与决策模型的 `questions` 分开适配。先用[模型页的短合成材料](../services/decision-models.md)检查缺失值、尾部证据、原文位置、`truncated` 与 `usage.input_tokens`。65,536 context 与 8,192-token pass 的同页差异未解决，不能直接套较大预算；多步算术先抽取值，再用代码计算。未做真实模型调用。[S163] [S164]
+
+
 ## 11 / Agent 执行：持久身份、Linux 环境与文件历史分开
 
 ### 哪些事情留在 Worker，哪些交给容器
@@ -505,6 +514,17 @@ Kitesurf 是新的浏览器与终端操作入口，可以用于独立实验；�
 
 需要登录、上传、发布或支付的浏览器任务，要把人可确认的具体动作留在执行前。正当的自动化可能需要会话 cookie，但应只读取和使用该任务获准的会话，不把浏览器个人资料目录整体交给临时执行环境。
 
+### Cron、SSH、路由与构建：用本地证据识别变化
+
+| 变化 | 实施检查 |
+|---|---|
+| Local Explorer 单次 Cron 调用 | 在既有 dev server 的 `/cdn-cgi/local/explorer` 调用 `scheduled()`，指定 cron／触发时间并查看结果；本地不自动执行 cron 表。[S166] |
+| infrastructure application 默认 24 小时 | 到期关闭 SSH，多个应用采用最短时长；把进程存活、断线与结果恢复分开验收。[S167] |
+| Tunnel／Mesh 默认 50,000 routes | 指 CIDR／hostname routes；不含 published applications。每账户包含 1,000 tunnels，额外 $4.50／tunnel·月。[S168] |
+| Workers Builds 默认工具链升级 | 10-14 默认 Node 24.21.0、Python 3.14.8；环境变量和版本文件固定值继续生效。对照构建镜像、runtime 和 lockfile，不从源码未变推断构建环境未变。[S169] |
+
+这些是公开文档查阅，没有创建本地云模拟器或执行账号操作。各主题的使用过程见手册对应章节。
+
 ## 13 / 观测：先记录足以定位的问题，不先复制全部正文
 
 ### 一次请求最有用的记录
@@ -549,7 +569,7 @@ Workers 侧的观测不会自动看到所有本机脚本、第三方平台和离
 
 ### 免费、包含、测试期间不收费是三种承诺
 
-免费计划可能达到上限就失败；Paid 包含量之外可能继续计费；beta 免费则可能有明确未来起算日。10 月 13 日复核后，Artifacts 价格页和 changelog 都写 10 月 14 日计费，博客仍写 15 日；保留冲突并按较早日期准备预算。AI Search 的 11 月 1 日起算沿用原来源。核验日期与生效日期分别记录。[S07] [S08] [S135] [S10]
+免费计划可能达到上限就失败；Paid 包含量之外可能继续计费；beta 免费则可能有明确未来起算日。10 月 20 日复核后，Artifacts 价格页写 10 月 14 日计费、博客仍写 15 日；两日均已过去，按公开条款已进入计费期，实际账单未核验。AI Search 的 11 月 1 日起算本次重新核对，尚未到达。核验日期与生效日期分别记录。[S07] [S08] [S135] [S10]
 
 ## 15 / 排障、恢复与停用
 
@@ -862,3 +882,19 @@ GitHub：[github.com/IndelibleVivi](https://github.com/IndelibleVivi)
 [S137]: https://developers.cloudflare.com/changelog/post/2026-09-18-queues-jurisdictions/ "Queues jurisdiction 发布"
 [S138]: https://developers.cloudflare.com/queues/configuration/data-location/ "Queues 数据地点与死信队列约束"
 [S139]: https://developers.cloudflare.com/changelog/post/2026-10-02-us-jurisdiction/ "D1 美国 jurisdiction"
+
+[S161]: https://developers.cloudflare.com/changelog/post/2026-10-16-cjk-keyword-search/ "AI Search 中日韩关键词查询修复"
+
+[S162]: https://developers.cloudflare.com/ai-search/configuration/indexing/keyword-search/ "AI Search keyword tokenizer、匹配模式与索引限制"
+
+[S163]: https://developers.cloudflare.com/changelog/post/2026-10-19-clairic-workers-ai/ "Clairic preview：有类型的字段抽取"
+
+[S164]: https://developers.cloudflare.com/workers-ai/models/clairic/ "Clairic 模型卡、输入字段与上下文说明"
+
+[S166]: https://developers.cloudflare.com/changelog/post/2026-10-17-local-explorer-cron-triggers/ "Local Explorer 单次调用 Cron Triggers"
+
+[S167]: https://developers.cloudflare.com/changelog/post/2026-10-14-infrastructure-ssh-session-duration/ "Access infrastructure application 会话时长"
+
+[S168]: https://developers.cloudflare.com/changelog/post/2026-10-16-tunnels-for-platforms-and-50k-routes/ "Tunnel 与 Mesh 的五万 routes 和 Tunnels for Platforms"
+
+[S169]: https://developers.cloudflare.com/changelog/post/2026-10-14-workers-builds-default-tooling/ "Workers Builds 默认工具链升级"

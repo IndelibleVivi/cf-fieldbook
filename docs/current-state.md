@@ -1,25 +1,24 @@
 # 当前状态
 
-2026-10-13 · [公共源码](https://github.com/IndelibleVivi/cf-fieldbook)，默认分支 `main`。
+2026-10-20 · [公共源码](https://github.com/IndelibleVivi/cf-fieldbook)，默认分支 `main`。
 
-- 本轮更新见 [PR #1](https://github.com/IndelibleVivi/cf-fieldbook/pull/1)。当前手册、专题及本轮更新页的资料截止日已对齐 10 月 13 日；固定费用表仍为 10 月 3 日，逐来源核验范围保留。网页与新冻结候选共用正文截止日，手册／专题分享卡随之重建；站点由主分支既有流程发布，部署结果以 [Actions](https://github.com/IndelibleVivi/cf-fieldbook/actions) 为准，没有新增 PDF Release。
-
-- 本轮[10 月 13 日观察](../reports/2026-10-13.md)与当前页一并收录：Clef-flash 降价／缩窗及 Omni、Workers 排空、SDK 搜索／读页与 OpenCodeHarness、Markdown 响应头、Queues／D1 地点约束、Artifacts 条款、499 调查口径与 SDK／MCP 入口。来源 S123–S142 定向查阅；既有事实未因编辑日期整体刷新。
-- 更新接口实际处理了来源→数据→正文→例子传播；修复 JSON `source` 单值漏检，仍支持 `sources` 数组。决策例子补齐 S79 的正文引用，并覆盖四款模型的文本／JSON 外壳。`sync/check` 只同步登记事实块；表外建议另做编辑审阅，`due` 仍只检查登记复核日。
-- Artifacts 10-14／15 的官方来源冲突保留，预算建议按较早日期准备；没有实际账单或云端调用。新观察作为独立阅读页纳入目录与搜索，原首发作品编排、`dist/` 与旧报告正文不重出、不覆盖。部署仍由主分支既有 Actions 接住。
+- 本轮[10 月 20 日观察](../reports/2026-10-20.md)纳入费用修正、中文关键词检索、Clairic typed extraction、Browser／MCP、出站控制与四项运维条件。新增[云 API 与 HTTP 出站控制](../services/egress-controls.md)和 Gateway Forward 流程图，当前正文资料上界为 10-20；旧事实核验范围与原复核期限分别保留。
+- Observability 费用本次单独核对，固定 `observability_as_of` 推进至 10-20：12 月公布方案为 10 GB-month；旧 12／10 冲突已解决，官方算例仍需按条款重算。Artifacts 10-14／15 冲突保留，公开计费期已到；AI Search 11-01 尚待生效。没有实际账单、账号、模型或云端运行验收。
+- 新报告是独立条目，原 10-02／03／13 报告、首发编排、`dist/` 与已冻结 PDF 不覆盖。手册／专题的网页、版本身份与分享卡同步资料上界；原三册没有重出；另将三册之后的更新编成[独立增补](../reports/2026-10-update-supplement.md)，完成 14 页本地 PDF 候选、文字／链接与 Poppler／macOS 原生正文检查，没有新 Release。站点沿既有 main workflow 发布，具体运行结果见 [Actions](https://github.com/IndelibleVivi/cf-fieldbook/actions)。
+- [10 月 13 日更新](../reports/2026-10-13.md)由 [PR #1](https://github.com/IndelibleVivi/cf-fieldbook/pull/1)合入：来源传播补齐 JSON `source` 单值，`sync/check` 继续只处理登记事实块，表外条件须编辑复查；`due` 仍只查复核日，较粗的 launches 依赖本轮人工筛选，没有扩建维护系统。
 
 - 三部作品为[个人基础设施实践手册](../guides/handbook.md)、[Clef / Jev 专题](../comparisons/clef-vs-jev.md)、[2026.10 新发布观察首发选编](../reports/2026-10-first-release.md)。选编保留完整发布主题并整合后续四组变化；10 月 2 日、10 月 3 日观察保持历史身份，不自动同步新价格。服务与实践仍可独立阅读。
 - 新增[API／SDK 维护](../reference/api-maintenance.md)、[项目判断指南](../use-cases/project-context.md)与[任务单](../templates/project-context-task.md)，以及第五个[离线操作例子](../examples/api-operations/README.md)。`impact-source` 从登记正文引用与 JSON 来源字段定位，再沿原有依赖查询生成候选；项目实际用法仍须另查。指南使用合成 VPS 迁移、发布变慢和静态官网场景，当前理由与配置由各项目已有文档持有，没有跨项目状态表或自动监控。
 - 10 月 8 日定向查阅 S118–S122：官方 SDK、固定 Go `v7.12.0` 的分页／期限／重试与 release、OpenAPI 仓库用途及 R2 调用入口，并复看 S117。没有安装 SDK、访问账户或执行云端操作；其他条目、旧报告、三册编排与固定出版物没有因此重新核验或重出。新增页与例子进入静态站点构建，部署结果仍以既有 Actions 为准。
 - 10 月 5 日定向核查 Access 严格 Service Token 条件、Tunnel 私网路由／连接查询变更与 Artifacts / Sandbox v0、1.0 的接口边界，进入手册与实施参考。没有因此刷新全书事实日期，也没有新的账户或云端实测。
-- 新增 Observability、PiHarness、Web Search API、Protected Quick Tunnels 四组主题。新增官方来源查阅截止 2026-10-03，原有条目仍保留各自核验范围，没有新的账户、云端或模型实测。费用记录区分当前 Workers Logs 条款与 2026-12-01 的统一计费；博客／pricing 包含量和 Web Search ZDR 的来源差异保留在正文。
+- 新增 Observability、PiHarness、Web Search API、Protected Quick Tunnels 四组主题。新增官方来源查阅截止 2026-10-03，原有条目仍保留各自核验范围，没有新的账户、云端或模型实测。费用记录区分当前 Workers Logs 条款与 2026-12-01 的统一计费；当时博客／pricing 包含量差异在 10-20 已按现行价格解决，Web Search ZDR 仍保留原来源范围。
 - 五个例子默认离线。[三份文档的小资料架](../examples/reading-shelf/README.md)可直接阅读与下载，由合成原件重建；手册沿同一材料解释权限、版本、任务和检索的扩展设计。它没有运行数据库、云端索引或身份系统。API 操作例子使用虚拟时间与合成流水，不能作为真实客户端或持久化恢复的验收。
 - [任务恢复观察台](https://indeliblevivi.github.io/cf-fieldbook/examples/job-state/demo.html)回放实际 SQLite 模型的五种合成场景。事件反馈紧邻控制区，支持场景、时间、步骤与播放；没有云端实测声明。外部副作用重复的反例仍保留，继续使用[离线工单](../templates/job-recovery-task.md)可复现。
 - 阅读站默认冷白，可切暖纸；选择只存读者本地浏览器，无 JavaScript 时保持冷白。篇类题头、透明母题、篇尾日出印与轻动画沿用青橙视觉；动画遵循减弱动态设置。键盘定位用内部底色与下划线，署名集中于页脚。
 - 三部作品的编排归 `catalog/publications.json`，Markdown 仍拥有正文。稳定章节 ID 与显示编号分开，旧网页锚点保留；新增报告按条目和正文身份编排，不再修改 renderer 内的固定日期。
 - edition 可独立冻结一个作品，也可一次生成三部作品的独立候选。冻结固定所需正文、数据、图示、词表与渲染代码；所引用词义嵌入当版附录。2026.10 首发的三册完整 PDF 已生成本地候选并检查分页与链接，没有发布新的 Release；`dist/` 固定 r3 历史文件未改。
 - 首发兼容候选 `first-release-20261005-r4-{comparison,launches,handbook}` 修复本机 PingFang SC 的 OpenType / CFF 封装在 PDFKit 与 Quick Look 下缺字和错字形的问题。三册仍为 10 / 22 / 27 页，正文文字、链接和书签逐页保留；59 页正文已用 macOS 原生引擎复看，Quick Look 正文复现页恢复。读者确认 iPhone 微信中 r4 专题正文显示正常；其他分册与合订本没有逐页手机验收。新文件没有登记为 GitHub Release；旧冻结文件保留。
-- 六张 Mermaid 图由锁定的 11.17.2 引擎生成；新增资料架更新／撤下图明确为扩展设计。入口路线与任务状态的横／窄 SVG 继续共用语义源。
+- 七张 Mermaid 图由锁定的 11.17.2 引擎生成；新增资料架更新／撤下图明确为扩展设计。入口路线与任务状态的横／窄 SVG 继续共用语义源。
 - 当前正文、来源说明与阅读投影不保留与本作品无关的材料致谢；历史固定出版物不在本轮改写。来源核验与分发边界见[来源说明](provenance.md)。
 - `Checks and Pages` 对提交运行离线检查，主分支通过后更新[正式阅读站](https://indeliblevivi.github.io/cf-fieldbook/)，PR 只检查。最新运行结果见[GitHub Actions](https://github.com/IndelibleVivi/cf-fieldbook/actions)；网站部署与出版物 Release 是两件事。
 - 原创功能代码采用 SUL-1.0，原创内容采用 CC BY-NC-SA 4.0。第三方例外见[许可范围](../LICENSE-STATUS.md)。

@@ -4,6 +4,21 @@
   "releases": [],
   "updates": [
     {
+      "date": "2026-10-20",
+      "families": [
+        "handbook",
+        "comparison"
+      ],
+      "kind": "content",
+      "topics": [
+        "observability-allowance",
+        "cjk-keyword-search",
+        "clairic-extraction",
+        "browser-mcp-egress"
+      ],
+      "summary": "手册吸收中文检索、字段抽取、Browser／MCP、出站控制和运维条件；专题补 Clairic 用途边界。资料上界与分享卡对齐10-20，观测费用本次单独复核为10 GB-month；未重出既有PDF。 另提供10-08/13/20独立增补正文与本地PDF候选，原三册默认编排保持。"
+    },
+    {
       "date": "2026-10-13",
       "families": [
         "handbook",

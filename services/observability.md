@@ -1,15 +1,15 @@
 ---
 title: 沿着一条请求，找到问题发生的地方
 subtitle: Cloudflare Traces、SQL 调查、采样与保留
-source_cutoff: 2026-10-13
-observability_as_of: 2026-10-03
+source_cutoff: 2026-10-20
+observability_as_of: 2026-10-20
 ---
 
 # 沿着一条请求，找到问题发生的地方
 
 一页资料架的搜索昨天很快，今天却要十二秒。先保留请求身份、部署版本、时间范围与路径，比较一条慢请求和一条正常请求；再决定要调查入口、程序还是依赖。这里使用合成问题解释调查方法，没有对实际账户发起查询。
 
-2026-10-13 定向补查 HTTP/3 取消记录与 Logpush Transformers 的失败语义。其他机制与费用表仍保留 2026-10-03 的资料日期；这次补查不表示重新核验了价格或账户可用范围。
+2026-10-20 定向复核 Observability 新方案包含量、迁移前 Workers Logs 价格，并补充 Issues 的 MCP Events 入口；10 月 13 日的 HTTP/3 取消与 Logpush 复核范围保留，其他机制未整体重核。没有账户或账单实测。
 
 ## 请求经过哪里，时间就在哪里分段
 
@@ -45,20 +45,24 @@ SQL API beta 给受支持数据集共同的调查入口。当前每个 statement
 
 Workers Issues 将错误与部署版本、源码上下文连起来。Alerts 用持续错误、积压或延迟条件把调查入口递给维护者。通知应带请求线索与可采取的动作；截图与告警本身都不能代替因果验证。[S11] [S12] [S98]
 
+10 月 13 日 API MCP 开始将新出现或复发的 Workers Issues 作为 MCP Events 发给订阅客户端，使用签名 webhook。需要启用 Issues、具备权限，并由客户端支持该扩展。事件只提供调查入口；核对签名与事件身份后，仍须读回时间窗、版本和错误证据，再决定修复动作。新增权限通过客户端授权处理，不能把一次事件当作写生产配置的许可；接入说明见[API 维护](../reference/api-maintenance.md)。[S145] [S146]
+
 为了重现这个方法，可以在另行获准的测试环境制造一次不含私人输入的慢请求或无害错误，对照成功请求，再检查定向采样与恢复。本文只完成官方机制查阅；没有声称这项云端实验已经执行。
 
 ## 费用：当前适用与将来生效
 
 <!-- facts: observability-costs -->
-固定资料日期：**2026-10-03**。
+固定资料日期：**2026-10-20**。
 
 | 条款 | Free | Paid |
 |---|---|---|
 | 当前 Workers Logs [S111] | 200,000 events / 日；3 天 | 20,000,000 events / 月；超出 $0.60 / 百万；7 天 |
-| 已公布；将在 2026-12-01 生效 [S100] | 0.5 GB 摄取 / 日；7 天 | 50 GB 摄取 + 12 GB-month / billing cycle；超出 $0.25 / GB + $0.10 / GB-month |
+| 已公布；将在 2026-12-01 生效 [S100] | 0.5 GB 摄取 / 日；7 天 | 50 GB 摄取 + 10 GB-month / billing cycle；超出 $0.25 / GB + $0.10 / GB-month |
 <!-- /facts -->
 
-表格读取同一[费用记录](../catalog/observability-pricing.json)与[公告生效事件](../catalog/launches.json)，固定资料日期为 2026-10-03。Paid 的 12 GB-month 采用 pricing docs；两篇发布博客写 10，差异保留。未采样安全数据集使用另一计价，不消费共享包含量；Enterprise 在合同续约时迁移。[S100]
+表格读取同一[费用记录](../catalog/observability-pricing.json)与[公告生效事件](../catalog/launches.json)，固定资料日期为 2026-10-20。现行价格页的 Paid 存储包含量是 **10 GB-month**，原先 12／10 的冲突已不再是当前口径；页面标注 10 月 15 日更新，不足以确定条款变更的正式日期。Log Explorer datasets 使用另一计价，不消费共享包含量；Enterprise 在合同续约时迁移。[S100]
+
+价格页的算例仍有算术不一致：75 GB 摄取和 20 GB-month 存储，按现行包含量应为 `(75−50)×$0.25 + (20−10)×$0.10 = $7.25`，其中存储为 $1.00；页面仍列 $0.80 和总额 $7.05。估算采用条款重算，不能复制旧算例。[S100]
 
 摄取按压缩前的内容及 attributes 计量，采样会影响摄取与保存；查询、dashboard、alerts 没有额外收费。Free 达到每天摄取限额后停止接收新数据，已有数据在其保留期内仍可查。不要把十二月的公布条款提前写成十月已经适用的账单。[S100]
 
@@ -76,3 +80,7 @@ Workers Issues 将错误与部署版本、源码上下文连起来。Alerts 用�
 [S111]: https://developers.cloudflare.com/workers/platform/pricing/ "当前 Workers Logs 计费"
 [S140]: https://developers.cloudflare.com/changelog/post/2026-10-09-http3-499-reporting-improvement/ "HTTP/3 客户端取消的 499 记录变化"
 [S141]: https://blog.cloudflare.com/transformers-on-logpush/ "Logpush Transformers 转换与失败恢复机制"
+
+[S145]: https://developers.cloudflare.com/changelog/post/2026-10-13-cloudflare-mcp-events/ "Cloudflare API MCP 作为 MCP Events 发送 Workers Issues"
+
+[S146]: https://developers.cloudflare.com/changelog/post/2026-10-19-cloudflare-mcp-step-up/ "Cloudflare API MCP 的 step-up authorization"
