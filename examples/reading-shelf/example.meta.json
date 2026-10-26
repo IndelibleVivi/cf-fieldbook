@@ -25,9 +25,11 @@
   "observation_scope": [
     "offline reading",
     "original Markdown links; download over local HTTP",
-    "portable relative links"
+    "portable relative links",
+    "source versus generated page before and after rebuild",
+    "four-file static publication directory; optional tooling is separate"
   ],
   "cloud_resources_created": [],
-  "teardown": "not applicable: offline files create no cloud resources",
+  "teardown": "Stop the local HTTP server with Ctrl+C. Offline files create no cloud resources. Remote publication and cleanup are separate, explicitly authorized steps.",
   "evidence_notice": "Passing this check does not prove service availability or model quality."
 }

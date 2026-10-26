@@ -53,7 +53,10 @@
         "data.decision-routes",
         "data.sources",
         "example.job-state",
-        "usecase.recoverable-jobs"
+        "usecase.recoverable-jobs",
+        "example.reading-shelf",
+        "usecase.publish-reading-shelf",
+        "usecase.temporary-sharing"
       ],
       "practice": [
         "practice.private-reader",

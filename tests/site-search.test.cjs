@@ -16,6 +16,19 @@ if (!process.env.FIELDBOOK_SEARCH_INDEX) {
 const index = JSON.parse(fs.readFileSync(process.env.FIELDBOOK_SEARCH_INDEX || path.join(generated, 'search-index.json'), 'utf8'));
 if (generated) test.after(() => fs.rmSync(generated, { recursive: true }));
 const first = query => { const result = search(index, query); assert.ok(result.length, query); return result[0]; };
+test('reading-shelf questions reach the actual download, rebuild and hosting explanations', () => {
+  for (const [query, page, section, evidence] of [
+    ['下载完整资料架', 'examples/reading-shelf/README.html#', /取得完整例子/, /materials.*目录|目录.*materials/s],
+    ['改了原文页面没变', 'examples/reading-shelf/README.html#', /修改并重建/, /暂不 build.*旧句/s],
+    ['关机后还能读吗', 'use-cases/publish-reading-shelf.html#', /关机/, /Tunnel.*本地 HTTP.*静态发布/s],
+  ]) {
+    const result = first(query);
+    assert.ok(result.url.startsWith(page), result.url);
+    assert.match(result.section, section);
+    assert.match(result.text, evidence);
+    assert.deepEqual(search(index, query + ' 不存在这个词987'), []);
+  }
+});
 test('resource operation questions reach concrete API guidance', () => {
   for (const query of ['SDK 分页', 'API 超时', '盘点不完整']) {
     const item = first(query);

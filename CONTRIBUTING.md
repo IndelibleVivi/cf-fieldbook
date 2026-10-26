@@ -21,6 +21,8 @@ macOS 已安装 Homebrew Pango/GLib、却遇到 `cannot load library libgobject-
 
 作品编排改 `catalog/publications.json`；章节身份用正文的稳定 `chapter` 标记，改标题、插章或重排不要改掉已发布的锚点。Observability 费用数值改 `catalog/observability-pricing.json`，未来计费日期归 `catalog/launches.json`；`tools/content.py` 按显式 as-of、正文 `observability_as_of`、`source_cutoff` 的优先级生成对应时间的说明。报告新增为独立条目，历史报告不参与同步。资料架例子改三份 `materials/` 原件后，运行 `python3 examples/reading-shelf/build.py` 重建页面。
 
+例子附件、资料架 ZIP 与出版阅读闭包共用 `tools/example_files.py` 的显式清单；新增可分发源文件时在这里接线，不递归收取例子目录。资料架的 `prepare_publish.py` 只把四个公开文件准备到本地 `public/`；固定 Wrangler 是可选开发工具，默认检查不用 npm、账号或云资源。新增静态发布路线的操作边界见[用例](use-cases/publish-reading-shelf.md)。
+
 先查一项变更影响哪里，再判断哪些候选真的需要修改：
 
 ```sh

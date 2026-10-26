@@ -1358,5 +1358,29 @@
     "kind": "official_primary",
     "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
     "published_on": "2026-10-19"
+  },
+  {
+    "id": "S172",
+    "title": "Workers Static Assets 静态站起步",
+    "url": "https://developers.cloudflare.com/workers/static-assets/get-started/",
+    "accessed": "2026-10-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_static_assets_configuration_and_cli_docs; local_Wrangler_4.152.0; no_account_or_live_deployment"
+  },
+  {
+    "id": "S173",
+    "title": "纯静态 assets 配置与可省略的脚本和 binding",
+    "url": "https://developers.cloudflare.com/workers/static-assets/migration-guides/migrate-from-pages/",
+    "accessed": "2026-10-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_static_assets_configuration_and_cli_docs; local_Wrangler_4.152.0; no_account_or_live_deployment"
+  },
+  {
+    "id": "S174",
+    "title": "Wrangler 本地预览、部署与删除命令",
+    "url": "https://developers.cloudflare.com/workers/wrangler/commands/workers/",
+    "accessed": "2026-10-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_static_assets_configuration_and_cli_docs; local_Wrangler_4.152.0; no_account_or_live_deployment"
   }
 ]

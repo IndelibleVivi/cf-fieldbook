@@ -61,7 +61,7 @@ def _add_dir(files: list[Path], root: Path, name: str) -> list[Path]:
 
 def included(root: Path, fam: dict) -> list[Path]:
     """Close the freeze over the family's actual manuscript, figures, glossary,
-    sources and needed tools, and cover the directories those references reach.
+    sources and needed tools. Each reading is already an explicit file.
     Unrelated prose and the whole maintenance-doc tree are not packaged."""
     files = [root / name for name in ('package.json', 'package-lock.json', 'requirements-render.txt',
                                       pub.PUBLICATIONS_PATH, *READER_DEPENDENCIES,
@@ -72,12 +72,10 @@ def included(root: Path, fam: dict) -> list[Path]:
         if top not in allowed:
             raise ValueError(f'{fam["id"]}: reading {relative} is outside the input allowlist')
         path = root / relative
-        if path.suffix in SUFFIXES:
-            if path.is_symlink() or not path.resolve().is_relative_to(root.resolve()):
-                raise ValueError(f'input must be a regular repository file: {relative}')
-            files.append(path)
-        else:
-            _add_dir(files, root, top)
+        if (not path.is_file() or path.is_symlink()
+                or not path.resolve().is_relative_to(root.resolve())):
+            raise ValueError(f'input must be a regular repository file: {relative}')
+        files.append(path)
     # The shared tools (including publications.py) always travel with the renderer.
     _add_dir(files, root, 'tools')
     # The catalog holds the exact cross-page data the renderer resolves entry

@@ -22,6 +22,7 @@ Markdown 保存解释；catalog 保存跨页复用的精确记录；源码保存
 | 来源书目 | catalog/sources.json | 来源索引、核验记录 | 导出 HTML 的无来源数字 |
 | 内容身份与依赖 | catalog/entries.json | 导航、影响查询、到期队列 | frontmatter 另存一份同样依赖 |
 | 请求外壳、任务状态 | examples 内的源码 | 例子执行、引用或一致性测试 | 文内粘贴后独立修改的算法 |
+| 例子分发范围 | tools/example_files.py 的显式文件清单 | 站点附件、资料架 ZIP 与出版阅读闭包 | 按例子目录递归收取本地依赖、配置和生成物 |
 | 图的结构和文字 | diagrams/src/*.mmd | assets/diagrams/*.svg | 手工移动 SVG 节点后不更新源码 |
 | 装饰 | assets/motifs 独立 SVG | 封面、封底、少量细节 | 让装饰成为状态唯一编码 |
 | 私人运行与凭据 | 仓库外 | 明确获准的运行节点 | tracked .env、真实配置、原始运行日志 |

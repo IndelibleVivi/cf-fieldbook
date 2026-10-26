@@ -8,6 +8,12 @@
   const normalize = value => String(value).normalize('NFKC').toLocaleLowerCase().replace(/\s+/g, ' ').trim();
   // These phrases name reading intentions. They only match words already in a section.
   const aliases = [
+    { phrases: ['关机后还能读吗', '电脑关机后还能看吗', '关机后朋友还能读吗'],
+      words: ['静态', '发布'], intent: 'shelf-publish' },
+    { phrases: ['改了原文页面没变', '原文改了页面还是旧的', '漏 build', '忘了build'],
+      words: ['重建', 'build'], required: ['原件'], intent: 'shelf-rebuild' },
+    { phrases: ['下载完整资料架', '下载整个例子'],
+      words: ['完整', 'zip'], required: ['资料架'], intent: 'shelf-download' },
     { phrases: ['任务重复', '重复执行'], words: ['重复', '不止一次', '重试', '幂等'], intent: 'repeat' },
     { phrases: ['断了怎么办', '中断恢复'], words: ['恢复', '租约', '接管'], intent: 'recover' },
     { phrases: ['外网访问', '内网穿透'], words: ['tunnel'], intent: 'tunnel' },
@@ -125,6 +131,11 @@
       if (parsed.intents.includes('cjk-keyword') && url.startsWith('services/search.html#')) score += 90;
       if (parsed.intents.includes('extraction') && url.startsWith('services/decision-models.html#')) score += 90;
       if (parsed.intents.includes('browser-cancel') && url.startsWith('services/agent-runtime.html#')) score += 90;
+      if (parsed.intents.includes('shelf-publish') && url.startsWith('use-cases/publish-reading-shelf.html#') && heading.includes('关机')) score += 110;
+      if (url.startsWith('examples/reading-shelf/README.html#')) {
+        if (parsed.intents.includes('shelf-rebuild') && heading.includes('修改并重建')) score += 110;
+        if (parsed.intents.includes('shelf-download') && heading.includes('取得完整例子')) score += 110;
+      }
       if (url.startsWith('use-cases/project-context.html#')) {
         if (parsed.intents.includes('migration') && heading.includes('vps')) score += 110;
         if (parsed.intents.includes('publishing') && heading.includes('发布')) score += 110;

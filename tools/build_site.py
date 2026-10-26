@@ -12,6 +12,7 @@ import os
 from pathlib import Path
 import re
 import shutil
+import zipfile
 from urllib.parse import quote, unquote, urlsplit, urlunsplit
 from xml.etree import ElementTree
 
@@ -22,6 +23,7 @@ import yaml
 
 from content import project_markdown
 import publications as pub
+from example_files import EXAMPLE_FILES, example_paths
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_DOCS = (
@@ -33,7 +35,7 @@ PUBLIC_DOCS = (
 PUBLIC_REPOSITORY_PATHS = {
     'AGENTS.md', '.github/workflows/check.yml', 'requirements-render.txt', 'requirements-design.txt',
     'package.json', 'package-lock.json',
-    *(f'tools/{name}.py' for name in ('build_site', 'content', 'editions', 'render', 'figures', 'fieldbook', 'check', 'render_diagrams', 'recovery_demo', 'publications', 'share_images')),
+    *(f'tools/{name}.py' for name in ('build_site', 'content', 'editions', 'render', 'figures', 'fieldbook', 'check', 'render_diagrams', 'recovery_demo', 'publications', 'example_files', 'share_images')),
     *(f'tests/{name}.py' for name in ('test_examples', 'test_fieldbook', 'test_job_recovery', 'test_decision_example', 'test_api_operations', 'test_site', 'test_publication')),
     'tests/site-search.test.cjs',
 }
@@ -50,15 +52,8 @@ READER_MOTIFS = {'service': 'edge-route', 'comparison': 'weigh-routes', 'use-cas
 LINK_LABELS = {'internal': '站内阅读', 'term': '词义，可就地展开或打开词表', 'repository': '本项目公开源码，前往 GitHub',
                'source': '外部来源，离开本站', 'attachment': '附件；下载或打开文件'}
 READER_PREFIXES = {'services', 'comparisons', 'use-cases', 'guides', 'reference', 'reports', 'examples', 'practice'}
-EXAMPLE_FILES = {
-    'api-operations': ('model.py', 'demo.py', 'example.meta.json'),
-    'decision-routing': ('payloads.py', 'example.meta.json'),
-    'health-worker': ('index.mjs', 'worker.test.mjs', 'wrangler.example.json', 'example.meta.json'),
-    'job-state': ('model.py', 'demo.py', 'example.meta.json'),
-    # A small offline reading shelf: three synthetic documents plus a static index.
-    'reading-shelf': ('build.py', 'index.html', 'materials/welcome.md', 'materials/notes.md',
-                      'materials/checklist.md', 'example.meta.json'),
-}
+READING_SHELF_BUNDLE = 'examples/reading-shelf/cf-fieldbook-reading-shelf.zip'
+READING_SHELF_BUNDLE_ROOT = 'cf-fieldbook-reading-shelf'
 KIND_LABELS = {'use-case': '用途', 'guide': '手册', 'service': '服务', 'comparison': '比较',
                'example': '例子', 'reference': '实施参考', 'report': '带日期报告', 'practice': '实践', 'doc': '资料维护'}
 STATUS_LABELS = {'current': '当前资料', 'superseded': '已有替代', 'archived': '历史归档',
@@ -241,12 +236,14 @@ class Site:
             selected.update((diagram['source'], diagram['output']))
         selected.update(f'assets/{key}.svg' for key in FIGCAP)
         selected.update(('assets/two-routes-mobile.svg', 'assets/task-state-mobile.svg'))
-        for name, filenames in EXAMPLE_FILES.items():
+        for name in EXAMPLE_FILES:
             path = f'examples/{name}/README.md'
             # Executable bytes are distributed only for catalog-current examples.
             if self.entries.get(path, {}).get('status') == 'current':
-                selected.update(f'examples/{name}/{f}' for f in filenames)
-        return {p for p in selected if (self.root / p).is_file()}
+                selected.update(example_paths(self.root, name))
+                if name == 'reading-shelf':
+                    selected.add(READING_SHELF_BUNDLE)
+        return {p for p in selected if p == READING_SHELF_BUNDLE or (self.root / p).is_file()}
 
     def page_markdown(self, path: str) -> str:
         entry = self.entries.get(path, {})
@@ -632,7 +629,19 @@ class Site:
             related = sorted(p for p in self.attachments
                              if root_dir == Path(p).parent or root_dir in Path(p).parents)
             demo_link = '<p><a href="demo.html">逐步观察：任务恢复演示 →</a>（离线模型事件回放）</p>' if path == 'examples/job-state/README.md' and self.demo_available() else ''
-            files = '<section class="example-downloads"><h2>例子附件</h2>' + demo_link + '<p>在自己的本地环境检查；本站不调用云端服务或部署例子。</p><ul>' + ''.join(
+            if path == 'examples/reading-shelf/README.md':
+                related = [p for p in related if p != READING_SHELF_BUNDLE]
+                demo_link = (f'<p><a href="{escape(self.url(page, "examples/reading-shelf/index.html"))}">打开资料架成品 →</a></p>'
+                             f'<p><a download href="{escape(self.url(page, READING_SHELF_BUNDLE))}">下载完整资料架 ZIP ↓</a>'
+                             '（保留目录、原件、构建与可选发布工具、署名及许可）</p>'
+                             '<p>解压后进入 <code>cf-fieldbook-reading-shelf/</code> 根目录，再运行说明中的命令。</p>')
+                files_heading = '查看或下载单个源文件'
+            else:
+                files_heading = '例子附件'
+            files = '<section class="example-downloads"><h2>例子附件</h2>' + demo_link + '<p>在自己的本地环境检查；本站不调用云端服务或部署例子。</p>'
+            if path == 'examples/reading-shelf/README.md':
+                files += f'<h3>{files_heading}</h3><p>单个文件便于查阅；运行与修改请取完整 ZIP，逐个保存不会自动建立目录。</p>'
+            files += '<ul>' + ''.join(
                 f'<li><a download href="{escape(self.url(page, p))}">{escape(Path(p).relative_to(root_dir))} ↓</a></li>' for p in related) + '</ul></section>'
         status = entry.get('status', 'current')
         self.directory_items.append({'title': self.titles[path], 'url': page, 'kind': kind, 'status': status})
@@ -861,6 +870,52 @@ class Site:
             return f'{label}（仓库文件，未随阅读站分发）'
         return re.sub(r'(!?)\[([^\]]+)\]\(([^)]+)\)', link, self.texts[path])
 
+    def bundle_markdown(self, path: str, text: str, members: set[str]) -> str:
+        """Keep in-package links local and send other references to public owners."""
+        def link(match):
+            prefix, label, value = match.groups()
+            parsed = urlsplit(value)
+            if parsed.scheme or parsed.netloc or value.startswith('#'):
+                return match[0]
+            target = (self.root / Path(path).parent / unquote(parsed.path)).resolve()
+            if not target.is_relative_to(self.root):
+                raise ValueError(f'Link escapes repository: {path}: {value}')
+            relative = target.relative_to(self.root).as_posix()
+            if relative in members:
+                return match[0]
+            if relative in self.paths:
+                public = PUBLIC_SITE_URL + quote(str(Path(relative).with_suffix('.html')), safe='/')
+            else:
+                public = REPOSITORY_URL + quote(relative, safe='/')
+            return f'{prefix}[{label}]({public}' + (f'#{parsed.fragment}' if parsed.fragment else '') + ')'
+        return re.sub(r'(!?)\[([^\]]+)\]\(([^)]+)\)', link, text)
+
+    def write_reading_shelf_bundle(self) -> None:
+        members = {*example_paths(self.root, 'reading-shelf', include_readme=True),
+                   'LICENSE', 'LICENSE-DOCUMENTATION.md', 'LICENSE-STATUS.md'}
+        intro = ("# CF Fieldbook · 三份文档的小资料架\n\n"
+                 "本包保留仓库相对目录。解压后先进入 `cf-fieldbook-reading-shelf/` 根目录；"
+                 "所有 `python3 examples/reading-shelf/...` 命令都从这里执行。\n\n"
+                 "直接打开 `examples/reading-shelf/index.html` 阅读成品；完整操作、修改与重建步骤见"
+                 "[例子说明](examples/reading-shelf/README.md)。默认只需 Python，不登录或部署。\n\n"
+                 "```sh\npython3 -m http.server 8768 --bind 127.0.0.1 --directory examples/reading-shelf\n```\n\n"
+                 "打开 http://127.0.0.1:8768/ 。结束时用 Ctrl+C 停止服务器。\n\n"
+                 "可选发布工具和锁文件也在例子目录；安装依赖、登录和云端发布是单独步骤，"
+                 "按例子说明链接的正式指南执行。包内不含 npm 依赖、账号配置或发布产物。\n\n"
+                 "保留 [代码许可](LICENSE)、[内容许可](LICENSE-DOCUMENTATION.md) 与"
+                 "[许可范围](LICENSE-STATUS.md)。\n\n"
+                 "GitHub · [IndelibleVivi/cf-fieldbook](https://github.com/IndelibleVivi/cf-fieldbook)  \n"
+                 "*made by Faye & Cove*\n")
+        target = self.output / READING_SHELF_BUNDLE
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with zipfile.ZipFile(target, 'w', compression=zipfile.ZIP_DEFLATED) as bundle:
+            bundle.writestr(f'{READING_SHELF_BUNDLE_ROOT}/README.md', intro)
+            for path in sorted(members):
+                data = (self.root / path).read_bytes()
+                if Path(path).suffix == '.md':
+                    data = self.bundle_markdown(path, data.decode('utf-8'), members).encode('utf-8')
+                bundle.writestr(f'{READING_SHELF_BUNDLE_ROOT}/{path}', data)
+
     def write(self, path: str, text: str) -> None:
         target = self.output / path
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -912,10 +967,12 @@ class Site:
         self.write('search-index.json', json.dumps(self.search, ensure_ascii=False, indent=2) + '\n')
         self.write('sources.html', self.sources_page())
         self.write('404.html', self.not_found())
-        for path in sorted(self.attachments | demo_assets | SITE_ASSETS):
+        for path in sorted((self.attachments | demo_assets | SITE_ASSETS) - {READING_SHELF_BUNDLE}):
             target = self.output / path
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(self.root / path, target)
+        if READING_SHELF_BUNDLE in self.attachments:
+            self.write_reading_shelf_bundle()
         html_pages = ([str(Path(path).with_suffix('.html')) for path in self.paths] + demo_pages
                       + ['index.html', 'products.html', 'publications.html', *version_pages,
                          'directory.html', 'sources.html', '404.html'])

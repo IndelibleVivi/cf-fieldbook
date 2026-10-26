@@ -14,6 +14,8 @@
 
 | 我现在想做什么 | 从这里开始 | 读完或运行后得到什么 |
 |---|---|---|
+| 先做完一个可读的小项目 | [三份文档的小资料架](examples/reading-shelf/README.md) | 打开成品或取得完整包，在本地阅读、下载原文、修改并重建，再按需要临时分享或持续公开 |
+| 让朋友在我关机后仍能读公开资料 | [把同一个资料架公开发布](use-cases/publish-reading-shelf.md) | 准备独立发布目录，预览后按明确步骤部署、更新和停用 |
 | 看服务在真实系统里怎样配合 | [三篇实践记录](practice/README.md) | 私有资料站的交付与检索、Access/PWA 重连、Tunnel 状态页的分层检查 |
 | 给网页、API 或已有服务选入口 | [个人基础设施实践手册](guides/handbook.md) | 画清请求、身份、程序与数据的路径，再选择需要的服务 |
 | 理解任务为什么登记了却没完成 | [任务中断与恢复](use-cases/recoverable-jobs.md) | 看见租约恢复、迟到拒绝与未知结果，知道哪些动作不能盲目重试 |
@@ -24,10 +26,11 @@
 | 控制程序发出的云 API 或 HTTP 请求 | [云 API 与 HTTP 出站控制](services/egress-controls.md) | 确认代理、Gateway 与 Worker 实际检查的流量和条件 |
 | 用程序盘点或维护 CF 资源 | [API 与 SDK 维护](reference/api-maintenance.md) · [可靠操作例子](examples/api-operations/README.md) | 选择调用入口，识别完整分页、总期限、部分失败与未知写结果 |
 | 找回项目为什么这样选，判断变化是否相关 | [把变化接到当前项目](use-cases/project-context.md) · [项目判断任务单](templates/project-context-task.md) | 由 agent 读取已有理由与具体用法，区分命中、已查范围未发现和未知 |
-| 先做完一个可读的小项目 | [三份文档的小资料架](examples/reading-shelf/README.md) | 本地阅读合成文档，经本地 HTTP 下载，沿同一份材料继续理解权限、更新、任务与检索 |
 | 运行例子，或把检查交给 agent | [五个离线例子](examples/README.md) · [恢复任务单](templates/job-recovery-task.md) | 用合成输入取得实际输出、失败证据与清理结果 |
 
 不熟悉的词可以先查[术语小词表](docs/glossary.md)。需要精确配置、命令或完整状态约束时，从对应例子进入[实施参考](reference/implementation.md)。
+
+资料架的接续只有一份材料：本地 HTTP 负责自己阅读；[临时分享](use-cases/temporary-sharing.md)把请求转回仍在运行的电脑；静态发布提供上传的公开文件。阅读站的完整 ZIP 保留 `examples/reading-shelf/` 目录和署名许可，解压后可直接沿用命令。发布工具是可选的 Node.js 22+／固定 Wrangler 开发依赖，默认 Python 阅读与构建不登录或部署。
 
 三册之后的变化集中在[独立更新增补](reports/2026-10-update-supplement.md)：汇集 10 月 8 日、13 日与 20 日的资料，按检索、模型、执行、出站控制与维护连贯阅读。增补 PDF 已完成本地候选与检查，尚未发布为 GitHub Release。
 
@@ -90,6 +93,8 @@ Node.js 20+ 用于 Worker 测试；Mermaid 只在修改图示时需要安装。[
 公共例子使用合成输入，没有账号凭据或真实运行数据。阅读站由 GitHub Pages 托管，主分支通过检查后自动更新。搜索在浏览器内完成，不向搜索服务发送查询；站点不嵌入统计脚本或远程字体。云端实验、定期上游监控和新版出版物 Release 独立于网站部署。
 
 PDF 构建保留可复制文字、链接和书签，并对本机 PingFang 的 CFF 字体封装作原生预览兼容处理；新文件仍须在实际阅读设备验收。字体嵌入或文字提取通过不能代替显示检查，见[出版流程](docs/publication.md)。
+
+当前手册另有纳入 10 月 26 日资料的 31 页本地候选，已重新检查网页回访、字体与 macOS 显示，尚未登记为 Release 或“latest PDF”；其状态与旧版设备检查分开记录，见[当前状态](docs/current-state.md)。
 
 原创功能代码采用 [SUL-1.0](LICENSE)；原创正文、出版物、独立图形和资料编排采用 [CC BY-NC-SA 4.0](LICENSE-DOCUMENTATION.md)。这是一份 source-available 项目，不是无商业使用限制的 OSI 开源软件；具体路径与第三方例外见[许可与权利范围](LICENSE-STATUS.md)。
 

@@ -10,13 +10,21 @@ source_cutoff: 2026-10-03
 
 ## 从本机页面到指定邮箱
 
-先在本机确认 `http://localhost:8080` 打开预期页面。使用含新参数的 `cloudflared` 后，可以运行：
+沿用[小资料架](../examples/reading-shelf/README.md)的本地服务，从仓库或完整包的解压根目录运行：
 
 ```bash
-cloudflared tunnel --url http://localhost:8080 --allowed-mail 'alice@example.com,bob@example.com'
+python3 -m http.server 8768 --bind 127.0.0.1 --directory examples/reading-shelf
+```
+
+保持这个终端运行，确认 `http://127.0.0.1:8768` 打开预期页面，再另开一个终端运行含新参数的 `cloudflared`：
+
+```bash
+cloudflared tunnel --url http://127.0.0.1:8768 --allowed-mail 'alice@example.com,bob@example.com'
 ```
 
 访问者输入获准邮箱，再填写邮件 PIN；无需 Cloudflare account。也可以重复该参数，或明确选择 `'*@example.com'` 域规则。示例邮箱都是占位符。[S109]
+
+分享已有应用时，改用你刚确认能打开的实际本地地址。这里的 `8768` 专门承接资料架，其他应用的端口不必跟随修改。
 
 普通 Quick Tunnel 没有 `--allowed-mail` 时，拿到 URL 的人仍可访问。它不会自动成为默认私有入口，也不替应用建立角色、数据库权限或对下载副本的控制。[S110]
 
@@ -28,7 +36,7 @@ Quick Tunnel 用于测试与开发，没有 SLA，当前最多 200 个并发请�
 
 ## 从一次试看过渡到长期服务
 
-先决定程序在哪里持续运行，再决定谁可用：本机编辑、云端交付可以让读者在电脑关闭后继续阅读；仅把本机 HTTP 包装成公网 URL 做不到这一点。继续读[请求路线](../guides/handbook.md#routes)、[Access 与替代入口](../guides/handbook.md#access)和[私有阅读站实践](../practice/private-reader.md)。
+先决定程序在哪里持续运行，再决定谁可用：公开的三份资料可以继续走[同一资料架的静态发布](publish-reading-shelf.md)，让朋友在电脑关闭后仍能读取上传的文件；仅把本机 HTTP 包装成公网 URL 做不到这一点。继续读[请求路线](../guides/handbook.md#routes)、[Access 与替代入口](../guides/handbook.md#access)和[私有阅读站实践](../practice/private-reader.md)。
 
 本仓库没有运行 Tunnel、发送 PIN 或检验真实邮箱；上述检查属于另行授权的云端实验，本文证据是官方资料查阅。
 

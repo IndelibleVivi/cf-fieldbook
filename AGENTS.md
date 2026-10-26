@@ -11,6 +11,7 @@ CF Fieldbook 是独立的参考资料与离线例子仓库。先读 [README](REA
 - `source_cutoff` 拥有当前正文纳入资料的时间上界，用于网页摘要、版本页、冻结 `as_of`、出版封面与分享卡；它不表示全部来源同日重新核验，各来源日期与局部范围仍分别保留。
 - Observability 费用取 `catalog/observability-pricing.json`，生效日期归 `catalog/launches.json`；投影依次使用调用参数 `as_of`、正文 `observability_as_of`、正文 `source_cutoff`，不用构建当天刷新事实。其他段落更新截止日时，不顺带刷新固定费用表的日期。
 - `tools/build_site.py` 是唯一阅读站构建入口，只分发显式 allowlist。阅读呈现的注释过滤与单次署名不回写 Markdown；代码中的注释示例和权利声明须保留，不通过开启任意 HTML 来处理维护标记。
+- `tools/example_files.py` 拥有例子可分发文件清单，站点附件／完整包和出版阅读闭包共用；不递归收取例子目录。`node_modules`、本地实际配置与生成 `public/` 不能因同目录存在而进入下载或冻结。完整 ZIP 目前仅为 current reading-shelf 生成，撤下或归档时入口、包和附件随重建停止分发。
 - `docs/glossary.md` 的词条首段拥有短释义；站点从它生成就地解释，冻结出版物嵌入当版所引用的定义。术语链接保留普通 Markdown 锚点。
 - `styles/search.js` 拥有本地问题别名与排序；索引来自实际正文小节。搜索目标必须有答案，不能用别名掩盖缺失内容。
 - `tools/fieldbook.py impact-source` 从登记条目的正文引用与 JSON `source` 单值／`sources` 数组定位，再复用 `impact`；直接引用也纳入候选，历史条目保持传播终点。来源书目、代码、注释与附录不作为使用点，不推断项目适用性、不改正文或日期。
@@ -18,6 +19,7 @@ CF Fieldbook 是独立的参考资料与离线例子仓库。先读 [README](REA
 - `examples/api-operations/model.py` 拥有合成分页、总期限和未知写结果核对的教学行为；不是实际 SDK，不引入网络或真实账号。
 - `examples/job-state/model.py` 拥有恢复规则；`tools/recovery_demo.py` 执行模型生成合成场景，`styles/recovery.js` 只控制场景与播放。演示只随 current 例子分发，不增加云端执行。
 - `examples/reading-shelf/materials/` 拥有三份合成原件；`build.py` 生成 `index.html`，不另行编辑生成正文。静态例子不包含手册扩展设计中的权限、数据库或索引。
+- `examples/reading-shelf/prepare_publish.py` 仅重建并准备四个公开文件到本地 `public/`，遇到额外文件或符号链接停止，不清理未知内容。Wrangler 是例子目录中固定的可选开发工具，实际发布配置和生成目录留在 Git 外；默认检查、站点和出版构建不登录或调用它。远端部署、更新和删除遵循独立授权。
 - `tools/editions.py freeze/build/check` 是三册出版入口，使用冻结输入内的 renderer；`.build/editions/` 是本地产物，`dist/` 是固定 r3 历史。
 - `tools/render.py embed_compact_cid_fonts` 拥有 PDF 的 identity CID CFF 封装兼容处理，保留原 CFF bytes；不要通过改字形、改正文或栅格化来修显示。字体／renderer 改动须同时看 Poppler 与原生预览正文，文字提取不能代替显示验收；具体设备实测分开记录。
 - `tools/share_images.py` 从作品编排、日期与原创 SVG 生成 `assets/share/` PNG；普通站点构建只复制。作品身份、截止日或母题变化须重建并复看分享卡。

@@ -33,7 +33,7 @@ def validate(root: Path = ROOT) -> list[str]:
             date.fromisoformat(source['accessed'])
         except ValueError:
             errors.append(f"bad checked date: {source['id']}")
-    for name in [*(p.relative_to(root).as_posix() for p in sorted((root / 'reports').glob('*.md'))), 'guides/handbook.md', 'reference/implementation.md', 'reference/api-maintenance.md', 'comparisons/clef-vs-jev.md', 'services/observability.md', 'services/search.md', 'services/agent-runtime.md', 'services/egress-controls.md', 'use-cases/temporary-sharing.md', 'use-cases/project-context.md']:
+    for name in [*(p.relative_to(root).as_posix() for p in sorted((root / 'reports').glob('*.md'))), 'guides/handbook.md', 'reference/implementation.md', 'reference/api-maintenance.md', 'comparisons/clef-vs-jev.md', 'services/observability.md', 'services/search.md', 'services/agent-runtime.md', 'services/egress-controls.md', 'use-cases/temporary-sharing.md', 'use-cases/publish-reading-shelf.md', 'use-cases/project-context.md']:
         text = (root / name).read_text()
         refs = set(re.findall(r'\[(S\d{2,3})\]', text))
         if refs - ids:

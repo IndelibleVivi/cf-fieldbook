@@ -2,9 +2,9 @@
 title: Cloudflare 个人基础设施实践手册
 subtitle: 从一个入口到可恢复的应用与自动化
 edition: 2026.10 · 持续阅读修订
-source_cutoff: 2026-10-20
+source_cutoff: 2026-10-26
 observability_as_of: 2026-10-20
-presentation_revision: 3
+presentation_revision: 4
 author: Faye & Cove
 github: https://github.com/IndelibleVivi
 credits: made by Faye & Cove
@@ -23,11 +23,7 @@ scope: 不含邮件服务；通用示例与实际账户分离
 
 读完选中的路线后，你应能画清一次请求经过谁、身份在哪里核验、任务与成果如何保存；再用配套离线例子检查一个具体机制。陌生词可以查[术语小词表](../docs/glossary.md)，精确命令见[例子](../examples/README.md)与[实施参考](../reference/implementation.md)。配套练习默认离线，使用合成输入。实际部署的配置条件和验证步骤在各节说明。
 
-原有条目沿用 **2026-10-02** 的核验范围；本次新增观测、PiHarness、互联网搜索、临时分享及 R2 费用说明，来源查阅截至 **2026-10-03**。严格机器认证、Tunnel API 与 Sandbox 接口另于 **2026-10-05** 定向核验，不刷新全书事实。不同条目的核验范围见[来源说明](../docs/provenance.md)。决策模型的供应路径另见[Clef 与 Jev 比较](../comparisons/clef-vs-jev.md)，详细代码和状态约束见[实施参考](../reference/implementation.md)。邮件服务不在本期范围内。
-
-**2026-10-13 定向更新：** 决策模型价格与输入预算、运行时排空、agent 搜索／抓取与 OpenCodeHarness、Queues／D1 地点约束，以及 Artifacts 计费日期与容量限制。当时没有重核其他价格；变化及采用条件保留在[10 月 13 日观察](../reports/2026-10-13.md)。
-
-**2026-10-20 定向更新：** 中文关键词检索、Clairic 字段抽取、浏览器跨轮运行、MCP 事件与增权、出站请求控制，以及 Cron、SSH、Tunnel 和构建条件。观测费用表本次单独复核，固定日期更新为 10 月 20 日，12 月新方案改用 10 GB-month。其余旧事实保留各自日期，完整范围见[本期观察](../reports/2026-10-20.md)。
+本版纳入资料截至 **2026-10-26**；新增静态发布路线只核对相关文档与本地工具，其他事实保留各自核验日期。详细范围与各轮更新见[关于这一版](#关于这一版)。邮件服务不在本期范围内。
 
 <!-- chapter: start -->
 
@@ -37,7 +33,7 @@ scope: 不含邮件服务；通用示例与实际账户分离
 
 检索、模型与 agent 执行分别在第 7–9 章。系统已经能运行，却越来越难维护，可以直接读第 10–13 章。各章不构成强制施工顺序。
 
-从同一个[三份文档小资料架](../examples/reading-shelf/README.md)开始：直接打开并读完，经本地 HTTP 下载原文，先取得一个完整结果。之后需要限制读者、保存版本、生成索引时，再沿相应章节扩展。它使用合成输入，没有云端依赖。
+从同一个[三份文档小资料架](../examples/reading-shelf/README.md)开始：打开成品，或下载完整 ZIP，保留目录后在本地读完、下载原文、修改一句并重建。先观察一次“改了原文但暂不 build”的差异，再让两处一致。需要给朋友看时，按下面第 3–4 章选择[持续公开](../use-cases/publish-reading-shelf.md)或[临时分享](../use-cases/temporary-sharing.md)；权限、数据库和索引可以等出现需要后再加入。例子默认离线并使用合成输入，云端步骤另外执行。
 
 本手册解释做法；配套《Cloudflare 新发布观察》记录当期产品变化和价格时间线。工具名或价格影响决策时，可通过文内来源编号回查。
 
@@ -75,6 +71,14 @@ scope: 不含邮件服务；通用示例与实际账户分离
 <!-- chapter: first-worker -->
 
 ## 03 / 发布第一个小入口
+
+### 先让同一个资料架持续可读
+
+已经读完小资料架，只想让朋友在你的电脑关闭后继续阅读，可以直接[发布这四个公开文件](../use-cases/publish-reading-shelf.md)。先在本地生成独立的 `public/`，检查页面与三份原文，再用固定版本的 Wrangler 预览；核对公开内容和目标账号后才执行部署。纯静态页面可以采用 Workers Static Assets，无需另写 Worker handler 或增加 `ASSETS` binding。[S172] [S173]
+
+本地 HTTP 从你的电脑读取文件；Tunnel 仍把请求送回这台电脑；静态发布则提供已上传的文件。因而关机后，只有上传后的那份继续服务。修改原件后仍要重新生成并发布，云端不会自动跟随本地编辑。完整路线还包括更新核对与停用清理；本书已检查本地产物，没有执行这次云端实验。
+
+只有需要程序按请求返回结果时，再接着做下面的健康入口。
 
 ### 先选一个很容易判断对错的功能
 
@@ -139,10 +143,10 @@ Workers Static Assets 可把网页与 API 一起发布。要确定静态资源�
 已经在本机打开的小资料架，只想给两位朋友看，可以先用 Protected Quick Tunnel 的邮箱 PIN，不必先配正式域名。`--allowed-mail` 是可选限制；没有它的普通 Quick Tunnel 仍向拿到 URL 的人开放。电脑关机或 `cloudflared` 停止后，访问也停止。[S109]
 
 ```bash
-cloudflared tunnel --url http://localhost:8080 --allowed-mail 'alice@example.com,bob@example.com'
+cloudflared tunnel --url http://127.0.0.1:8768 --allowed-mail 'alice@example.com,bob@example.com'
 ```
 
-这是供读者另外执行的网络命令，本仓库没有启动 Tunnel。先试允许邮箱、另一个不允许的邮箱，再停止连接器确认入口失效；完整步骤与开发限制见[临时给几个人看本地 demo](../use-cases/temporary-sharing.md)。长期私有服务继续读下面的 Access 路线。
+保持资料架的 Python 服务终端运行，确认 `http://127.0.0.1:8768` 打开预期页面，再另开终端执行这条网络命令；已有应用使用刚确认的实际地址。本仓库没有启动 Tunnel。先试允许邮箱、另一个不允许的邮箱，再停止连接器确认入口失效；完整步骤与开发限制见[临时给几个人看本地 demo](../use-cases/temporary-sharing.md)。公开资料若要在关机后继续阅读，转到[静态发布](../use-cases/publish-reading-shelf.md)；长期私有服务继续读下面的 Access 路线。
 
 ### 能到达，不等于有权使用
 
@@ -569,7 +573,7 @@ Artifacts 限 Workers Paid，每月含 10,000 operations 与 1 GB 存储；超�
 | 任务有记录却没结果 | outbox、领取状态、租约与未知结果 |
 | 容器文件消失 | 生命周期、镜像、快照与持久成果 |
 
-状态码是线索，不是诊断。一次只验证一个原因，恢复后重新测拒绝路径，避免“能打开了”掩盖权限被顺手放宽。
+状态码是线索，不是诊断。Tunnel 显示 Healthy、请求跳到登录页和真正进入应用，分别证明不同层次；沿[受保护状态页实践](../practice/protected-status.md)逐层核对。一次只验证一个原因，恢复后重新测拒绝路径，避免“能打开了”掩盖权限被顺手放宽。
 
 ### 让恢复目标具体一点
 
@@ -584,6 +588,16 @@ Artifacts 限 Workers Paid，每月含 10,000 operations 与 1 GB 存储；超�
 <!-- chapter: edition-notes -->
 
 ## 14 / 继续维护这份手册
+
+### 关于这一版
+
+原有条目沿用 **2026-10-02** 的核验范围；10 月 3 日新增观测、PiHarness、互联网搜索、临时分享及 R2 费用说明，来源查阅截至 **2026-10-03**。严格机器认证、Tunnel API 与 Sandbox 接口另于 **2026-10-05** 定向核验，不刷新全书事实。不同条目的核验范围见[来源说明](../docs/provenance.md)。决策模型的供应路径另见[Clef 与 Jev 比较](../comparisons/clef-vs-jev.md)，详细代码和状态约束见[实施参考](../reference/implementation.md)。邮件服务不在本期范围内。
+
+**2026-10-13 定向更新：** 决策模型价格与输入预算、运行时排空、agent 搜索／抓取与 OpenCodeHarness、Queues／D1 地点约束，以及 Artifacts 计费日期与容量限制。当时没有重核其他价格；变化及采用条件保留在[10 月 13 日观察](../reports/2026-10-13.md)。
+
+**2026-10-20 定向更新：** 中文关键词检索、Clairic 字段抽取、浏览器跨轮运行、MCP 事件与增权、出站请求控制，以及 Cron、SSH、Tunnel 和构建条件。观测费用表本次单独复核，固定日期更新为 10 月 20 日，12 月新方案改用 10 GB-month。其余旧事实保留各自日期，完整范围见[本期观察](../reports/2026-10-20.md)。
+
+**2026-10-26 定向补充：** 同一资料架的完整取得、漏重建观察、8768 临时分享与 Workers Static Assets 发布路线；S172–S174 只核对静态配置与 CLI，Wrangler 实际安装为 `4.152.0`。本地预览、发布目录与候选出版分别检查；没有部署、更新或删除远端资源。`source_cutoff` 表示本版纳入资料的上界，Observability 费用表仍固定 10 月 20 日，旧来源与历史观察不整体改期。
 
 ### 保留问题，更新做法
 
@@ -653,6 +667,9 @@ Artifacts 限 Workers Paid，每月含 10,000 operations 与 1 GB 存储；超�
 - **[S44]** · Workflows 价格
 - **[S45]** · Workers Bindings
 - **[S46]** · Workers Static Assets
+- **[S172]** · Workers Static Assets 静态站起步
+- **[S173]** · 静态发布的 assets 配置与脚本边界
+- **[S174]** · Wrangler 部署、预览与删除命令
 - **[S47]** · Cloudflare Tunnel
 - **[S48]** · Access JWT 验证
 - **[S49]** · Access Service Tokens
@@ -817,3 +834,7 @@ GitHub：[github.com/IndelibleVivi](https://github.com/IndelibleVivi)
 [S151]: https://developers.cloudflare.com/changelog/post/2026-10-19-cloud-workload-security-beta/ "Cloud Workload Security Beta 发布"
 
 [S156]: https://developers.cloudflare.com/cloudflare-one/traffic-controls/integrate-workers/forward-traffic/ "Gateway Forward traffic：执行顺序、限制与故障"
+
+[S172]: https://developers.cloudflare.com/workers/static-assets/get-started/ "Workers Static Assets 静态站起步"
+[S173]: https://developers.cloudflare.com/workers/static-assets/migration-guides/migrate-from-pages/ "静态发布的 assets 配置与脚本边界"
+[S174]: https://developers.cloudflare.com/workers/wrangler/commands/workers/ "Wrangler 部署、预览与删除命令"

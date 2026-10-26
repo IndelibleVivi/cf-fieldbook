@@ -18,3 +18,5 @@ private/
 .playwright-cli/
 .pytest_cache/
 *.log
+examples/reading-shelf/public/
+examples/reading-shelf/wrangler.publish.jsonc

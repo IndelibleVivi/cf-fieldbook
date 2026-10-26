@@ -247,7 +247,8 @@
         "service.agent-runtime",
         "usecase.temporary-sharing",
         "example.reading-shelf",
-        "service.egress-controls"
+        "service.egress-controls",
+        "usecase.publish-reading-shelf"
       ],
       "related": [
         "example.job-state",
@@ -256,7 +257,7 @@
       "review": {
         "state": "inherited",
         "checked_on": "2026-10-02",
-        "scope": "继承 r3 来源记录，核验范围见来源说明；10-03 新主题及 R2/脚手架的局部官方查阅见来源说明；10-05 仅对严格 Service Token、Tunnel routes/connections 与 Artifacts/Sandbox API 区分做定点官方核验，不刷新全部历史事实；10-13 定向吸收模型预算、运行时排空、SDK 读取/harness、Queues/D1 地点与 Artifacts 费用/容量；其余原日期不刷新；10-20 定向吸收当前主题及四项运维条件；Observability费用单独复核，其余旧事实不刷新",
+        "scope": "继承 r3 来源记录，核验范围见来源说明；10-03 新主题及 R2/脚手架的局部官方查阅见来源说明；10-05 仅对严格 Service Token、Tunnel routes/connections 与 Artifacts/Sandbox API 区分做定点官方核验，不刷新全部历史事实；10-13 定向吸收模型预算、运行时排空、SDK 读取/harness、Queues/D1 地点与 Artifacts 费用/容量；其余原日期不刷新；10-20 定向吸收当前主题及四项运维条件；Observability费用单独复核，其余旧事实不刷新；10-26 仅静态发布资料与本地工具核对，其他日期保留",
         "next_review_on": "2026-11-01"
       },
       "evidence": [
@@ -589,6 +590,37 @@
       ]
     },
     {
+      "id": "usecase.publish-reading-shelf",
+      "kind": "use-case",
+      "path": "use-cases/publish-reading-shelf.md",
+      "track": "maintained",
+      "status": "current",
+      "depends_on": [
+        "example.reading-shelf"
+      ],
+      "related": [
+        "usecase.temporary-sharing",
+        "guide.handbook",
+        "reference.implementation"
+      ],
+      "review": {
+        "state": "checked",
+        "checked_on": "2026-10-26",
+        "scope": "S172–S174 定向官方资料；固定 Wrangler 4.152.0 的本地配置、目录与预览；没有账号、部署、更新或停用实测",
+        "next_review_on": "2026-11-25"
+      },
+      "evidence": [
+        {
+          "kind": "source-reviewed",
+          "ref": "docs/provenance.md"
+        },
+        {
+          "kind": "local-executed",
+          "ref": "examples/reading-shelf/prepare_publish.py"
+        }
+      ]
+    },
+    {
       "id": "report.2026-10-03",
       "kind": "report",
       "path": "reports/2026-10-03.md",
@@ -625,12 +657,13 @@
       "depends_on": [],
       "related": [
         "guide.handbook",
-        "practice.private-reader"
+        "practice.private-reader",
+        "usecase.publish-reading-shelf"
       ],
       "review": {
         "state": "checked",
         "checked_on": "2026-10-03",
-        "scope": "三份合成原件生成静态阅读页；离线阅读、跳转与下载，不包含云端扩展",
+        "scope": "三份合成原件生成静态阅读页；离线阅读、跳转与下载，不包含云端扩展；10-26 补完整包、漏重建观察与独立发布目录的本地检查，未执行云端扩展",
         "next_review_on": "2026-12-31"
       },
       "evidence": [

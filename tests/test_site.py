@@ -5,6 +5,8 @@ import json
 import re
 from pathlib import Path
 import shutil
+import subprocess
+import zipfile
 import sys
 import tempfile
 import unittest
@@ -28,7 +30,8 @@ class ReadingSiteTests(unittest.TestCase):
         # Only public build inputs are copied; no working notes or environment.
         for directory in ('catalog', 'services', 'comparisons', 'use-cases', 'guides',
                           'reference', 'reports', 'examples', 'practice', 'diagrams', 'assets', 'styles', 'templates'):
-            shutil.copytree(ROOT / directory, cls.root / directory)
+            shutil.copytree(ROOT / directory, cls.root / directory,
+                            ignore=shutil.ignore_patterns('node_modules', '.wrangler', 'public', '__pycache__', 'wrangler.publish.jsonc'))
         for path in (*build_site.PUBLIC_DOCS, 'LICENSE'):
             if (ROOT / path).is_file():
                 destination = cls.root / path
@@ -84,6 +87,115 @@ class ReadingSiteTests(unittest.TestCase):
             self.assertTrue((self.output / name).is_file())
         self.assertIn('SUL-1.0', (self.output / 'LICENSE-STATUS.html').read_text())
         self.assertIn('CC BY-NC-SA 4.0', (self.output / 'LICENSE-DOCUMENTATION.html').read_text())
+
+    def test_reading_shelf_complete_zip_is_portable_and_allowlisted(self):
+        expected_files = {'README.md', 'build.py', 'index.html', 'example.meta.json',
+                          'materials/welcome.md', 'materials/notes.md', 'materials/checklist.md',
+                          'prepare_publish.py', 'wrangler.publish.example.jsonc', 'package.json', 'package-lock.json'}
+        expected = {'README.md', 'LICENSE', 'LICENSE-DOCUMENTATION.md', 'LICENSE-STATUS.md'}
+        expected.update(f'examples/reading-shelf/{name}' for name in expected_files)
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / 'fieldbook'
+            shutil.copytree(self.root, root, ignore=shutil.ignore_patterns('.build'))
+            # Build from a working tree that contains local installs and private outputs.
+            shelf = root / 'examples/reading-shelf'
+            for relative in ('node_modules/package/private.js', '.wrangler/state.json',
+                             'wrangler.publish.jsonc', '.env', 'secret-sentinel.md',
+                             'public/index.html', '.hidden'):
+                private = shelf / relative
+                private.parent.mkdir(parents=True, exist_ok=True)
+                private.write_text('DO_NOT_DISTRIBUTE_SHELF_SENTINEL')
+            output = root / '.build/bundle-test'
+            manifest = build_site.build_site(root, output)
+            self.assertIn(build_site.READING_SHELF_BUNDLE, manifest['attachments'])
+            self.assertEqual({path.relative_to(output / 'examples/reading-shelf').as_posix()
+                              for path in (output / 'examples/reading-shelf').rglob('*') if path.is_file()},
+                             expected_files | {'README.html', 'cf-fieldbook-reading-shelf.zip'})
+            with zipfile.ZipFile(output / build_site.READING_SHELF_BUNDLE) as bundle:
+                prefix = 'cf-fieldbook-reading-shelf/'
+                self.assertEqual(set(bundle.namelist()), {prefix + path for path in expected})
+                self.assertTrue(all(b'DO_NOT_DISTRIBUTE_SHELF_SENTINEL' not in bundle.read(name)
+                                    for name in bundle.namelist()))
+                for name in ('LICENSE', 'LICENSE-DOCUMENTATION.md', 'LICENSE-STATUS.md'):
+                    self.assertEqual(bundle.read(prefix + name), (ROOT / name).read_bytes())
+                bundle.extractall(Path(temp) / 'unpacked')
+            unpacked = Path(temp) / 'unpacked/cf-fieldbook-reading-shelf'
+            self.assertIn('根目录', (unpacked / 'README.md').read_text())
+            readme = (unpacked / 'examples/reading-shelf/README.md').read_text()
+            self.assertIn(build_site.PUBLIC_SITE_URL + 'use-cases/publish-reading-shelf.html', readme)
+            self.assertIn('made by Faye & Cove', readme)
+            # Every remaining relative documentation link resolves within this package.
+            md = MarkdownIt()
+            for document in unpacked.rglob('*.md'):
+                for token in md.parse(document.read_text()):
+                    for node in token.children or []:
+                        if node.type != 'link_open':
+                            continue
+                        href = node.attrGet('href')
+                        parsed = urlsplit(href)
+                        if not parsed.scheme and parsed.path:
+                            self.assertTrue((document.parent / unquote(parsed.path)).is_file(), f'{document}: {href}')
+            shelf = unpacked / 'examples/reading-shelf'
+            metadata = json.loads((shelf / 'example.meta.json').read_text())
+            subprocess.run(metadata['check_command'], cwd=unpacked, check=True, capture_output=True)
+            old_html = (shelf / 'index.html').read_bytes()
+            notes = shelf / 'materials/notes.md'
+            old_sentence, new_sentence = '旧引用可以保留版本身份', '旧引用也要注明资料日期'
+            self.assertIn(old_sentence, notes.read_text())
+            notes.write_text(notes.read_text().replace(old_sentence, new_sentence))
+            self.assertEqual((shelf / 'index.html').read_bytes(), old_html)
+            self.assertNotIn(new_sentence, old_html.decode())
+            subprocess.run([sys.executable, '-B', 'examples/reading-shelf/build.py'], cwd=unpacked,
+                           check=True, capture_output=True)
+            self.assertIn(new_sentence, (shelf / 'index.html').read_text())
+            self.assertIn(new_sentence, notes.read_text())
+            soup = BeautifulSoup((output / 'examples/reading-shelf/README.html').read_text(), 'html.parser')
+            attachments = soup.select_one('.example-downloads')
+            self.assertIsNotNone(attachments.find('a', href='index.html', download=False))
+            self.assertIsNotNone(attachments.find('a', href='cf-fieldbook-reading-shelf.zip', download=True))
+            self.assertIn('查看或下载单个源文件', attachments.get_text())
+            # The site packages the reviewed generated page; it never rebuilds sources.
+            self.assertEqual((root / 'examples/reading-shelf/index.html').read_bytes(), old_html)
+
+    def test_reading_shelf_status_rebuild_removes_bundle_attachments_and_entries(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / 'fieldbook'
+            shutil.copytree(self.root, root, ignore=shutil.ignore_patterns('.build'))
+            output = root / '.build/lifecycle'
+            catalog_path = root / 'catalog/entries.json'
+            catalog = json.loads(catalog_path.read_text())
+            entry = next(e for e in catalog['entries'] if e['id'] == 'example.reading-shelf')
+            for status in ('archived', 'withdrawn'):
+                with self.subTest(status=status):
+                    entry['status'] = 'current'
+                    catalog_path.write_text(json.dumps(catalog, ensure_ascii=False))
+                    build_site.build_site(root, output)
+                    self.assertTrue((output / build_site.READING_SHELF_BUNDLE).is_file())
+                    entry['status'] = status
+                    catalog_path.write_text(json.dumps(catalog, ensure_ascii=False))
+                    manifest = build_site.build_site(root, output)
+                    self.assertNotIn(build_site.READING_SHELF_BUNDLE, manifest['attachments'])
+                    self.assertFalse((output / build_site.READING_SHELF_BUNDLE).exists())
+                    for filename in build_site.EXAMPLE_FILES['reading-shelf']:
+                        self.assertFalse((output / 'examples/reading-shelf' / filename).exists(), filename)
+                    page = BeautifulSoup((output / 'examples/reading-shelf/README.html').read_text(), 'html.parser')
+                    self.assertIsNone(page.select_one('.example-downloads'))
+                    for document in output.rglob('*.html'):
+                        self.assertNotIn('cf-fieldbook-reading-shelf.zip', document.read_text(), str(document))
+                    self.assertEqual((output / 'examples/reading-shelf/README.md').exists(), status == 'archived')
+                    self.assertTrue((output / 'examples/api-operations/model.py').is_file())
+
+    def test_missing_or_symlinked_example_input_fails_clearly(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / 'fieldbook'
+            shutil.copytree(self.root, root, ignore=shutil.ignore_patterns('.build'))
+            source = root / 'examples/reading-shelf/build.py'
+            source.unlink()
+            with self.assertRaisesRegex(ValueError, 'missing public example input: examples/reading-shelf/build.py'):
+                build_site.Site(root, root / '.build/missing')
+            source.symlink_to('index.html')
+            with self.assertRaisesRegex(ValueError, 'regular repository file: examples/reading-shelf/build.py'):
+                build_site.Site(root, root / '.build/symlink')
 
     def test_home_has_three_real_reading_paths(self):
         soup = BeautifulSoup((self.output / 'index.html').read_text(), 'html.parser')
@@ -573,10 +685,13 @@ GitHub · [https://github.com/IndelibleVivi](https://github.com/IndelibleVivi)
                 self.assertEqual(len(soup.select('meta[name="twitter:description"]')), 1)
                 self.assertEqual((output / ('assets/share/' + key + '.png')).read_bytes(),
                                  (ROOT / ('assets/share/' + key + '.png')).read_bytes())
-            for path in ('guides/handbook.html', 'comparisons/clef-vs-jev.html', 'services/observability.html',
-                         'reference/implementation.html', 'reference/api-maintenance.html'):
+            for path, cutoff in (('guides/handbook.html', '2026-10-26'),
+                                 ('comparisons/clef-vs-jev.html', '2026-10-20'),
+                                 ('services/observability.html', '2026-10-20'),
+                                 ('reference/implementation.html', '2026-10-20'),
+                                 ('reference/api-maintenance.html', '2026-10-20')):
                 soup = BeautifulSoup((output / path).read_text(), 'html.parser')
-                self.assertIn('资料截至 2026-10-20', soup.select_one('meta[name="description"]')['content'])
+                self.assertIn('资料截至 ' + cutoff, soup.select_one('meta[name="description"]')['content'])
             for path in ('guides/handbook.html', 'services/observability.html'):
                 soup = BeautifulSoup((output / path).read_text(), 'html.parser')
                 self.assertIn('固定资料日期：2026-10-20', soup.get_text('', strip=True))

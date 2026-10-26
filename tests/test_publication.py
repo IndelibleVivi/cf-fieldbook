@@ -26,7 +26,8 @@ class PublicationTests(unittest.TestCase):
         for name in ('catalog', 'guides', 'comparisons', 'services', 'use-cases', 'reference',
                      'reports', 'examples', 'practice', 'diagrams', 'assets', 'styles', 'docs',
                      'templates', 'tools'):
-            shutil.copytree(ROOT / name, self.root / name)
+            shutil.copytree(ROOT / name, self.root / name,
+                            ignore=shutil.ignore_patterns('node_modules', '.wrangler', 'public', '__pycache__', 'wrangler.publish.jsonc'))
         for name in ('package.json', 'package-lock.json', 'requirements-render.txt'):
             shutil.copyfile(ROOT / name, self.root / name)
 
@@ -105,6 +106,49 @@ class PublicationTests(unittest.TestCase):
         self.assertNotIn('docs/lifecycle.md', digests)
         self.assertNotIn('docs/provenance.md', digests)
 
+    def test_frozen_reading_shelf_uses_only_the_shared_explicit_files(self):
+        shelf = self.root / 'examples/reading-shelf'
+        for relative in ('node_modules/package/private.js', '.wrangler/state.json',
+                         'wrangler.publish.jsonc', '.env', 'private-sentinel.md',
+                         'public/index.html', 'public/materials/notes.md'):
+            private = shelf / relative
+            private.parent.mkdir(parents=True, exist_ok=True)
+            private.write_text('NEVER_FREEZE_LOCAL_SHELF_SENTINEL')
+        # A linked local file is not a license to widen the controlled example boundary.
+        with (self.root / 'guides/handbook.md').open('a') as manuscript:
+            manuscript.write('\n[private local output](../examples/reading-shelf/private-sentinel.md)\n')
+        target = editions.freeze(self.root, 'shelf-allowlist', 'handbook')
+        digests = json.loads((target / 'edition.json').read_text())['input_digests']
+        expected = {'examples/reading-shelf/README.md',
+                    *(f'examples/reading-shelf/{name}' for name in pub.EXAMPLE_FILES['reading-shelf'])}
+        actual = {path for path in digests if path.startswith('examples/reading-shelf/')}
+        self.assertEqual(actual, expected)
+        self.assertIn('tools/example_files.py', digests)
+        for path in actual:
+            self.assertNotIn('NEVER_FREEZE_LOCAL_SHELF_SENTINEL', (target / 'inputs' / path).read_text())
+        self.assertFalse((target / 'inputs/examples/reading-shelf/node_modules').exists())
+        self.assertFalse((target / 'inputs/examples/reading-shelf/public').exists())
+        self.assertTrue((shelf / 'private-sentinel.md').is_file())
+
+    def test_frozen_example_missing_or_symlinked_allowlisted_file_fails_clearly(self):
+        source = self.root / 'examples/reading-shelf/build.py'
+        source.unlink()
+        with self.assertRaisesRegex(ValueError, 'missing public example input: examples/reading-shelf/build.py'):
+            editions.freeze(self.root, 'shelf-missing', 'handbook')
+        source.symlink_to('index.html')
+        with self.assertRaisesRegex(ValueError, 'regular repository file: examples/reading-shelf/build.py'):
+            editions.freeze(self.root, 'shelf-symlink', 'handbook')
+
+    def test_archived_reading_shelf_freezes_the_readme_without_executable_files(self):
+        catalog_path = self.root / 'catalog/entries.json'
+        catalog = json.loads(catalog_path.read_text())
+        next(e for e in catalog['entries'] if e['id'] == 'example.reading-shelf')['status'] = 'archived'
+        catalog_path.write_text(json.dumps(catalog, ensure_ascii=False))
+        target = editions.freeze(self.root, 'shelf-archived', 'handbook')
+        digests = json.loads((target / 'edition.json').read_text())['input_digests']
+        self.assertEqual({path for path in digests if path.startswith('examples/reading-shelf/')},
+                         {'examples/reading-shelf/README.md'})
+
     def test_offline_reading_has_no_file_uri_or_remote_asset(self):
         editions.freeze(self.root, 'offline', 'handbook')
         output = editions.build(self.root, 'offline', ['html'])
@@ -117,13 +161,13 @@ class PublicationTests(unittest.TestCase):
     # --- build identity, report adaptivity, tamper -------------------------
 
     def test_updated_books_freeze_and_render_the_current_cutoff(self):
-        for family in ('comparison', 'handbook'):
+        for family, cutoff in (('comparison', '2026-10-20'), ('handbook', '2026-10-26')):
             with self.subTest(family=family):
                 target = editions.freeze(self.root, 'current-' + family, family)
-                self.assertEqual(json.loads((target / 'edition.json').read_text())['as_of'], '2026-10-20')
+                self.assertEqual(json.loads((target / 'edition.json').read_text())['as_of'], cutoff)
                 output = editions.build(self.root, 'current-' + family, ['md', 'html'])
                 soup = BeautifulSoup(next(output.glob('*.html')).read_text(), 'html.parser')
-                self.assertIn('资料截至 2026-10-20', soup.select_one('.cover-bottom').get_text(' ', strip=True))
+                self.assertIn('资料截至 ' + cutoff, soup.select_one('.cover-bottom').get_text(' ', strip=True))
                 self.assertIn('Clef-omni', next(output.glob('*.md')).read_text())
                 if family == 'handbook':
                     self.assertIn('固定资料日期：**2026-10-20**', next(output.glob('*.md')).read_text())

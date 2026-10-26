@@ -1,0 +1,13 @@
+{
+  "name": "cf-fieldbook-reading-shelf",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Optional local tooling for publishing the synthetic reading shelf.",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "devDependencies": {
+    "wrangler": "4.152.0"
+  },
+  "license": "SEE LICENSE IN ../../LICENSE-STATUS.md"
+}

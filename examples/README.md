@@ -4,7 +4,7 @@
 
 | 例子 | 能看见什么 | 没有证明什么 |
 |---|---|---|
-| [reading-shelf](reading-shelf/README.md) | 三份合成文档可读，经本地 HTTP 下载；修改后从原件重建 | 身份、云端版本、检索或模型扩展 |
+| [reading-shelf](reading-shelf/README.md) | 完整包保留目录；本地阅读和下载，观察漏 build 后从原件重建；可准备独立静态发布目录 | 真实部署、停用、身份、云端版本、检索或模型扩展 |
 | [health-worker](health-worker/README.md) | 最小路由、响应与错误路径 | 真实 Worker 部署、Access 策略或账户可用 |
 | [job-state](job-state/README.md) · [失败与恢复实践](../use-cases/recoverable-jobs.md) | 任务中断、租约恢复、迟到拒绝和未知结果核对的离线过程 | 云队列端到端交付或外部副作用安全 |
 | [decision-routing](decision-routing/README.md) | 决策请求外壳、路线与费用算术 | 模型判断正确、阈值可迁移、provider 独立 |

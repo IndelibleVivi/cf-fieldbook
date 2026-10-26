@@ -67,6 +67,8 @@ python3 tools/content.py check
 - `outputs/`：所选作品的 Markdown、HTML、PDF。
 - `edition.json`：作品身份、固定 `as_of`、来源 commit、输入／输出身份与排版环境。`as_of` 取源正文 source_cutoff，不用构建时钟刷新事实。
 
+例子正文与附件的范围来自 `tools/example_files.py` 的显式清单，和站点下载共源；例子目录里的 npm 依赖、实际发布配置、隐藏文件与 `public/` 不进入快照。`readings_for` 返回精确文件，edition 按文件消费，未知扩展名不会触发整个目录回退；清单缺失或符号链接会明确失败。资料架的可选 JSONC 模板和真实 npm lockfile随源冻结，依赖包本体不打包。
+
 输入摘要是内容身份的依据，commit 只是辅助来源，未提交的输入也如实记录。冻结后的渲染使用 `inputs/tools/render.py` 和快照里的数据、图与样式，不读取工作树的实时材料。编辑源、原有 PDF 与核验日期不会被构建改写。输入清单、摘要或已生成输出不符时，检查失败。
 
 手册引用的词条会从冻结词表提取首段，附在该册的“术语小词表”中；Markdown 与 HTML／PDF 的词义链接指向本册定义。之后更新网站词表不会改变已冻结的解释。网页交互演示不打包为 PDF 交互，出版物仍用于连续阅读。
@@ -82,6 +84,8 @@ PDF 在文件内嵌入字体；HTML 仍使用阅读设备自己的字体。`tool
 阅读站提供[作品与版本入口](https://indeliblevivi.github.io/cf-fieldbook/publications.html)及每册的版本页。`catalog/publication-releases.json` 分别拥有当前编辑修订、固定历史版链接和已分发版登记；编辑修订按作品关联，不把任意 repo commit 当成该册过期。专题的新增任务说明属于编辑修订，不刷新模型事实日期。
 
 当前新候选未登记为 Release，没有新版“latest PDF”下载；版本页可以回访当前正文和固定 r3 的真实文件。登记文件只提供经过审阅的公开链接与版本信息，不自动复制 `.build` 文件。公开新的文件前先执行候选 check、检查实际 PDF、确认许可／来源范围及发布授权，再登记具体分发文件；不能把候选路径或未经检查的文件标成 latest。已分发登记包含 `id`、`family`、`edition`、`state: released` 和 `files`；每个格式记录真实 HTTPS URL 及 check 对应输出的 `sha256`。`latest` 按 family 指向登记 ID；候选状态、无文件身份或错误家族指针会使站点构建失败。登记验证检查引用和身份格式，实际文件审阅仍由前述 check 与 PDF 检查完成。
+
+2026-10-26 仅为当前手册生成新候选 `handbook-20261026-r2`：Markdown、HTML 与 31 页 PDF，资料上界 10-26，费用表保留 10-20。该文件重新完成身份／链接检查、Poppler 与 macOS PDFKit 全页渲染复看，并在 Preview 打开新增正文；没有继承旧 r4 的设备验收，没有 iPhone／微信结果，也未上传或登记 Release。旧候选及 `dist/` 不覆盖。构建环境的缺失库处理见[贡献说明](../CONTRIBUTING.md)。
 
 ## 检查、分发与撤下
 

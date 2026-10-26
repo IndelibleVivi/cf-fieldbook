@@ -4,6 +4,19 @@
   "releases": [],
   "updates": [
     {
+      "date": "2026-10-26",
+      "families": [
+        "handbook"
+      ],
+      "kind": "content",
+      "topics": [
+        "reading-shelf-download",
+        "static-assets-publishing",
+        "reading-route"
+      ],
+      "summary": "资料架完整包、8768 分享接续、漏重建观察与静态发布路线；整理手册开头和实施参考日期。仅 S172–S174 与本地工具定向核对，手册资料上界推进至10-26，Observability仍固定10-20；新版手册准备本地候选，没有新Release或云端实测。"
+    },
+    {
       "date": "2026-10-20",
       "families": [
         "handbook",

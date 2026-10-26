@@ -19,6 +19,8 @@ import os
 import re
 from pathlib import Path
 
+from example_files import EXAMPLE_FILES, example_paths
+
 ROOT = Path(__file__).resolve().parents[1]
 PUBLICATIONS_PATH = 'catalog/publications.json'
 RELEASES_PATH = 'catalog/publication-releases.json'
@@ -190,7 +192,8 @@ def local_links(text: str, manuscript_path: str) -> list[str]:
 
 def readings_for(root: Path, fam: dict) -> list[str]:
     """The explicit source entries this family reads, plus the figures and linked
-    example directories its own manuscripts reference. Every returned path sits
+    examples its own manuscripts reference, using the site's file allowlist.
+    Local installs and publish outputs are never inferred inputs. Every returned path sits
     under the freeze input allowlist; shared dependencies (glossary, catalog,
     styles, motifs) are copied separately."""
     entries = [source_entry(fam), *fam.get('readings', []), *fam.get('practice', [])]
@@ -202,18 +205,35 @@ def readings_for(root: Path, fam: dict) -> list[str]:
             raise ValueError(f'{fam["id"]}: unknown catalog entry {ident}')
         if path not in paths:
             paths.append(path)
+    by_path = {entry['path']: entry for entry in index.values()}
     extra: list[str] = []
+
+    def add_example(readme: str) -> None:
+        name = Path(readme).parent.name
+        if name not in EXAMPLE_FILES:
+            raise ValueError(f'{fam["id"]}: example has no public file allowlist: {readme}')
+        extra.append(readme)
+        if by_path.get(readme, {}).get('status') == 'current':
+            extra.extend(example_paths(root, name, include_readme=True))
+
     for path in paths:
+        if path.startswith('examples/') and path.endswith('/README.md'):
+            add_example(path)
         if path.endswith('.md'):
             text = (root / path).read_text(encoding='utf-8')
             extra += figures(text)
             for link in local_links(text, path):
                 top = Path(link).parts[0]
-                if top == 'examples' and link.endswith('README.md'):
-                    directory = Path(link).parent
-                    for candidate in sorted((root / directory).rglob('*')):
-                        if candidate.is_file():
-                            extra.append(candidate.relative_to(root).as_posix())
+                if top == 'examples':
+                    parts = Path(link).parts
+                    if len(parts) >= 3:
+                        readme = f'examples/{parts[1]}/README.md'
+                        if link == readme:
+                            add_example(readme)
+                        elif (by_path.get(readme, {}).get('status') == 'current'
+                              and parts[1] in EXAMPLE_FILES
+                              and link in example_paths(root, parts[1])):
+                            extra.append(link)
                 elif top in {'assets', 'practice', 'use-cases', 'comparisons', 'services', 'guides',
                              'reference', 'reports', 'examples'}:
                     extra.append(link)
