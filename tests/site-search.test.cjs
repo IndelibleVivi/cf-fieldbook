@@ -16,6 +16,21 @@ if (!process.env.FIELDBOOK_SEARCH_INDEX) {
 const index = JSON.parse(fs.readFileSync(process.env.FIELDBOOK_SEARCH_INDEX || path.join(generated, 'search-index.json'), 'utf8'));
 if (generated) test.after(() => fs.rmSync(generated, { recursive: true }));
 const first = query => { const result = search(index, query); assert.ok(result.length, query); return result[0]; };
+test('October migration questions reach current instructions and preserve extra constraints', () => {
+  for (const [query, page, section, evidence] of [
+    ['D1误删怎么办', 'reference/implementation.html#', /误删/, /7×24.*Time Travel.*undelete/s],
+    ['MCP 连不上 410', 'reference/api-maintenance.html#', /410/, /产品专用.*410 Gone.*重新登录/s],
+    ['Computer重放会重复吗', 'services/agent-runtime.html#', /Computer/, /callId.*unsafeToRepeat/s],
+    ['Workflows数据放哪', 'reference/implementation.html#', /Workflows/, /设置本身在辖区外.*local dev/s],
+    ['source maps 会自动上传吗', 'guides/handbook.html#', /source maps/, /4\.150\.0.*upload_source_maps: false/s],
+  ]) {
+    const result = first(query);
+    assert.ok(result.url.startsWith(page), result.url);
+    assert.match(result.section, section);
+    assert.match(result.text, evidence);
+    assert.deepEqual(search(index, query + ' 不存在这个词987'), []);
+  }
+});
 test('reading-shelf questions reach the actual download, rebuild and hosting explanations', () => {
   for (const [query, page, section, evidence] of [
     ['下载完整资料架', 'examples/reading-shelf/README.html#', /取得完整例子/, /materials.*目录|目录.*materials/s],

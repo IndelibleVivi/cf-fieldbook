@@ -51,17 +51,17 @@
     "id": "S07",
     "title": "Artifacts 公开测试发布",
     "url": "https://blog.cloudflare.com/next-git-platform-on-cloudflare/",
-    "accessed": "2026-10-20",
+    "accessed": "2026-10-28",
     "kind": "official_primary",
-    "verification_scope": "targeted_public_pricing_terms_consulted; no_account_or_live_cloud_or_bill_verification"
+    "verification_scope": "targeted_stated_billing_start_only; no_bill_verification"
   },
   {
     "id": "S08",
     "title": "Artifacts 价格",
     "url": "https://developers.cloudflare.com/artifacts/platform/pricing/",
-    "accessed": "2026-10-20",
+    "accessed": "2026-10-28",
     "kind": "official_primary",
-    "verification_scope": "targeted_public_pricing_terms_consulted; no_account_or_live_cloud_or_bill_verification"
+    "verification_scope": "targeted_pricing_and_billing_start_only; no_bill_verification"
   },
   {
     "id": "S09",
@@ -75,9 +75,9 @@
     "id": "S10",
     "title": "AI Search 限制与价格",
     "url": "https://developers.cloudflare.com/ai-search/platform/limits-pricing/",
-    "accessed": "2026-10-20",
+    "accessed": "2026-10-28",
     "kind": "official_primary",
-    "verification_scope": "targeted_public_pricing_terms_consulted; no_account_or_live_cloud_or_bill_verification"
+    "verification_scope": "targeted_billing_start_pricing_ingestion_metering_and_legacy_bucket_only; retrieval_limits_not_rechecked"
   },
   {
     "id": "S11",
@@ -131,17 +131,17 @@
     "id": "S17",
     "title": "Clef 模型卡",
     "url": "https://developers.cloudflare.com/workers-ai/models/clef/",
-    "accessed": "2026-10-13",
+    "accessed": "2026-10-28",
     "kind": "official_primary",
-    "verification_scope": "targeted_hosted_model_price_context_and_input_budget; no_model_calls"
+    "verification_scope": "targeted_hosted_input_output_price_and_context_only; media_questions_and_quality_not_rechecked"
   },
   {
     "id": "S18",
     "title": "Clef-flash 模型卡",
     "url": "https://developers.cloudflare.com/workers-ai/models/clef-flash/",
-    "accessed": "2026-10-13",
+    "accessed": "2026-10-28",
     "kind": "official_primary",
-    "verification_scope": "targeted_hosted_model_price_context_and_input_budget; no_model_calls"
+    "verification_scope": "targeted_hosted_input_output_price_and_context_only; media_questions_and_quality_not_rechecked"
   },
   {
     "id": "S19",
@@ -563,9 +563,9 @@
     "id": "S73",
     "title": "Jev：Cloudflare 第三方模型目录",
     "url": "https://developers.cloudflare.com/ai/models/typesafe/jev/",
-    "accessed": "2026-10-02",
+    "accessed": "2026-10-28",
     "kind": "official_primary",
-    "verification_scope": "revision_3_public_document_consulted; no_live_model_calls"
+    "verification_scope": "targeted_CF_catalog_input_output_price_and_context_only; no_inference_or_provider_backend_verification"
   },
   {
     "id": "S74",
@@ -779,9 +779,9 @@
     "id": "S100",
     "title": "Cloudflare Observability 价格",
     "url": "https://developers.cloudflare.com/observability/pricing/",
-    "accessed": "2026-10-20",
+    "accessed": "2026-10-28",
     "kind": "official_primary",
-    "verification_scope": "targeted_public_pricing_terms_consulted; no_account_or_live_cloud_or_bill_verification"
+    "verification_scope": "targeted_plan_terms_meters_transition_retention_and_corrected_example; no_bill_verification"
   },
   {
     "id": "S101",
@@ -867,9 +867,9 @@
     "id": "S111",
     "title": "Workers Logs 迁移前计费",
     "url": "https://developers.cloudflare.com/workers/platform/pricing/",
-    "accessed": "2026-10-20",
+    "accessed": "2026-10-28",
     "kind": "official_primary",
-    "verification_scope": "targeted_public_pricing_terms_consulted; no_account_or_live_cloud_or_bill_verification"
+    "verification_scope": "targeted_Workers_Logs_current_price_and_December_transition_only"
   },
   {
     "id": "S112",
@@ -972,9 +972,9 @@
     "id": "S124",
     "title": "Clef-omni 模型卡与媒体输入预算",
     "url": "https://developers.cloudflare.com/workers-ai/models/clef-omni/",
-    "accessed": "2026-10-13",
+    "accessed": "2026-10-28",
     "kind": "official_primary",
-    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution"
+    "verification_scope": "targeted_hosted_input_output_price_and_context_only; media_questions_and_quality_not_rechecked"
   },
   {
     "id": "S125",
@@ -1293,9 +1293,9 @@
     "id": "S164",
     "title": "Clairic 模型卡、输入字段与上下文说明",
     "url": "https://developers.cloudflare.com/workers-ai/models/clairic/",
-    "accessed": "2026-10-20",
+    "accessed": "2026-10-28",
     "kind": "official_primary",
-    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution"
+    "verification_scope": "targeted_price_context_and_pass_ambiguity_only; no_model_execution"
   },
   {
     "id": "S165",
@@ -1382,5 +1382,260 @@
     "accessed": "2026-10-26",
     "kind": "official_primary",
     "verification_scope": "targeted_static_assets_configuration_and_cli_docs; local_Wrangler_4.152.0; no_account_or_live_deployment"
+  },
+  {
+    "id": "S175",
+    "title": "Computer v0.7.0：中断恢复与等待批准",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-26-computer-durable-javascript/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-26"
+  },
+  {
+    "id": "S176",
+    "title": "Computer 文件工作区、replay、批准与实验限制",
+    "url": "https://developers.cloudflare.com/agents/tools/filesystem/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution"
+  },
+  {
+    "id": "S177",
+    "title": "Think 改用 Computer 工作区与旧文件迁移",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-20-think-computer-workspace/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-20"
+  },
+  {
+    "id": "S178",
+    "title": "Agents SDK 0.30.0 与 Pi 1.4 恢复和 schema 边界",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-22-pi-harness-pi-1-4/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-22"
+  },
+  {
+    "id": "S179",
+    "title": "createAI 替代旧 Workers AI 与 Gateway provider",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-21-createai/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-21"
+  },
+  {
+    "id": "S180",
+    "title": "Agents Models：连接、fallback 与 stream resume",
+    "url": "https://developers.cloudflare.com/agents/models/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution"
+  },
+  {
+    "id": "S181",
+    "title": "Cloudflare 产品 MCP 退役 /sse 入口",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-22-cloudflare-mcp-servers-retire-sse/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-22"
+  },
+  {
+    "id": "S182",
+    "title": "Workflows jurisdiction 发布",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-27-workflow-jurisdictions/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-27"
+  },
+  {
+    "id": "S183",
+    "title": "Workflows 数据地点、创建约束与例外",
+    "url": "https://developers.cloudflare.com/workflows/reference/data-location/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution"
+  },
+  {
+    "id": "S184",
+    "title": "D1 误删恢复限于删除后七天",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-23-undelete-seven-day-window/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-23"
+  },
+  {
+    "id": "S185",
+    "title": "D1 undelete API 与 Time Travel 恢复边界",
+    "url": "https://developers.cloudflare.com/api/resources/d1/subresources/database/methods/undelete/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution"
+  },
+  {
+    "id": "S186",
+    "title": "Wrangler 与 cf 默认上传 source maps",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-20-source-maps-on-by-default/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-20"
+  },
+  {
+    "id": "S187",
+    "title": "Workers Builds 用 packageManager 固定 npm",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-23-workers-builds-pin-npm-version/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-23"
+  },
+  {
+    "id": "S188",
+    "title": "Workers Builds 与 Pages 构建镜像拒绝受损 eMudhra 证书",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-23-build-images-emudhra-certificates/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-23"
+  },
+  {
+    "id": "S189",
+    "title": "Sandbox 0.x 与 1.x 的 eMudhra 信任链更新路径",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-22-emudhra-certificates/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-22"
+  },
+  {
+    "id": "S190",
+    "title": "cloudflared ingress URL 归一化与默认启用时间",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-22-cloudflared-path-normalization/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-22"
+  },
+  {
+    "id": "S191",
+    "title": "Tunnel 细粒度 Read And Monitor 角色 GA",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-22-granular-read-and-monitor-ga/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-22"
+  },
+  {
+    "id": "S192",
+    "title": "Access HTML 与 Liquid 自定义页面发布",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-27-access-custom-pages/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-27"
+  },
+  {
+    "id": "S193",
+    "title": "Access 自定义页面限制、回退与共享模板",
+    "url": "https://developers.cloudflare.com/cloudflare-one/reusable-components/custom-pages/access-custom-pages/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution"
+  },
+  {
+    "id": "S194",
+    "title": "Workers spanContext、setStatus 与 updateName",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-26-span-context-status-update-name/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-26"
+  },
+  {
+    "id": "S195",
+    "title": "Workers custom spans 配置与 API",
+    "url": "https://developers.cloudflare.com/workers/observability/traces/custom-spans/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution"
+  },
+  {
+    "id": "S196",
+    "title": "SQL API introspection 的 include_attributes 字段",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-27-introspection-include-attributes/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-27"
+  },
+  {
+    "id": "S197",
+    "title": "Logpush 账户级 HTTP request logs",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-21-account-scoped-http-requests/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-21"
+  },
+  {
+    "id": "S198",
+    "title": "Advanced Nameservers 类型与兼容字段迁移",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-26-foundation-dns-nameserver-type/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-26"
+  },
+  {
+    "id": "S199",
+    "title": "Flagship 结构化 evaluation context",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-23-structured-evaluation-context/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-23"
+  },
+  {
+    "id": "S200",
+    "title": "Workers AI GLM-5.3 跨请求 KV cache 暴露事故与修复披露",
+    "url": "https://blog.cloudflare.com/kv-cache-exposure-remediation/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-26"
+  },
+  {
+    "id": "S201",
+    "title": "WAF 全事务检测与响应规则",
+    "url": "https://blog.cloudflare.com/full-transaction-waf/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-21"
+  },
+  {
+    "id": "S202",
+    "title": "WAF Brotli 与 Next.js 紧急规则的 Log 默认动作",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-25-emergency-waf-release/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-25"
+  },
+  {
+    "id": "S203",
+    "title": "Basin SQL OFFSET 分页",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-21-basin-sql-offset/",
+    "accessed": "2026-10-28",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "published_on": "2026-10-21"
   }
 ]

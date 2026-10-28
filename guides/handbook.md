@@ -2,8 +2,8 @@
 title: Cloudflare 个人基础设施实践手册
 subtitle: 从一个入口到可恢复的应用与自动化
 edition: 2026.10 · 持续阅读修订
-source_cutoff: 2026-10-26
-observability_as_of: 2026-10-20
+source_cutoff: 2026-10-28
+observability_as_of: 2026-10-28
 presentation_revision: 4
 author: Faye & Cove
 github: https://github.com/IndelibleVivi
@@ -23,7 +23,7 @@ scope: 不含邮件服务；通用示例与实际账户分离
 
 读完选中的路线后，你应能画清一次请求经过谁、身份在哪里核验、任务与成果如何保存；再用配套离线例子检查一个具体机制。陌生词可以查[术语小词表](../docs/glossary.md)，精确命令见[例子](../examples/README.md)与[实施参考](../reference/implementation.md)。配套练习默认离线，使用合成输入。实际部署的配置条件和验证步骤在各节说明。
 
-本版纳入资料截至 **2026-10-26**；新增静态发布路线只核对相关文档与本地工具，其他事实保留各自核验日期。详细范围与各轮更新见[关于这一版](#关于这一版)。邮件服务不在本期范围内。
+本版纳入资料截至 **2026-10-28**；本轮定向查阅恢复、迁移、地点、访问、发布与观测变化，其他事实保留各自核验日期。详细范围与各轮更新见[关于这一版](#关于这一版)。邮件服务不在本期范围内。
 
 <!-- chapter: start -->
 
@@ -164,6 +164,10 @@ Access 可以保护一个 hostname 或指定路径，让用户先完成身份验
 
 Cookie 会话的写请求还要处理 CSRF／Origin。私人数据应在权限检查以后读取，而不是先取得完整内容，再靠界面藏按钮。
 
+Access 自 10 月 27 日支持 HTML／Liquid 登录、拒绝与命令行批准页，可以解释拒绝原因；模板不支持自定义 JavaScript 或认证表单，渲染失败回退内置页也不改变策略判定。共享模板发布会影响所有引用它的应用，先用独立模板检查。[S192] [S193]
+
+代理网站的 WAF 另有响应阶段规则，可阻止源站响应送达，但不能撤销源站已经执行的动作；它与 Access 身份和应用授权分别工作。检测、Log／Block 与默认覆盖的区别见[10 月 28 日观察](../reports/2026-10-28.md#waf)。[S201] [S202]
+
 ### 已有服务器：Tunnel 只改变访问方式
 
 Tunnel 由[源站](../docs/glossary.md#origin--源站)连接器主动向 Cloudflare 建立连接，把指定 hostname 的请求送到原应用。它不替原设备运行程序，不备份磁盘；笔记本关机后，程序仍会停。[S47]
@@ -178,6 +182,8 @@ ingress:
 这只是示例结构。端口要对应实际监听，最后一条为未知入口提供兜底；源站若还另开公网端口，仍需检查是否绕过访问限制。
 
 顺序可以很朴素：先确认本机 HTTP 正常，再检查连接器与 Tunnel，最后从外部验证 hostname 和权限。Quick Tunnel 适合短暂试验，长期入口使用可管理的命名配置。升级、日志和恢复方式依然属于服务器维护的一部分。
+
+`cloudflared` **2026.10.0** 起可先归一化 URL 再匹配需要 Access validation 的 ingress，传给源站的路径保持原样。当前默认关闭，**2027-01-25 起的新版本**将默认开启；按路径分配权限的配置先测匹配和拒绝用例，各 replica 使用同一设置，不能把源站路径当作归一化后的匹配路径。[S190]
 
 普通 HTTP ingress 不受 2026 年私有路由与连接端点变更影响；若另有脚本自行维护私有网段路由或读取 tunnel 连接，见[实施参考的维护提示](../reference/implementation.md#私有路由与连接维护api-变更核验于-2026-10-05)。该提示不新增可执行集成。[S117]
 
@@ -232,6 +238,8 @@ D1 Time Travel 有计划相关的保留期，原地恢复会改变数据库。�
 
 一个可用的演练是恢复到隔离目标，再检查代表性记录、原件 hash、版本与权限。数据库恢复成功但文件缺失，或文件齐全但权限回到旧状态，都不算恢复完了。
 
+**误删整个 D1 数据库**走另一条 undelete 路线：10 月 23 日起只接受删除后 **7×24 小时内**的请求，恢复后 Time Travel 也不能回到此次 undelete 时刻及更早状态。不要把 Paid Time Travel 的 30 天读成删库后有 30 天；具体条件见[实施参考](../reference/implementation.md#误删-d1-之后还能恢复吗)。[S184] [S185]
+
 ### 有数据地点要求时，逐项检查
 
 D1 新建数据库已支持 `us` jurisdiction，数据库在美国运行并持久化；这个属性不会自动覆盖调用它的 Worker、队列、对象存储或模型服务。先画出实际数据路径，再逐项确认地点约束，不能从一个数据库设置推断整条路径。[S139]
@@ -284,6 +292,8 @@ Outbox 可以理解为“准备寄出的任务清单”。它保住待投递意�
 Queues 可能重复投递；重试耗尽后，DLQ 可以保存需要调查的消息。Workflows 的步骤也可能重试，所以外部服务仍要有自己的幂等机制。[S53] [S54] [S55]
 
 Queues 自 10 月 12 日提供 `eu`、`us`、`fedramp` jurisdiction；只能在创建队列时选择，之后不能增删或更换，DLQ 须与源队列相同。它限定 Queues 存储和处理消息的地点，生产／消费 Worker 仍可在其他地点运行。已有队列需要改变约束时，应另外设计迁移和积压处理。[S137] [S138]
+
+Workflows 10 月 27 日也支持这三个 `jurisdiction`，要求 Wrangler **4.152.0+**，创建后不可改变。限制覆盖实例执行和持久数据，设置本身存于辖区外，管理调用也可来自其他地区；local dev 忽略该字段。先确定数据路径再创建，删除重建会同时删掉实例，配置移除也不会解除原约束。[S182] [S183]
 
 ### 结果未知，应该有一个明确位置
 
@@ -353,6 +363,8 @@ Cloudflare Agent Memory 当前仍是 private beta，与 AI Search 的 GA 分开�
 
 Workers AI 提供模型推理；AI Gateway 组织经过它的调用、凭据、观测与路由。通过 binding 或受控凭据，可以减少应用直接持有 provider key；Gateway 的访问资格本身仍是敏感能力。[S41] [S45] [S15]
 
+Agents SDK 自 10 月 21 日用 `createAI` 替代旧 provider；fallback 与流恢复各有适用条件，不能据此重放工具副作用。参数迁移见[API 维护](../reference/api-maintenance.md#模型-provider-迁移保留调用条件)。Workers AI 的 GLM-5.3 历史隔离事故则在 10 月 26 日披露、9 月已修复；具体部署与日期边界见[模型页](../services/decision-models.md#接入方式与模型隔离另看两项变化)。[S179] [S200]
+
 资料架问“撤下规则在哪里”时，允许动作可以是读标题、读第二份原文、或停止并报告材料不足。完整输入见[Clef / Jev 的首个有限决策任务](../comparisons/clef-vs-jev.md)；离线阅读例子没有调用模型。
 
 先记录模型、时间、结果、token 和费用。确实需要正文调试时，再限定内容和保留期。首次创建 Gateway 在 2026-09-24 或之后的账户走新的 Workers Logs 规则；Unified Billing 充值另收 5%。[S15]
@@ -420,6 +432,10 @@ Clef 系列适合分类、筛选和下一步建议，不一定要为一个小判
 
 PiHarness 为 beta，Pi Durable 为 experimental。官方工具示例的 `replay: "safe"` 用在无副作用的字数统计，不能推导邮件、付款或发布都可随意重放。把它和第 6 章的[未知结果](#结果未知应该有一个明确位置)一起读，再看[agent 运行分工](../services/agent-runtime.md)，选择是否研究这条实现，而不是因新 SDK 自动迁移。[S104]
 
+Agents SDK **0.30.0**／Pi **1.4** 增强休眠、存储错误恢复与反复崩溃任务的 `parked` 状态，但会升级会话 schema，Pi 1.3 无法读回。升级前确认存储恢复安排，不能只准备旧代码回滚。[S178]
+
+Computer 的 JavaScript backend 从 **v0.7.0** 提供 experimental journal replay 和等待批准；未记下结果的动作仍可能重复，须用稳定 `callId`／幂等或 `unsafeToRepeat()` 处理。Think 从旧 shell 工作区升级没有自动文件迁移。具体边界见[Agent runtime](../services/agent-runtime.md#computer重放执行记录仍要保护外部动作)。[S175] [S177]
+
 Agents SDK 0.28.0 又加入 experimental OpenCodeHarness：OpenCode 在普通 SQLite Durable Object 中保存会话，由 Lifecycle 唤醒中断工作。原生工具仍须替换或交给外部环境；持久事件回放也不重放尚未提交的实时文字增量。选型时分别验收会话恢复、工具执行和客户端显示。[S132] [S133]
 
 运行环境本身也会更新。Workers 例行更新时，旧进程现在最多有 **20 分钟**排空已有请求与连接；崩溃等情况仍可更早中断。这个窗口与响应后 `waitUntil()` 最多 30 秒是不同限制；客户端重连、稳定任务身份和结果核对仍要保留。[S125] [S126]
@@ -437,6 +453,8 @@ Artifacts 当前每 repo 上限 **1 GB**，单个 file／blob 上限 **32 MB**�
 Sandbox 1.0 由应用自己的 Durable Object 控制 `ctx.container`。命令使用参数数组，每次指定工作目录和环境；新镜像未必含有旧镜像的全部工具，旧进程也不会因为 Worker 更新就自动替换。[S72]
 
 网络能力同样需要按新版文档设置。将长期凭据留在控制层，只在获准请求上使用，比把它们写进镜像更易限制。配置后仍要测试实际允许与拒绝的访问。[S72]
+
+10 月 22 日 eMudhra 证书公告把两代处理分开：0.x 更新到 **0.12.14** 并配套镜像；1.x 的信任链由自己的镜像决定，需要重建并替换旧容器。旧 snapshot 会带回旧镜像的证书；不能仅升级 SDK 或 Worker 就宣布所有环境已更新。[S189]
 
 ### 做一次完整的小实验
 
@@ -472,7 +490,13 @@ Agents SDK 的 Browser／browserTool 可以重连仍然存活的远端浏览器�
 
 Workers Builds 当前 Paid 包含每月 6,000 分钟、6 并发，单次限 20 分钟；设备专属和不同操作系统的测试，仍放在对应环境。[S35] [S65]
 
-10 月 14 日 Workers Builds 更新默认工具链，包括 Node.js 24.21.0、Python 3.14.8。固定的环境变量或版本文件继续生效；代码没变而构建结果变了，先比构建镜像、runtime 与 lockfile，再决定修依赖还是固定版本。[S169]
+10 月 14 日的 Workers Builds 工具链更新后，10 月 23 日镜像又纳入修补 CA 与 Node.js 22.23.4／24.22.1、Bun 1.4.4、pip 26.2.2。自带 CA、旧 Bun 或覆盖证书环境变量的项目仍须单查；固定版本与修补信任链是两项判断。[S169] [S188]
+
+### 固定 npm，也核对默认上传的 source maps
+
+Workers Builds 现以 `package.json` 的 `packageManager` 精确选择 npm／Yarn／pnpm／Bun，例如 `npm@11.19.1`；`engines.npm` 不负责选版本。它不改变本仓库的 GitHub Pages 构建路线。[S187]
+
+Wrangler **4.150.0+** 默认生成并上传 source maps；`cf deploy` 也默认上传，Vite plugin **1.64.0+** 默认生成。部署前检查原始源码与路径是否适合上传；Wrangler 可设 `upload_source_maps: false`，cf／Vite 用对应 Worker 的 `build.sourcemap: false`。自定义 build 的 map 无法解析时默认跳过，显式 `true` 才要求失败；这与静态资料架四文件 allowlist 是不同边界。[S186]
 
 ### 预览也会使用真实资源
 
@@ -531,7 +555,7 @@ R2 Standard 的标价为 $0.015 / GB-month、Class A $4.50 / 百万次、Class B
 ### Observability：当前与已公布的费用分开读
 
 <!-- facts: observability-costs -->
-固定资料日期：**2026-10-20**。
+固定资料日期：**2026-10-28**。
 
 | 条款 | Free | Paid |
 |---|---|---|
@@ -539,7 +563,7 @@ R2 Standard 的标价为 $0.015 / GB-month、Class A $4.50 / 百万次、Class B
 | 已公布；将在 2026-12-01 生效 [S100] | 0.5 GB 摄取 / 日；7 天 | 50 GB 摄取 + 10 GB-month / billing cycle；超出 $0.25 / GB + $0.10 / GB-month |
 <!-- /facts -->
 
-上表共用 [费用记录](../catalog/observability-pricing.json)与[生效事件](../catalog/launches.json)。10 月 20 日复核的 pricing docs 将 Paid 存储包含量列为 **10 GB-month**，原 12／10 冲突已不再是当前口径；生效日仍为 **12 月 1 日**。文档算例尚未同步：20 GB-month 存储超额应为 $1.00，与 75 GB 摄取的 $6.25 合计 $7.25。Log Explorer dataset 不消费共享包含量；Enterprise 在合同续约时迁移。按字节计费后，大 attributes 和完整正文也增加摄取量，不只数 span。[S100]
+上表共用 [费用记录](../catalog/observability-pricing.json)与[生效事件](../catalog/launches.json)，固定资料日期为 10 月 28 日。Paid 存储包含量仍为 **10 GB-month**，生效日仍为 **12 月 1 日**，官方算例已对齐存储 $1.00／总额 $7.25。此前用量不追溯收费，但当天仍可查询的旧数据开始计入存储；摄取与存储量分别使用。Log Explorer dataset 不消费共享包含量；Enterprise 在合同续约时迁移。[S100]
 
 ### 给每次实验记一笔小账
 
@@ -549,7 +573,7 @@ R2 Standard 的标价为 $0.015 / GB-month、Class A $4.50 / 百万次、Class B
 
 ### 免费也有三种含义
 
-免费计划可能在达到上限后停止；Paid 包含量之外可能继续计费；beta 免费可能有未来起算日。10 月 20 日复核时，Artifacts 价格页写 **10 月 14 日**起算，博客仍写 15 日；两日均已过去，应按已经进入公开计费期安排预算，具体账号扣款未验证，来源冲突继续登记。AI Search 的 **11 月 1 日**起算本次重新核对，仍属临近生效事项。[S07] [S08] [S135] [S10]
+免费计划可能在达到上限后停止；Paid 包含量之外可能继续计费；beta 免费可能有未来起算日。10 月 28 日复看时，Artifacts 价格页仍写 **10 月 14 日**起算，博客写 15 日；两日均已过去，应按已经进入公开计费期安排预算，具体账号扣款未验证，来源冲突继续登记。AI Search 的 **11 月 1 日**起算仍属临近生效事项。[S07] [S08] [S10]
 
 Artifacts 限 Workers Paid，每月含 10,000 operations 与 1 GB 存储；超额分别为 $0.15／1,000 operations 与 $0.50／GB-month。仓库保留会继续计入存储，不能只统计任务活跃时长；这里给出公开计价单位，没有实际账户账单测量。[S08]
 
@@ -598,6 +622,8 @@ Artifacts 限 Workers Paid，每月含 10,000 operations 与 1 GB 存储；超�
 **2026-10-20 定向更新：** 中文关键词检索、Clairic 字段抽取、浏览器跨轮运行、MCP 事件与增权、出站请求控制，以及 Cron、SSH、Tunnel 和构建条件。观测费用表本次单独复核，固定日期更新为 10 月 20 日，12 月新方案改用 10 GB-month。其余旧事实保留各自日期，完整范围见[本期观察](../reports/2026-10-20.md)。
 
 **2026-10-26 定向补充：** 同一资料架的完整取得、漏重建观察、8768 临时分享与 Workers Static Assets 发布路线；S172–S174 只核对静态配置与 CLI，Wrangler 实际安装为 `4.152.0`。本地预览、发布目录与候选出版分别检查；没有部署、更新或删除远端资源。`source_cutoff` 表示本版纳入资料的上界，Observability 费用表仍固定 10 月 20 日，旧来源与历史观察不整体改期。
+
+**2026-10-28 定向更新：** Computer／Think／Pi 迁移与恢复、createAI、Workflows 地点、D1 undelete、MCP 旧入口退役、Tunnel 路径匹配、Access 页面、发布默认值、证书镜像及观测变化。来源与选择范围见[当期观察](../reports/2026-10-28.md)；仅查公开文档，没有安装这些 SDK、升级 schema 或执行账号操作，历史报告和冻结候选保留。
 
 ### 保留问题，更新做法
 
@@ -838,3 +864,22 @@ GitHub：[github.com/IndelibleVivi](https://github.com/IndelibleVivi)
 [S172]: https://developers.cloudflare.com/workers/static-assets/get-started/ "Workers Static Assets 静态站起步"
 [S173]: https://developers.cloudflare.com/workers/static-assets/migration-guides/migrate-from-pages/ "静态发布的 assets 配置与脚本边界"
 [S174]: https://developers.cloudflare.com/workers/wrangler/commands/workers/ "Wrangler 部署、预览与删除命令"
+
+[S175]: https://developers.cloudflare.com/changelog/post/2026-10-26-computer-durable-javascript/ "Computer v0.7.0：中断恢复与等待批准"
+[S177]: https://developers.cloudflare.com/changelog/post/2026-10-20-think-computer-workspace/ "Think 改用 Computer 工作区与旧文件迁移"
+[S178]: https://developers.cloudflare.com/changelog/post/2026-10-22-pi-harness-pi-1-4/ "Agents SDK 0.30.0 与 Pi 1.4 恢复和 schema 边界"
+[S179]: https://developers.cloudflare.com/changelog/post/2026-10-21-createai/ "createAI 替代旧 Workers AI 与 Gateway provider"
+[S182]: https://developers.cloudflare.com/changelog/post/2026-10-27-workflow-jurisdictions/ "Workflows jurisdiction 发布"
+[S183]: https://developers.cloudflare.com/workflows/reference/data-location/ "Workflows 数据地点、创建约束与例外"
+[S184]: https://developers.cloudflare.com/changelog/post/2026-10-23-undelete-seven-day-window/ "D1 误删恢复限于删除后七天"
+[S185]: https://developers.cloudflare.com/api/resources/d1/subresources/database/methods/undelete/ "D1 undelete API 与 Time Travel 恢复边界"
+[S186]: https://developers.cloudflare.com/changelog/post/2026-10-20-source-maps-on-by-default/ "Wrangler 与 cf 默认上传 source maps"
+[S187]: https://developers.cloudflare.com/changelog/post/2026-10-23-workers-builds-pin-npm-version/ "Workers Builds 用 packageManager 固定 npm"
+[S188]: https://developers.cloudflare.com/changelog/post/2026-10-23-build-images-emudhra-certificates/ "Workers Builds 与 Pages 构建镜像拒绝受损 eMudhra 证书"
+[S189]: https://developers.cloudflare.com/changelog/post/2026-10-22-emudhra-certificates/ "Sandbox 0.x 与 1.x 的 eMudhra 信任链更新路径"
+[S190]: https://developers.cloudflare.com/changelog/post/2026-10-22-cloudflared-path-normalization/ "cloudflared ingress URL 归一化与默认启用时间"
+[S192]: https://developers.cloudflare.com/changelog/post/2026-10-27-access-custom-pages/ "Access HTML 与 Liquid 自定义页面发布"
+[S193]: https://developers.cloudflare.com/cloudflare-one/reusable-components/custom-pages/access-custom-pages/ "Access 自定义页面限制、回退与共享模板"
+[S200]: https://blog.cloudflare.com/kv-cache-exposure-remediation/ "Workers AI GLM-5.3 跨请求 KV cache 暴露事故与修复披露"
+[S201]: https://blog.cloudflare.com/full-transaction-waf/ "WAF 全事务检测与响应规则"
+[S202]: https://developers.cloudflare.com/changelog/post/2026-10-25-emergency-waf-release/ "WAF Brotli 与 Next.js 紧急规则的 Log 默认动作"

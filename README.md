@@ -21,7 +21,7 @@
 | 理解任务为什么登记了却没完成 | [任务中断与恢复](use-cases/recoverable-jobs.md) | 看见租约恢复、迟到拒绝与未知结果，知道哪些动作不能盲目重试 |
 | 让模型建议下一步，而由程序控制执行 | [有限决策与下一步动作](use-cases/bounded-decision.md) | 区分模型建议、允许的动作与需要检验的误判 |
 | 比较 Clef、Jev 与接入路线 | [服务页](services/decision-models.md) · [Clef / Jev 专题](comparisons/clef-vs-jev.md) | 在同一任务下比较模型与供应路径，不把价格当作正确率 |
-| 判断近期产品变化是否影响自己 | [10 月 20 日观察](reports/2026-10-20.md) · [10 月 13 日](reports/2026-10-13.md) · [首发选编](reports/2026-10-first-release.md) | 检查费用、中文检索、字段抽取与执行边界，再回看完整产品地图 |
+| 判断近期产品变化是否影响自己 | [10 月 28 日观察](reports/2026-10-28.md) · [10 月 20 日](reports/2026-10-20.md) · [首发选编](reports/2026-10-first-release.md) | 检查恢复、迁移、数据地点、发布默认值和费用，再回看完整产品地图 |
 | 中文原文搜不到，或想从通知里抽字段 | [检索与样本](services/search.md) · [决策与字段抽取](services/decision-models.md) | 检查 tokenizer、短词和索引；区分有限选项、typed values 与生成 |
 | 控制程序发出的云 API 或 HTTP 请求 | [云 API 与 HTTP 出站控制](services/egress-controls.md) | 确认代理、Gateway 与 Worker 实际检查的流量和条件 |
 | 用程序盘点或维护 CF 资源 | [API 与 SDK 维护](reference/api-maintenance.md) · [可靠操作例子](examples/api-operations/README.md) | 选择调用入口，识别完整分页、总期限、部分失败与未知写结果 |
@@ -33,6 +33,8 @@
 资料架的接续只有一份材料：本地 HTTP 负责自己阅读；[临时分享](use-cases/temporary-sharing.md)把请求转回仍在运行的电脑；静态发布提供上传的公开文件。阅读站的完整 ZIP 保留 `examples/reading-shelf/` 目录和署名许可，解压后可直接沿用命令。发布工具是可选的 Node.js 22+／固定 Wrangler 开发依赖，默认 Python 阅读与构建不登录或部署。
 
 三册之后的变化集中在[独立更新增补](reports/2026-10-update-supplement.md)：汇集 10 月 8 日、13 日与 20 日的资料，按检索、模型、执行、出站控制与维护连贯阅读。增补 PDF 已完成本地候选与检查，尚未发布为 GitHub Release。
+
+[10 月 28 日观察](reports/2026-10-28.md)继续记录 Computer／Pi／Think 的恢复与迁移、createAI、MCP 旧入口退役、Workflows 地点、D1 误删恢复及发布／观测变化。当前主题页与手册已吸收相关条件；Observability 官方算例现已修正，AI Search 的 11 月 1 日计费仍为临近事项。此前增补和 PDF 保留原范围。
 
 ## 先运行一个真实机制
 
@@ -88,13 +90,13 @@ Node.js 20+ 用于 Worker 测试；Mermaid 只在修改图示时需要安装。[
 
 ## 状态与边界
 
-这是持续编辑的 source-available 参考仓库；具体实现、验证和未启用能力见[当前状态](docs/current-state.md)。[10 月 20 日观察](reports/2026-10-20.md)记录本轮定向更新；[10 月 13 日观察](reports/2026-10-13.md)保留上一轮资料；[2026.10 首发选编](reports/2026-10-first-release.md)继续保留 10 月 2 日主体和 10 月 3 日四组更新的时间位置。手册与报告按各自来源范围阅读，局部核查不表示全书重新核验。[实践记录](practice/README.md)匿名重构作者维护过的系统，保留历史观察日期，并链接相关官方机制文档。旧三册 Markdown / HTML / PDF 固定保留在 `dist/`，用于历史阅读；新构建进入 `.build/`，不覆盖旧版。新版 PDF 为本地首发候选，尚未发布为 Release。
+这是持续编辑的 source-available 参考仓库；具体实现、验证和未启用能力见[当前状态](docs/current-state.md)。[10 月 28 日观察](reports/2026-10-28.md)记录本轮定向更新；[10 月 20 日观察](reports/2026-10-20.md)与[10 月 13 日观察](reports/2026-10-13.md)保留此前资料；[2026.10 首发选编](reports/2026-10-first-release.md)继续保留 10 月 2 日主体和 10 月 3 日四组更新的时间位置。手册与报告按各自来源范围阅读，局部核查不表示全书重新核验。[实践记录](practice/README.md)匿名重构作者维护过的系统，保留历史观察日期，并链接相关官方机制文档。旧三册 Markdown / HTML / PDF 固定保留在 `dist/`，用于历史阅读；新构建进入 `.build/`，不覆盖旧版。新版 PDF 为本地首发候选，尚未发布为 Release。
 
 公共例子使用合成输入，没有账号凭据或真实运行数据。阅读站由 GitHub Pages 托管，主分支通过检查后自动更新。搜索在浏览器内完成，不向搜索服务发送查询；站点不嵌入统计脚本或远程字体。云端实验、定期上游监控和新版出版物 Release 独立于网站部署。
 
 PDF 构建保留可复制文字、链接和书签，并对本机 PingFang 的 CFF 字体封装作原生预览兼容处理；新文件仍须在实际阅读设备验收。字体嵌入或文字提取通过不能代替显示检查，见[出版流程](docs/publication.md)。
 
-当前手册另有纳入 10 月 26 日资料的 31 页本地候选，已重新检查网页回访、字体与 macOS 显示，尚未登记为 Release 或“latest PDF”；其状态与旧版设备检查分开记录，见[当前状态](docs/current-state.md)。
+现有手册 PDF 候选固定纳入 10 月 26 日资料，共 31 页，不包含本轮 10 月 28 日增补；已检查网页回访、字体与 macOS 显示，尚未登记为 Release 或“latest PDF”。其状态与当前正文、旧版设备检查分开记录，见[当前状态](docs/current-state.md)。
 
 原创功能代码采用 [SUL-1.0](LICENSE)；原创正文、出版物、独立图形和资料编排采用 [CC BY-NC-SA 4.0](LICENSE-DOCUMENTATION.md)。这是一份 source-available 项目，不是无商业使用限制的 OSI 开源软件；具体路径与第三方例外见[许可与权利范围](LICENSE-STATUS.md)。
 

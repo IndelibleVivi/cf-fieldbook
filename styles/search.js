@@ -8,6 +8,13 @@
   const normalize = value => String(value).normalize('NFKC').toLocaleLowerCase().replace(/\s+/g, ' ').trim();
   // These phrases name reading intentions. They only match words already in a section.
   const aliases = [
+    { phrases: ['d1 误删怎么办', 'd1误删怎么办'], words: ['undelete'], required: ['d1'], intent: 'd1-undelete' },
+    { phrases: ['mcp 连不上 410', 'mcp连接410', 'mcp 410'], words: ['410'], required: ['mcp'], intent: 'mcp-transport' },
+    { phrases: ['computer 重放会重复吗', 'computer重放会重复吗'],
+      words: ['replay', '重放'], required: ['computer', 'callid'], intent: 'computer-replay' },
+    { phrases: ['workflows 数据放哪', 'workflows数据放哪'],
+      words: ['jurisdiction'], required: ['workflows'], intent: 'workflow-location' },
+    { phrases: ['source maps 会自动上传吗'], words: ['source maps'], required: ['上传'], intent: 'maps-upload' },
     { phrases: ['关机后还能读吗', '电脑关机后还能看吗', '关机后朋友还能读吗'],
       words: ['静态', '发布'], intent: 'shelf-publish' },
     { phrases: ['改了原文页面没变', '原文改了页面还是旧的', '漏 build', '忘了build'],
@@ -131,6 +138,11 @@
       if (parsed.intents.includes('cjk-keyword') && url.startsWith('services/search.html#')) score += 90;
       if (parsed.intents.includes('extraction') && url.startsWith('services/decision-models.html#')) score += 90;
       if (parsed.intents.includes('browser-cancel') && url.startsWith('services/agent-runtime.html#')) score += 90;
+      if (parsed.intents.includes('computer-replay') && url.startsWith('services/agent-runtime.html#') && heading.includes('computer')) score += 100;
+      if (parsed.intents.includes('mcp-transport') && url.startsWith('reference/api-maintenance.html#') && heading.includes('410')) score += 100;
+      if (parsed.intents.includes('d1-undelete') && url.startsWith('reference/implementation.html#') && heading.includes('误删')) score += 100;
+      if (parsed.intents.includes('workflow-location') && url.startsWith('reference/implementation.html#') && heading.includes('workflows')) score += 100;
+      if (parsed.intents.includes('maps-upload') && inChapter(stable.release) && heading.includes('source maps')) score += 100;
       if (parsed.intents.includes('shelf-publish') && url.startsWith('use-cases/publish-reading-shelf.html#') && heading.includes('关机')) score += 110;
       if (url.startsWith('examples/reading-shelf/README.html#')) {
         if (parsed.intents.includes('shelf-rebuild') && heading.includes('修改并重建')) score += 110;

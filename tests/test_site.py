@@ -209,7 +209,7 @@ class ReadingSiteTests(unittest.TestCase):
         diagrams = BeautifulSoup((self.output / 'diagrams/README.html').read_text(), 'html.parser')
         self.assertEqual(len(diagrams.select('img.technical-diagram')), 7)
         self.assertIsNotNone(diagrams.find(id='diagram-reading-shelf'))
-        for path in ('reports/2026-10-20.html', 'reports/2026-10-update-supplement.html'):
+        for path in ('reports/2026-10-28.html', 'reports/2026-10-update-supplement.html'):
             self.assertIsNotNone(soup.find('a', href=path))
         site = build_site.Site(self.root, self.root / '.build/home-status')
         site.entries['reports/2026-10-update-supplement.md']['status'] = 'withdrawn'
@@ -685,16 +685,17 @@ GitHub · [https://github.com/IndelibleVivi](https://github.com/IndelibleVivi)
                 self.assertEqual(len(soup.select('meta[name="twitter:description"]')), 1)
                 self.assertEqual((output / ('assets/share/' + key + '.png')).read_bytes(),
                                  (ROOT / ('assets/share/' + key + '.png')).read_bytes())
-            for path, cutoff in (('guides/handbook.html', '2026-10-26'),
-                                 ('comparisons/clef-vs-jev.html', '2026-10-20'),
-                                 ('services/observability.html', '2026-10-20'),
-                                 ('reference/implementation.html', '2026-10-20'),
-                                 ('reference/api-maintenance.html', '2026-10-20')):
+            for path, cutoff in (('guides/handbook.html', '2026-10-28'),
+                                 ('comparisons/clef-vs-jev.html', '2026-10-28'),
+                                 ('services/observability.html', '2026-10-28'),
+                                 ('reference/implementation.html', '2026-10-28'),
+                                 ('reference/api-maintenance.html', '2026-10-28'),
+                                 ('reports/2026-10-28.html', '2026-10-28')):
                 soup = BeautifulSoup((output / path).read_text(), 'html.parser')
                 self.assertIn('资料截至 ' + cutoff, soup.select_one('meta[name="description"]')['content'])
             for path in ('guides/handbook.html', 'services/observability.html'):
                 soup = BeautifulSoup((output / path).read_text(), 'html.parser')
-                self.assertIn('固定资料日期：2026-10-20', soup.get_text('', strip=True))
+                self.assertIn('固定资料日期：2026-10-28', soup.get_text('', strip=True))
 
 
 if __name__ == '__main__':

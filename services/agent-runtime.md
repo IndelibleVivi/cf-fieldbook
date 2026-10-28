@@ -1,7 +1,7 @@
 ---
 title: Agent 的工作怎样持续，工具在哪里执行
 subtitle: Harness、Durable Object 与执行环境的分工
-source_cutoff: 2026-10-20
+source_cutoff: 2026-10-28
 ---
 
 # Agent 的工作怎样持续，工具在哪里执行
@@ -9,6 +9,8 @@ source_cutoff: 2026-10-20
 同一份资料更新任务，可能读到一半被重启，也可能需要系统包生成预览。前者需要保存工作与恢复入口，后者需要工具运行环境。文件、会话和外部结果分别回答不同问题。
 
 2026-10-20 补充 Browser／browserTool 的会话存活与中断边界，并接回 API MCP 事件调查入口；10 月 13 日核对的 OpenCodeHarness 与 runtime 连接排空规则保留原范围，PiHarness 基础机制仍按 2026-10-03 阅读。
+
+2026-10-28 定向补入 Computer 的执行恢复、Think 工作区迁移和 Pi 1.4 升级条件；这些是不同层的恢复机制，不能从其中一层推断浏览器调用或外部动作会安全重放。
 
 ## 三种状态，三种职责
 
@@ -25,6 +27,32 @@ source_cutoff: 2026-10-20
 2026-10-02，Agents SDK 接入 PiHarness。Pi 管 agent loop，transcript、follow-up / steer inbox、model calls 与 tools；PiHarness 给它 DO SQLite 存储，并在有未完成工作时安排 Lifecycle 唤醒。进程内 scheduler 随 eviction 消失后，持久 job 的 alarm 可重新唤醒并打开存储继续。[S104] [S105]
 
 这条路线是 beta，Pi Durable 是 experimental。应用仍自行选择模型、extension registry、工具、客户端入口和权限。不能把“可恢复 turn”理解成已经获得一台 Linux，或所有外部服务都参与同一事务。
+
+### Pi 1.4：会停放反复崩溃的任务，也会改变存储
+
+10 月 22 日的 Agents SDK **0.30.0** 接入 Pi **1.4**：等待退避时可借 `onWake` 让 DO 休眠；反复导致对象崩溃的任务进入 `parked`，由 `pending()` 查看、`session.retry()` 重试。存储错误会触发重新打开和退避恢复，截断或空闲的模型流可作为 transient error 重试。[S178]
+
+升级会迁移 SQLite 会话 schema，**Pi 1.3 无法再打开**；不能将旧部署回滚当成数据回滚。采用前先核对迁移和恢复安排，并区分停放任务、模型重试与已经发生的工具副作用。本页没有执行升级。[S178]
+
+## Computer：重放执行记录，仍要保护外部动作
+
+`@cloudflare/computer` 提供 DO 内的文件工作区；`WorkerJavaScriptBackend` 执行 JavaScript，完整 Linux 仍由 Sandbox 承担。10 月 26 日 **v0.7.0** 增补中断恢复与等待批准，当前文档把它们标为 experimental。[S175] [S176]
+
+| `onInterrupt` | 重启后的处理 | 应先确认 |
+|---|---|---|
+| `fail`，默认 | 该 run 失败 | 如何报告与接续 |
+| `restart` | 从头执行，调用与输出都会再发生 | 整段工作是否可重做 |
+| `replay` | 从头运行，已记入 journal 的调用结果复用，再继续执行 | 未记下结果的调用是否可重复 |
+
+**Computer 重放会重复外部动作吗？** 会有这个窗口：外部请求成功、journal 尚未取得结果时中断，恢复仍可能再调用。host module 的 `callId` 跨重跑稳定，可传给支持幂等的服务；不能安全重做的函数可用 `unsafeToRepeat()`，中断时让 run 失败，再核对外部结果。它不能撤回第一次动作。[S175] [S176]
+
+恢复在下一次调用 `workspace.runtime` 时触发；需要主动唤醒时，由 DO alarm 调用 `workspace.runtime.recover()`。`ctx.interrupt()` 可等待应用答复，应用通过 `pending()`／`respond()` 处理；等待不计 timeout，但批准返回后函数会再执行，批准前的工作也必须能重做。[S176]
+
+实验边界会影响选型：replay 的 `fetch` 会缓冲响应，默认每个 body 上限 **1 MiB**；路径必须保持一致，改变 runtime 条件或不兼容的 package 升级会使中断 run 失败。journal 暂占 DO 存储，不能据此承诺任意任务、任意升级后都能恢复。[S176]
+
+### Think 旧工作区为什么会变空
+
+10 月 20 日 Think 与 Agent Skills 改用 Computer；`@cloudflare/shell` 和 Think 的 `createExecuteTool` 停止维护。新旧文件表格式不同，**没有自动迁移**：直接升级会看到新空工作区，旧数据仍在原表。需要保留文件时先按官方迁移脚本复制和核对；这不等于重建旧进程。[S177]
 
 ## OpenCodeHarness 的会话与工具边界
 
@@ -101,3 +129,8 @@ stop    conversation                -> 已运行 call 仍可完成到 timeoutMs
 [S144]: https://developers.cloudflare.com/agents/tools/browser/ "Browser 会话、tab、中断与 Live View"
 [S145]: https://developers.cloudflare.com/changelog/post/2026-10-13-cloudflare-mcp-events/ "Cloudflare API MCP 作为 MCP Events 发送 Workers Issues"
 [S146]: https://developers.cloudflare.com/changelog/post/2026-10-19-cloudflare-mcp-step-up/ "Cloudflare API MCP 的 step-up authorization"
+
+[S175]: https://developers.cloudflare.com/changelog/post/2026-10-26-computer-durable-javascript/ "Computer v0.7.0：中断恢复与等待批准"
+[S176]: https://developers.cloudflare.com/agents/tools/filesystem/ "Computer 文件工作区、replay、批准与实验限制"
+[S177]: https://developers.cloudflare.com/changelog/post/2026-10-20-think-computer-workspace/ "Think 改用 Computer 工作区与旧文件迁移"
+[S178]: https://developers.cloudflare.com/changelog/post/2026-10-22-pi-harness-pi-1-4/ "Agents SDK 0.30.0 与 Pi 1.4 恢复和 schema 边界"

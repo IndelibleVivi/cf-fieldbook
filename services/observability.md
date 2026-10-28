@@ -1,8 +1,8 @@
 ---
 title: 沿着一条请求，找到问题发生的地方
 subtitle: Cloudflare Traces、SQL 调查、采样与保留
-source_cutoff: 2026-10-20
-observability_as_of: 2026-10-20
+source_cutoff: 2026-10-28
+observability_as_of: 2026-10-28
 ---
 
 # 沿着一条请求，找到问题发生的地方
@@ -11,11 +11,17 @@ observability_as_of: 2026-10-20
 
 2026-10-20 定向复核 Observability 新方案包含量、迁移前 Workers Logs 价格，并补充 Issues 的 MCP Events 入口；10 月 13 日的 HTTP/3 取消与 Logpush 复核范围保留，其他机制未整体重核。没有账户或账单实测。
 
+2026-10-28 复看费用条款与算例，并补充 custom spans、SQL 属性发现与账户级 Logpush。费用仍在 12 月 1 日切换，官方算例现已与条款一致；其他机制沿各自原核验范围。
+
 ## 请求经过哪里，时间就在哪里分段
 
 Cloudflare Traces 为 open beta，可展示支持范围内的安全规则、转换、缓存、路由、Worker 与源站处理。应用里的分块、权限与模型生成仍需自己的记录；没有看到 span，也可能是未采到或尚未覆盖，不能据此判断该步骤没有发生。[S99]
 
 把本机日志中的请求 ID、部署版本和阶段耗时，与平台的 Ray ID / trace 记录关联。原设备关机时，Tunnel 仍不能替它执行程序；这类故障应与 Worker 已运行但依赖缓慢区别开。调查前先画[请求路线](../guides/handbook.md#routes)，别同时修改所有服务。
+
+### 自定义 span 的身份、状态与名字
+
+10 月 26 日 Workers custom spans 增加 `spanContext()`、`setStatus()` 与 `updateName()`。前者取得可与平台／导出 trace 对应的 ID；路由识别后可更新 span 名称。`setStatus({ code: "error" })` 的状态进入 OTLP 导出，**Workers Observability dashboard 目前还不显示**；画面没有 error 标志不证明没有错误。接入配置和完整接口沿官方 custom spans 文档核对。[S194] [S195]
 
 ## 正常流量少采，调查流量单独采
 
@@ -35,11 +41,15 @@ SQL API beta 给受支持数据集共同的调查入口。当前每个 statement
 
 可重复的调查顺序是：选择 dataset 与短时间窗 → 按请求身份定位 → 比较成功与失败 → 查对应版本代码 → 缩小候选原因 → 修复后用同条件复查。API 的字段与查询格式沿[官方查询文档](https://developers.cloudflare.com/analytics/sql-api/query-api/)取得，不猜字段名。[S102]
 
+10 月 27 日 introspection 新增 `include_attributes=true`，从账户**前七天**数据发现 `attributes` JSON 的 keys 与类型，结果字段也叫 `attributes`。旧 `include_custom_attributes`／`custom_attributes` 仍可用但已 deprecated。这不是无限期 schema 清单：某 key 没出现在窗口里，不证明历史上从未存在。[S196]
+
 官方 Observability MCP 可以把有权限的遥测交给 agent；Workers 的 SQL binding 可省一套外部 API client。调查工具的读取资格与改生产配置的权限是两件事，接入前限定账号、时间窗和所需字段。[S98]
 
 ## 导出前转换，要检查失败时送出了什么
 
 10 月 12 日的官方机制说明进一步解释了 Logpush Transformers：SQL 在导出前过滤记录、调整字段，交付转换后的 NDJSON。转换失败时不发送原始 batch，也不推进 delivery offset；系统重试并报告错误，长期失败的 job 可能被自动禁用。因此接收端没出现新日志时，也应检查转换健康状态。这是对先前已发布能力的机制补充，不记作 10 月 12 日首次开放。[S141]
+
+10 月 21 日 HTTP request logs 可用账户级 Logpush dataset，以一个 job 交付账户各 zone 日志，`ZoneName` 标识来源。custom fields 仍按 zone 配置，由账户 job 分别遵循；没有变成一份账户级 custom fields 配置。已有逐 zone job 是否停用，应先检查新旧交付是否重叠。[S197]
 
 ## Issues 与 Alerts 接住下一次故障
 
@@ -52,7 +62,7 @@ Workers Issues 将错误与部署版本、源码上下文连起来。Alerts 用�
 ## 费用：当前适用与将来生效
 
 <!-- facts: observability-costs -->
-固定资料日期：**2026-10-20**。
+固定资料日期：**2026-10-28**。
 
 | 条款 | Free | Paid |
 |---|---|---|
@@ -60,9 +70,11 @@ Workers Issues 将错误与部署版本、源码上下文连起来。Alerts 用�
 | 已公布；将在 2026-12-01 生效 [S100] | 0.5 GB 摄取 / 日；7 天 | 50 GB 摄取 + 10 GB-month / billing cycle；超出 $0.25 / GB + $0.10 / GB-month |
 <!-- /facts -->
 
-表格读取同一[费用记录](../catalog/observability-pricing.json)与[公告生效事件](../catalog/launches.json)，固定资料日期为 2026-10-20。现行价格页的 Paid 存储包含量是 **10 GB-month**，原先 12／10 的冲突已不再是当前口径；页面标注 10 月 15 日更新，不足以确定条款变更的正式日期。Log Explorer datasets 使用另一计价，不消费共享包含量；Enterprise 在合同续约时迁移。[S100]
+表格读取同一[费用记录](../catalog/observability-pricing.json)与[公告生效事件](../catalog/launches.json)，固定资料日期为 2026-10-28。Paid 存储包含量仍为 **10 GB-month**，摄取与存储分别扣量、不能互抵或滚存。Log Explorer datasets 不消费共享包含量；Enterprise 在合同续约时迁移。[S100]
 
-价格页的算例仍有算术不一致：75 GB 摄取和 20 GB-month 存储，按现行包含量应为 `(75−50)×$0.25 + (20−10)×$0.10 = $7.25`，其中存储为 $1.00；页面仍列 $0.80 和总额 $7.05。估算采用条款重算，不能复制旧算例。[S100]
+价格页的算例已修正：75 GB 摄取和 20 GB-month 存储，对应 `(75−50)×$0.25 + (20−10)×$0.10 = $7.25`，其中存储为 $1.00。10 月 20 日观察中的旧差异保留历史位置，不再作为当前问题。[S100]
+
+12 月 1 日前用量不会追溯收费，但 Paid 当天仍可查询的旧数据从当天起计入存储；只停止发送新日志，不一定消除存储计量。默认保留仍为七天，30／90／365 天可配置保留只是未来计划。[S100]
 
 摄取按压缩前的内容及 attributes 计量，采样会影响摄取与保存；查询、dashboard、alerts 没有额外收费。Free 达到每天摄取限额后停止接收新数据，已有数据在其保留期内仍可查。不要把十二月的公布条款提前写成十月已经适用的账单。[S100]
 
@@ -84,3 +96,8 @@ Workers Issues 将错误与部署版本、源码上下文连起来。Alerts 用�
 [S145]: https://developers.cloudflare.com/changelog/post/2026-10-13-cloudflare-mcp-events/ "Cloudflare API MCP 作为 MCP Events 发送 Workers Issues"
 
 [S146]: https://developers.cloudflare.com/changelog/post/2026-10-19-cloudflare-mcp-step-up/ "Cloudflare API MCP 的 step-up authorization"
+
+[S194]: https://developers.cloudflare.com/changelog/post/2026-10-26-span-context-status-update-name/ "Workers spanContext、setStatus 与 updateName"
+[S195]: https://developers.cloudflare.com/workers/observability/traces/custom-spans/ "Workers custom spans 配置与 API"
+[S196]: https://developers.cloudflare.com/changelog/post/2026-10-27-introspection-include-attributes/ "SQL API introspection 的 include_attributes 字段"
+[S197]: https://developers.cloudflare.com/changelog/post/2026-10-21-account-scoped-http-requests/ "Logpush 账户级 HTTP request logs"

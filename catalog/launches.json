@@ -56,14 +56,16 @@
     "status": "released_sdk",
     "access": "执行面与 SDK 状态分别判断",
     "announced_on": null,
-    "verified_on": "2026-10-02",
+    "verified_on": "2026-10-28",
     "sources": [
       "S59",
-      "S72"
+      "S72",
+      "S189"
     ],
     "effective_events": [],
     "conflicts": [],
-    "next_check": "核查开放条件与文档是否发生实质变化"
+    "next_check": "核查开放条件与文档是否发生实质变化",
+    "verification_scope": "0.x/1.x certificate remediation only; no image rebuild or deployment"
   },
   {
     "id": "artifacts",
@@ -71,7 +73,7 @@
     "status": "public_beta",
     "access": "Workers Paid",
     "announced_on": "2026-10-01",
-    "verified_on": "2026-10-20",
+    "verified_on": "2026-10-28",
     "sources": [
       "S07",
       "S08",
@@ -108,7 +110,7 @@
       }
     ],
     "next_check": "10-14／15 均已过去，按公开计费期预算；保留来源日期冲突，未核对实际账单",
-    "verification_scope": "pricing and stated billing dates only; limits and account billing not reverified"
+    "verification_scope": "S07/S08 price and stated dates only; 10-14/15 conflict remains; limits retain prior scope; no bill readback"
   },
   {
     "id": "ai-search",
@@ -116,7 +118,7 @@
     "status": "ga",
     "access": "账号额度与模型条件分别检查",
     "announced_on": "2026-10-01",
-    "verified_on": "2026-10-20",
+    "verified_on": "2026-10-28",
     "sources": [
       "S09",
       "S10",
@@ -131,7 +133,7 @@
     ],
     "conflicts": [],
     "next_check": "11-01 计费、tokenizer 重建与短词召回；真实用量和质量仍须另行验证",
-    "verification_scope": "S10 pricing/limits and S161/S162 CJK keyword retrieval only; no cloud benchmark"
+    "verification_scope": "S10 pricing, start date, chunk/OCR metering and legacy bucket only; CJK limits retain prior scope"
   },
   {
     "id": "clef",
@@ -139,7 +141,7 @@
     "status": "available_models",
     "access": "Workers AI；设计合作另行申请",
     "announced_on": null,
-    "verified_on": "2026-10-13",
+    "verified_on": "2026-10-28",
     "sources": [
       "S16",
       "S17",
@@ -158,7 +160,8 @@
       }
     ],
     "conflicts": [],
-    "next_check": "按模型卡分别检查 hosted context 与媒体/问题预算；中文长材料质量与截断影响尚未实测"
+    "next_check": "按模型卡分别检查 hosted context 与媒体/问题预算；中文长材料质量与截断影响尚未实测",
+    "verification_scope": "S17/S18/S124 hosted price, output fee and context only; input details retain prior scope"
   },
   {
     "id": "autorouter",
@@ -377,14 +380,18 @@
     "status": "public_beta",
     "access": "Cloudflare Traces 与 SQL API 为 beta；dataset 与账号条件分别核对",
     "announced_on": "2026-10-02",
-    "verified_on": "2026-10-20",
+    "verified_on": "2026-10-28",
     "sources": [
       "S98",
       "S99",
       "S100",
       "S101",
       "S102",
-      "S103"
+      "S103",
+      "S194",
+      "S195",
+      "S196",
+      "S197"
     ],
     "effective_events": [
       {
@@ -392,18 +399,7 @@
         "date": "2026-12-01"
       }
     ],
-    "conflicts": [
-      {
-        "topic": "pricing_example_arithmetic",
-        "claims": [
-          {
-            "value": "20−10 GB-month at $0.10, but subtotal $0.80 and total $7.05",
-            "source": "S100"
-          }
-        ],
-        "resolution": "按现行条款重算存储 $1.00、总额 $7.25；已解决原 12/10 包含量差异，不推断正式变更日"
-      }
-    ],
+    "conflicts": [],
     "topics": [
       "observability",
       "economics"
@@ -413,8 +409,8 @@
       "guide.handbook",
       "report.2026-10-03"
     ],
-    "next_check": "12-01 新计费及官方算例修正；未核对实际账单",
-    "verification_scope": "S100 pricing terms only; tracing/SQL/access retain earlier scope"
+    "next_check": "12-01 transition and retained-data storage; example now matches $7.25; no account or bill acceptance",
+    "verification_scope": "S100/S111 pricing and corrected example; span APIs, SQL attributes and account Logpush; other mechanisms retain prior scope"
   },
   {
     "id": "pi-harness",
@@ -422,10 +418,11 @@
     "status": "public_beta",
     "access": "PiHarness beta；Pi Durable experimental",
     "announced_on": "2026-10-02",
-    "verified_on": "2026-10-03",
+    "verified_on": "2026-10-28",
     "sources": [
       "S104",
-      "S105"
+      "S105",
+      "S178"
     ],
     "effective_events": [],
     "conflicts": [],
@@ -437,7 +434,8 @@
       "guide.handbook",
       "report.2026-10-03"
     ],
-    "next_check": "开放条件、来源差异与生效条款；未进行云端调用"
+    "next_check": "开放条件、来源差异与生效条款；未进行云端调用",
+    "verification_scope": "Agents SDK 0.30.0/Pi 1.4 upgrade and recovery notes only; original harness scope retained"
   },
   {
     "id": "web-search",
@@ -722,7 +720,7 @@
     "status": "preview",
     "access": "Workers AI；字段值与有限决策分开",
     "announced_on": "2026-10-19",
-    "verified_on": "2026-10-20",
+    "verified_on": "2026-10-28",
     "sources": [
       "S163",
       "S164",
@@ -745,7 +743,8 @@
         "resolution": "同页关系未解释；保留疑点，短材料先测 truncated、尾部证据和实际 usage"
       }
     ],
-    "next_check": "澄清 context/pass、usage计量与输入完整性；preview质量需另测"
+    "next_check": "澄清 context/pass、usage计量与输入完整性；preview质量需另测",
+    "verification_scope": "S164 price and unresolved 65536-context/8192-pass relationship only; no inference test"
   },
   {
     "id": "local-explorer-cron",
@@ -795,13 +794,16 @@
     "status": "available",
     "access": "显式版本固定继续生效",
     "announced_on": "2026-10-14",
-    "verified_on": "2026-10-20",
+    "verified_on": "2026-10-28",
     "sources": [
-      "S169"
+      "S169",
+      "S187",
+      "S188"
     ],
     "effective_events": [],
     "conflicts": [],
-    "next_check": "按真实使用版本和条件复查；没有账号或云端实测"
+    "next_check": "Check exact packageManager, pinned runtimes, custom CA paths and tools that carry their own roots",
+    "verification_scope": "npm version selection and patched build images only; no provider/account changes"
   },
   {
     "id": "deepseek-v41-flash-1017",
@@ -925,5 +927,226 @@
       }
     ],
     "next_check": "HTTPS解密、body时序、next限制与排除协议"
+  },
+  {
+    "id": "computer-recovery",
+    "name": "Computer JavaScript 中断恢复与批准",
+    "status": "experimental",
+    "access": "v0.7.0；replay/approval experimental，未记结果的外部动作仍可重复",
+    "announced_on": "2026-10-26",
+    "verified_on": "2026-10-28",
+    "sources": [
+      "S175",
+      "S176"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "Journal、callId、unsafeToRepeat、唤醒与升级兼容",
+    "verification_scope": "targeted_public_document_review_only; no_account_or_cloud_execution"
+  },
+  {
+    "id": "think-computer-workspace",
+    "name": "Think Computer 工作区迁移",
+    "status": "released_sdk",
+    "access": "旧 shell/createExecuteTool 停止维护；无自动文件迁移",
+    "announced_on": "2026-10-20",
+    "verified_on": "2026-10-28",
+    "sources": [
+      "S177"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "复制旧表文件后核对；不把空工作区当删除",
+    "verification_scope": "targeted_public_document_review_only; no_account_or_cloud_execution"
+  },
+  {
+    "id": "agents-createai",
+    "name": "Agents createAI provider",
+    "status": "released_sdk",
+    "access": "旧 provider deprecated；AI Search 独立 provider",
+    "announced_on": "2026-10-21",
+    "verified_on": "2026-10-28",
+    "sources": [
+      "S179",
+      "S180"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "凭据参数、首个输出前 fallback 与 binding stream resume",
+    "verification_scope": "targeted_public_document_review_only; no_account_or_cloud_execution"
+  },
+  {
+    "id": "mcp-sse-retired",
+    "name": "Cloudflare 产品 MCP /sse 退役",
+    "status": "released_feature",
+    "access": "旧地址410；改/mcp，旧登录重新授权",
+    "announced_on": "2026-10-22",
+    "verified_on": "2026-10-28",
+    "sources": [
+      "S181"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "仅产品专用服务器，不推广到全部第三方MCP",
+    "verification_scope": "targeted_public_document_review_only; no_account_or_cloud_execution"
+  },
+  {
+    "id": "workflows-jurisdiction",
+    "name": "Workflows jurisdiction",
+    "status": "available",
+    "access": "Wrangler4.152.0+；eu/us/fedramp，创建后不可改",
+    "announced_on": "2026-10-27",
+    "verified_on": "2026-10-28",
+    "sources": [
+      "S182",
+      "S183"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "实例与设置存储、管理调用和local dev的不同范围",
+    "verification_scope": "targeted_public_document_review_only; no_account_or_cloud_execution"
+  },
+  {
+    "id": "d1-undelete-window",
+    "name": "D1 undelete 七天窗口",
+    "status": "available",
+    "access": "仅删除后7×24小时；恢复后Time Travel不能回到undelete及更早",
+    "announced_on": "2026-10-23",
+    "verified_on": "2026-10-28",
+    "sources": [
+      "S184",
+      "S185"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "独立导出、删除时间、重名与账户限制",
+    "verification_scope": "targeted_public_document_review_only; no_account_or_cloud_execution"
+  },
+  {
+    "id": "source-maps-default",
+    "name": "Wrangler/cf 默认上传 source maps",
+    "status": "available",
+    "access": "Wrangler4.150.0+；Vite plugin1.64.0+",
+    "announced_on": "2026-10-20",
+    "verified_on": "2026-10-28",
+    "sources": [
+      "S186"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "上传源码范围、显式退出与自定义map失败规则",
+    "verification_scope": "targeted_public_document_review_only; no_account_or_cloud_execution"
+  },
+  {
+    "id": "tunnel-path-normalization",
+    "name": "Tunnel ingress URL归一化",
+    "status": "available",
+    "access": "cloudflared2026.10.0+；目前off，2027-01-25起新版本默认on",
+    "announced_on": "2026-10-22",
+    "verified_on": "2026-10-28",
+    "sources": [
+      "S190"
+    ],
+    "effective_events": [
+      {
+        "kind": "new_cloudflared_releases_default_normalization",
+        "date": "2027-01-25"
+      }
+    ],
+    "conflicts": [],
+    "next_check": "Access validation路径匹配、原始源站路径与所有replica",
+    "verification_scope": "targeted_public_document_review_only; no_account_or_cloud_execution"
+  },
+  {
+    "id": "tunnel-read-monitor",
+    "name": "Tunnel Read And Monitor",
+    "status": "ga",
+    "access": "所选Tunnel读取与日志，无写入权限",
+    "announced_on": "2026-10-22",
+    "verified_on": "2026-10-28",
+    "sources": [
+      "S191"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "旧Read角色不含远程日志",
+    "verification_scope": "targeted_public_document_review_only; no_account_or_cloud_execution"
+  },
+  {
+    "id": "access-custom-pages",
+    "name": "Access HTML/Liquid自定义页",
+    "status": "available",
+    "access": "登录/拒绝/forbidden/CLI批准页；受限模板",
+    "announced_on": "2026-10-27",
+    "verified_on": "2026-10-28",
+    "sources": [
+      "S192",
+      "S193"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "共享发布、内置回退与策略判定分离",
+    "verification_scope": "targeted_public_document_review_only; no_account_or_cloud_execution"
+  },
+  {
+    "id": "advanced-nameserver-type",
+    "name": "Advanced Nameservers API类型",
+    "status": "available",
+    "access": "约七天滚动；兼容foundation_dns，新旧值不得冲突",
+    "announced_on": "2026-10-26",
+    "verified_on": "2026-10-28",
+    "sources": [
+      "S198"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "封闭enum与新写入，非zone迁移",
+    "verification_scope": "targeted_public_document_review_only; no_account_or_cloud_execution"
+  },
+  {
+    "id": "flagship-context",
+    "name": "Flagship结构化evaluation context",
+    "status": "available",
+    "access": "对象/数组/null；OpenFeature SDK0.6.0+",
+    "announced_on": "2026-10-23",
+    "verified_on": "2026-10-28",
+    "sources": [
+      "S199"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "JSON POST、nested paths与成员条件",
+    "verification_scope": "targeted_public_document_review_only; no_account_or_cloud_execution"
+  },
+  {
+    "id": "basin-offset",
+    "name": "Basin SQL OFFSET",
+    "status": "available",
+    "access": "配合LIMIT与唯一ORDER BY分页",
+    "announced_on": "2026-10-21",
+    "verified_on": "2026-10-28",
+    "sources": [
+      "S203"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "并发变化、完整读取与部分失败",
+    "verification_scope": "targeted_public_document_review_only; no_account_or_cloud_execution"
+  },
+  {
+    "id": "waf-response-rules",
+    "name": "WAF全事务检测与响应规则",
+    "status": "ga",
+    "access": "含Free；最多3条custom response rules，Log/Block；响应body不能任意写规则",
+    "announced_on": "2026-10-21",
+    "verified_on": "2026-10-28",
+    "sources": [
+      "S201",
+      "S202"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "源站副作用不可撤销；紧急规则最终动作与override",
+    "verification_scope": "targeted_public_document_review_only; no_account_or_cloud_execution"
   }
 ]

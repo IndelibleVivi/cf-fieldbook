@@ -1,7 +1,7 @@
 ---
 title: 用程序维护 Cloudflare 资源
 subtitle: 选择调用入口，取得完整结果，再判断变更是否完成
-source_cutoff: 2026-10-20
+source_cutoff: 2026-10-28
 ---
 
 # 用程序维护 Cloudflare 资源
@@ -13,6 +13,8 @@ source_cutoff: 2026-10-20
 10 月 13 日另核查 `v7.13.0` release 与 API MCP 的 Skills 扩展，下文补充具体触发点。原先 `v7.12.0` 的客户端默认值继续按固定版本阅读，没有据新 release 推断它们已重新验收。
 
 10 月 20 日补充 `cf docs search`、Cloudflare API MCP 的事件与 step-up 调查，以及 Gateway／CWS 作为变更执行边界的入口。没有安装 CLI、发出搜索请求或使用账户执行这些动作。
+
+10 月 28 日定向补充产品 MCP 的旧传输入口退役、模型 provider 迁移与两个字段变更；既有 Go 固定版本、分页和 timeout 说明保留原范围。
 
 ## 控制台、CLI、REST、SDK、binding 各接哪一段
 
@@ -76,9 +78,25 @@ Go `v7.12.0` release 增加 Containers application、instance、version、rollou
 
 来源查询只检查登记条目的正文引用和 JSON `source` 单值／`sources` 数组，接着沿 `depends_on` 传播；来源书目、代码示例、注释与来源附录不作为正文使用点。它返回当前复查、历史勘误和非活动候选，`related` 不传播。它不分析私人项目，不改变日期，也不判定所有引用已经过时。
 
+### 先核对具体字段，再迁移解析器
+
+10 月 26 日 Advanced Nameservers 开始约七天滚动切换为 `nameservers.type: "cloudflare.advanced"`；未轮到的账户仍可能返回旧类型。`foundation_dns` 保留为 deprecated 兼容别名，同时提交时两者必须一致。把 type 当封闭 enum 的代码须接受新值；这项 API 表示变化不要求迁移 zone，也不改变订阅。[S198]
+
+SQL introspection 另有 `include_attributes`／`attributes` 新名字，发现范围是前七天，旧字段仍兼容。它属于 SQL API，不应套到其他资源列表；[观测页](../services/observability.md#一次查询先选一份-dataset)保留具体查询条件。[S196]
+
+### 模型 provider 迁移保留调用条件
+
+10 月 21 日 `createAI` 从 `agents/models/ai-sdk` 或 `agents/models/pi-ai` 接入 Workers AI、Gateway catalog、dynamic route 和 vendor models。`workers-ai-provider`／`ai-gateway-provider` 已 feature frozen、deprecated；AI Search 则使用独立的 `ai-search-provider`。[S179]
+
+旧 `apiKey` 参数改为 `apiToken`。fallback 只在首选模型**产生输出之前**失败时尝试后续模型；binding 的 catalog／dynamic stream resume 是另一项能力，不能推定外部工具动作也可恢复。迁移时检查凭据、模型身份、用量与错误路径；本书的离线 REST 请求例子不依赖这些 provider，无需为了接口名变化重写。[S179] [S180]
+
 ## Agent 怎样取得官方操作指导
 
 10 月 10 日起，Cloudflare API MCP 在 `https://mcp.cloudflare.com/mcp` 提供 Skills over MCP：支持该扩展的客户端可用 `skills/list` 发现，再从 `skill://<name>/<path>` 读取。客户端具备 MCP 工具能力不自动说明它支持 Skills 扩展；接线时分别确认资源发现、内容读取和实际操作权限。本书没有连接真实账户验证此入口。[S134]
+
+### MCP 返回 410 Gone：检查旧 /sse 地址
+
+10 月 22 日起，Cloudflare **产品专用** MCP servers 只提供 `/mcp`；旧 `/sse` 返回 **410 Gone**，附新地址。将客户端配置改为服务器公布的 `/mcp`，例如 `https://docs.mcp.cloudflare.com/mcp`；原来经 `/sse` 登录的客户端需要重新登录。已经用 `/mcp` 的连接不受此项变化影响。它不表示所有第三方 MCP 都采用同一迁移安排。[S181]
 
 
 ## 先搜文档，再读取原页
@@ -143,3 +161,9 @@ cf analytics_engine sql query           -> cf analytics-engine sql query
 [S149]: https://github.com/cloudflare/cf/blob/main/packages/cli/CHANGELOG.md "cf CLI changelog：文档搜索与 kebab-case 命令"
 [S150]: https://github.com/cloudflare/cf/releases/tag/cf%401.0.0-beta.15 "cf 1.0.0-beta.15 release：docs search"
 [S160]: https://developers.cloudflare.com/changelog/post/2026-10-16-docs-search/ "使用 Cloudflare CLI 搜索文档"
+
+[S179]: https://developers.cloudflare.com/changelog/post/2026-10-21-createai/ "createAI 替代旧 Workers AI 与 Gateway provider"
+[S180]: https://developers.cloudflare.com/agents/models/ "Agents Models：连接、fallback 与 stream resume"
+[S181]: https://developers.cloudflare.com/changelog/post/2026-10-22-cloudflare-mcp-servers-retire-sse/ "Cloudflare 产品 MCP 退役 /sse 入口"
+[S196]: https://developers.cloudflare.com/changelog/post/2026-10-27-introspection-include-attributes/ "SQL API introspection 的 include_attributes 字段"
+[S198]: https://developers.cloudflare.com/changelog/post/2026-10-26-foundation-dns-nameserver-type/ "Advanced Nameservers 类型与兼容字段迁移"

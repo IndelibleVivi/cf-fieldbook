@@ -1,7 +1,7 @@
 {
   "schema": "fieldbook.observability-pricing/1",
   "launch_id": "observability-platform",
-  "as_of": "2026-10-20",
+  "as_of": "2026-10-28",
   "current": {
     "source": "S111",
     "free_events_per_day": 200000,

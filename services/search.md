@@ -1,7 +1,7 @@
 ---
 title: 自己的材料，还是互联网上的新信息
 subtitle: AI Search、Vectorize 与 Web Search API 分别搜什么
-source_cutoff: 2026-10-20
+source_cutoff: 2026-10-28
 ---
 
 # 自己的材料，还是互联网上的新信息
@@ -71,6 +71,12 @@ const results = await response.json();
 2026-10-09，Markdown for Agents 改为边缘进程内流式转换，HTML 上限增至解压后 6 MiB。转换响应不再生成 `x-markdown-tokens`、`x-original-tokens`，并移除 `Content-Length`。依赖这些头的读页程序应自行计算所需计量，按实际读取的 body 执行上限，并保留中断状态；不能用 header 缺失判定失败或用已有正文判定完整。[S127]
 
 网站转换的 6 MiB 上限与 SDK 读页的 5,000,000 bytes 默认预算约束不同环节。调整其中一项不会自动放宽另一项；处理长文时应一起检查转换、传输和返回给模型的窗口。
+
+## 11 月计费前，先数分块后的 tokens
+
+10 月 28 日复看 S10，11 月 1 日起算与已登记单价未变。摄取按最终入索引的 chunks 用 `cl100k_base` 计数，overlap 重复的文字在每个 chunk 都计入；不能拿原文件字数直接当账单。OCR 提取文字同时计基础与 image processing 摄取，图片处理量共用每月 5M tokens 包含量。[S10]
+
+每账户每月包含 10 GB-month 存储、1,000 semantic 和 1,000 full-text 查询；内部 Workers AI embedding／reranking 不另记模型账单，生成、query rewriting 和外部模型仍分别计费。旧网站抓取专用 R2 bucket 现已不再写入，但残留对象仍可能计 R2 存储；删除前先核对是否仍需要，不因新索引正常就清理所有旧对象。[S10]
 
 ## Provider 比较：费用、返回材料和保留分开看
 

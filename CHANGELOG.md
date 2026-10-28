@@ -1,5 +1,12 @@
 # 变更记录
 
+## 2026-10-28 · 恢复、迁移与发布默认值
+
+- 新增独立观察，直接从官方 changelog／博客追到机制文档；定向补充 Computer replay／批准、Think 文件迁移、Pi 1.4 schema、createAI 与产品 MCP `/sse` 退役。
+- 手册和实施参考补 Workflows jurisdiction、D1 七天 undelete 及恢复后的 Time Travel 边界、Tunnel URL 归一化与角色、Access 自定义页、source maps 默认上传、Builds npm 和镜像 CA；观测页补 span API、SQL 属性与账户 Logpush。
+- Observability 官方算例已修正，撤下当前错误提示，单独复核并推进费用日期至 10-28；AI Search 增加分块／OCR 计量和旧 R2 bucket 提示。Artifacts 日期冲突、Clairic context/pass 疑点保留，CF 模型只定向复看价／输出费／窗口。
+- 新增 S175–S203、首页当期入口与自然问法搜索；当前分享卡同步，历史报告、已分享增补、`dist/` 与冻结 PDF 不改。没有账户、模型或云端实测、新 PDF Release、部署配置或许可变化。
+
 ## 2026-10-26 · 资料架取得、分享与静态发布路线
 
 - 阅读站新增普通成品入口与保留目录、署名和许可的完整资料架 ZIP；8768 本地服务与临时分享接续一致，加入原件已改但 HTML 未重建的观察。

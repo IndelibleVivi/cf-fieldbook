@@ -15,8 +15,9 @@
       "sources": [
         "S73"
       ],
-      "verified_on": "2026-10-02",
-      "evidence": "official_documentation_not_inference_test"
+      "verified_on": "2026-10-28",
+      "evidence": "official_documentation_not_inference_test",
+      "verification_scope": "hosted_input_output_price_and_context_only; other_fields_retain_prior_scope"
     },
     {
       "id": "cf-clef-flash",
@@ -31,8 +32,9 @@
         "S18",
         "S123"
       ],
-      "verified_on": "2026-10-13",
-      "evidence": "official_documentation_not_inference_test"
+      "verified_on": "2026-10-28",
+      "evidence": "official_documentation_not_inference_test",
+      "verification_scope": "hosted_input_output_price_and_context_only; other_fields_retain_prior_scope"
     },
     {
       "id": "cf-clef-omni",
@@ -47,8 +49,9 @@
         "S124",
         "S123"
       ],
-      "verified_on": "2026-10-13",
-      "evidence": "official_documentation_not_inference_test"
+      "verified_on": "2026-10-28",
+      "evidence": "official_documentation_not_inference_test",
+      "verification_scope": "hosted_input_output_price_and_context_only; other_fields_retain_prior_scope"
     },
     {
       "id": "cf-clef",
@@ -62,8 +65,9 @@
       "sources": [
         "S17"
       ],
-      "verified_on": "2026-10-13",
-      "evidence": "official_documentation_not_inference_test"
+      "verified_on": "2026-10-28",
+      "evidence": "official_documentation_not_inference_test",
+      "verification_scope": "hosted_input_output_price_and_context_only; other_fields_retain_prior_scope"
     },
     {
       "id": "typesafe-direct",

@@ -2,9 +2,9 @@
 title: Clef 与 Jev：模型、入口与判断成本
 subtitle: 一份面向个人开发者的决策模型比较
 edition: 2026.10 · 专题 01 · 阅读版 3
-source_cutoff: 2026-10-20
-reviewed_on: 2026-10-13
-review_scope: Clef 系列标价、托管上下文与输入字段；其余来源保留原核对范围
+source_cutoff: 2026-10-28
+reviewed_on: 2026-10-28
+review_scope: CF 三款 Clef 与 Jev 目录标价、输出费及窗口；其他 provider、性能与输入细节保留原核对范围
 presentation_revision: 3
 author: Faye & Cove
 github: https://github.com/IndelibleVivi
@@ -13,6 +13,8 @@ status: source-verified-comparison-not-live-benchmark
 ---
 
 # Clef 与 Jev：模型、入口与判断成本
+
+10 月 28 日定向复看 Cloudflare 的三款 Clef 模型卡与 Jev 目录，标价、零输出 token 费和精确窗口与本页既有登记一致；其他 provider 和性能表未重核。新 `createAI` 是接入迁移，不改变本页按模型和供应路径分开比较的方法，见[API 维护](../reference/api-maintenance.md#模型-provider-迁移保留调用条件)。
 
 一个便宜的判断接口，值得拿来替代哪些大模型调用？这个问题不能只比较单价。还要知道返回的数字代表什么、模型读到了多少材料，以及一次误判会把后续工作带到哪里。
 

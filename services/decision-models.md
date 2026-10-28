@@ -1,7 +1,7 @@
 ---
 id: service.decision-models
-reviewed_on: 2026-10-20
-review_scope: 10-20 新增 Clairic preview 和 DS V4.1 Flash；Clef 保留 10-13、Jev 保留 10-02 范围
+reviewed_on: 2026-10-28
+review_scope: 10-28 复看 CF 四条决策路线的标价、输出费与窗口及 Clairic 疑点；补 createAI 与 GLM 事故披露，原性能和其他 provider 保留范围
 evidence: official-documents-only
 ---
 
@@ -34,6 +34,12 @@ Cloudflare 自有的 Clef／Clef-flash／Clef-omni 与第三方 Jev 都能进入
 
 这个区分围绕输出空间；同为小模型不表示任务相同。Clairic 也支持计算、估计与预测，但类型正确并不证明内容正确，长算式宜抽取输入后交给代码。[S163] [S165]
 
+## 接入方式与模型隔离，另看两项变化
+
+10 月 21 日起，Agents SDK 用 `createAI` 统一旧 Workers AI／Gateway provider；原两包已 deprecated，AI Search 转到独立 provider。模型、供应路径和价格仍分开判断；具体参数和 fallback 条件见[API 维护](../reference/api-maintenance.md#模型-provider-迁移保留调用条件)。[S179] [S180]
+
+10 月 26 日公开的事故报告涉及 **Workers AI 的 `@cf/zai-org/glm-5.3` 部署**：8 月 27 日至 9 月 9 日，过长输入触发 KV cache 跨请求暴露；官方称 9 月 9 日修复恢复，未影响其他 Workers AI 模型。这是已修复事故的披露，不是本周新发生，也不能推广到所有同名模型入口。本书据此提醒：长上下文验收还要核对返回内容、请求隔离和来源，HTTP 200 或 token 用量正确不能独自证明这些条件。[S200]
+
 ## Clairic：有类型的值与可定位原文
 
 Clairic 于 **2026-10-19** 进入 preview，Workers AI 选择器为 `@cf/cloudflare/clairic`。传入 `state` 和 `fields`，返回每个字段的 typed value；`text` 可附原文字符位置，缺少依据时 `value` 可为 `null`。输入标价 **$0.10／百万 tokens**，没有生成输出 token 费用。[S163] [S164]
@@ -57,7 +63,7 @@ Clairic 于 **2026-10-19** 进入 preview，Workers AI 选择器为 `@cf/cloudfl
 
 ### 65,536 与 8,192：暂不能合并成一个输入承诺
 
-10 月 20 日查阅时，同一模型页的表格写 **65,536-token context**，`fields` 说明却写字段和材料装入 **8,192-token pass**。两者关系没有解释清楚，本书保留疑点；先用短材料验证，不把较大的数字当成完整读取保证。字段会拆分为多个 pass，费用看响应的 `usage.input_tokens` 和 `usage.passes`，不能仅以原文长度乘单价。多 pass 可能重复计入材料是费用核查理由，具体计量仍以实际响应与后续官方澄清为准。[S164]
+10 月 20 日查阅、10 月 28 日复看时，同一模型页的表格仍写 **65,536-token context**，`fields` 说明写字段和材料装入 **8,192-token pass**。两者关系没有解释清楚，本书保留疑点；先用短材料验证，不把较大的数字当成完整读取保证。字段会拆分为多个 pass，费用看响应的 `usage.input_tokens` 和 `usage.passes`，不能仅以原文长度乘单价。多 pass 可能重复计入材料是费用核查理由，具体计量仍以实际响应与后续官方澄清为准。[S164]
 
 从长聊天判断一个人重视什么，还涉及语境、修订和评价标准；字段类型齐全不能替代这类质量验证。本页没有把抽取能力写成已经通过的记忆理解实验。
 
@@ -79,3 +85,7 @@ Workers AI 新增 `@cf/deepseek-ai/deepseek-v4.1-flash-1017`，模型卡列 **1,
 [S170]: https://developers.cloudflare.com/workers-ai/models/deepseek-v4.1-flash-1017/ "DeepSeek V4.1 Flash 1017 模型卡"
 
 [S171]: https://developers.cloudflare.com/changelog/post/2026-10-19-deepseek-v4.1-flash-workers-ai/ "DeepSeek V4.1 Flash 1017 Workers AI 发布"
+
+[S179]: https://developers.cloudflare.com/changelog/post/2026-10-21-createai/ "createAI 替代旧 Workers AI 与 Gateway provider"
+[S180]: https://developers.cloudflare.com/agents/models/ "Agents Models：连接、fallback 与 stream resume"
+[S200]: https://blog.cloudflare.com/kv-cache-exposure-remediation/ "Workers AI GLM-5.3 跨请求 KV cache 暴露事故与修复披露"

@@ -28,6 +28,10 @@ r3 重新核对来源 S16–S18，并补充 S73–S83，重点覆盖 Clef / Jev�
 
 2026-10-26 新增 S172–S174，仅查阅 Workers Static Assets 静态站、纯静态 `assets.directory`／脚本和 binding 边界，以及 Wrangler 本地预览、部署与删除命令。资料架的可选开发依赖实际安装为 Wrangler `4.152.0`，真实 lockfile 随源保留；普通构建和例子检查不安装或运行 Wrangler。新增完整取得、漏重建观察与独立四文件发布目录；本地目录、预览、dry run 和手册候选分别检查，没有登录账号、上传、更新或删除云资源。手册资料上界推进至 10-26，实施参考题头对齐其已有 10-20 范围；Observability 与其他未复核来源日期不因此刷新。
 
+2026-10-28 新增 S175–S203，从官方 changelog 与博客 10-20 至 10-27 的变化进入机制文档，定向核对 Computer／Think／Pi 恢复和迁移、createAI、MCP 旧入口、Workflows／D1、Tunnel／Access、source maps／Builds／Sandbox、观测与字段变化，以及 WAF 和 GLM-5.3 已修复事故的披露。调查范围与未扩成教程的方向见[10 月 28 日观察](../reports/2026-10-28.md)。事故披露日与发生／修复日分开；没有迁移 schema、安装 SDK、测试真实模型或变更账户。
+
+本轮另复看 S07／S08／S10／S17／S18／S73／S100／S111／S124／S164 的指定条款。Observability 官方算例已与 $7.25 一致，费用固定 `as_of` 单独推进至 10-28，生效仍为 12-01；Artifacts 日期冲突与 Clairic context/pass 疑点保留。CF 决策路线只复看标价、输出费和窗口，其他 provider、性能和旧输入细节不刷新；原复核期限继续覆盖尚未查阅部分。历史报告、独立增补、`dist/` 和冻结候选未改写，也没有新 PDF Release。
+
 [首发选编](../reports/2026-10-first-release.md)是独立的新编排，按主题吸收两篇历史观察，保留继承事实、后续增补和定向核查各自的范围。原 10 月 2 日和 10 月 3 日报告不被覆盖，构建日期也不作为它们的新事实日期。
 
 ## 历史资料的使用

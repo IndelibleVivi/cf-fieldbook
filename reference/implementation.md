@@ -2,7 +2,7 @@
 title: Cloudflare 实施参考
 subtitle: 从一个入口到可恢复的应用与自动化
 edition: 2026.10 · 修订 1
-source_cutoff: 2026-10-20
+source_cutoff: 2026-10-28
 author: Faye & Cove
 github: https://github.com/IndelibleVivi
 status: implementation-reference-snapshot
@@ -15,7 +15,7 @@ scope: 不含邮件；示例与实际账户分离
 
 本文件集中保存实现说明、代码、恢复语义和来源；按用途阅读可从[实践手册](../guides/handbook.md)开始。本文按资料截止日阅读，实际部署需要验证自己的环境。
 
-2026-10-13 定向补充 Workers 排空、Queues／D1 地点约束、Clef 输入预算和 Artifacts 计费／限制；2026-10-20 再纳入 CJK 检索、Clairic、Artifacts 时间，以及 Cron、SSH、Tunnel 和构建条件。其余内容保留原查阅范围。API／SDK 维护入口见[维护参考](api-maintenance.md)，本期资料范围见[10 月 20 日观察](../reports/2026-10-20.md)，上一轮记录仍见[10 月 13 日观察](../reports/2026-10-13.md)。
+2026-10-13 定向补充 Workers 排空、Queues／D1 地点约束、Clef 输入预算和 Artifacts 计费／限制；2026-10-20 再纳入 CJK 检索、Clairic、Artifacts 时间，以及 Cron、SSH、Tunnel 和构建条件。10 月 28 日补 D1 undelete、Workflows 地点、Tunnel 路径与角色、发布默认值和镜像 CA；其余保留原范围。API／SDK 入口见[维护参考](api-maintenance.md)，本期资料范围见[10 月 28 日观察](../reports/2026-10-28.md)，此前记录见[10 月 20 日](../reports/2026-10-20.md)与[10 月 13 日](../reports/2026-10-13.md)。
 
 个人基础设施的难处通常不是少一种服务。一个网站能打开之后，还要知道谁能写入、文件存在哪里、任务失败后怎么继续，以及几个月不用时是否仍在付费。本手册围绕这些工作展开，选择服务只是其中一步。
 
@@ -243,6 +243,12 @@ Quick Tunnel 适合临时试验；长期使用应选择可管理的命名入口�
 
 本仓库未调用这些账户接口；以上为官方迁移说明的维护摘要。[S117]
 
+### 路径匹配的归一化不是改写源站 URL
+
+`cloudflared` 2026.10.0+ 可在匹配需要 Access validation 的 ingress 前归一化 URL，源站收到的路径保持原样。当前可用 `TUNNEL_DISABLE_PATH_NORMALIZATION=false` 在每个 replica 开启并重启；2027-01-25 起的新版本默认开启。变更前测试正常路径、编码路径和邻近未授权路径，核对命中的规则与实际到达的源站；没有 Access validation 规则的配置不受此变化影响。[S190]
+
+Tunnel 细粒度 Read And Monitor 角色已 GA，允许所选 Tunnel 的读取与远程日志，不授写权限；旧 Read 角色不含日志串流。排障人员需要看日志时先用所需作用域，不直接授全账户写入。[S191]
+
 ### 与设备私网的区别
 
 Cloudflare One Client / WARP 是终端接入和流量策略；Mesh 连接加入组织的设备与私网；Tunnel 发布被明确选择的服务。当前 Mesh 仍有 beta 标识，不应成为没有替代方案的唯一灾难恢复入口。[S61]
@@ -296,6 +302,12 @@ SQL 导出另有实际限制。当前 D1 不直接接收原始 SQLite 文件；�
 
 **代码回滚与数据回滚分开。** 新版本已经写入新字段或发出外部操作之后，回退 Worker 代码不会撤销这些事实。迁移优先采用旧新版本都能读取的过渡结构，再择期清理；涉及不可逆删除时保留单独操作与确认。
 
+### 误删 D1 之后还能恢复吗
+
+整个库被删除后，`POST /accounts/{account_id}/d1/database/{database_id}/undelete` 只接受删除后 **7×24 小时内**的恢复，超时失败；这与现存数据库的 Time Travel 保留期不同。恢复通常沿用旧名，重名时用 `new_name`，恢复后的库计入账户限制。[S184] [S185]
+
+恢复后 **Time Travel 只能回到 undelete 之后的状态**，不能用旧 bookmark 回到恢复时刻或更早。先保留数据库身份、删除时间与独立导出，核对恢复后的数据和绑定；本页只说明接口，不执行恢复请求。[S185]
+
 ## 08 / 自动化：接收成功、执行成功、结果可见各有自己的状态
 
 ### 先选择最少的一种编排
@@ -305,6 +317,16 @@ Queues 解决接收与消费解耦、削峰和重投；Durable Objects 适合按
 队列是至少一次投递的工作环境，不能因为常见请求只收到一次，就把 consumer 写成单次运行程序。DLQ 是重试耗尽后的存放与调查入口，仍需要有人或程序处理；未配置时要认真确认消息在重试耗尽后的行为。[S53] [S54]
 
 **地点约束（2026-10-13 核查）：** 创建 Queues 时可指定 `jurisdiction` 为 `eu`、`us` 或 `fedramp`，之后不可更改或移除；DLQ 必须同 jurisdiction。限制覆盖队列侧存储／处理，Worker 的执行地点须另查。D1 新建库支持 `--jurisdiction=us`，同样不能从数据库的约束推出整条外部调用链的约束。[S137] [S138] [S139]
+
+### Workflows 的数据地点在创建时决定
+
+10 月 27 日起，Wrangler **4.152.0+** 支持在 Workflow 的 binding 或 `exports` 中设置 `jurisdiction`，值为 `eu`、`us`、`fedramp`。下面是配置片段，只在明确创建目标后用于实际部署：[S182]
+
+```json
+{"workflows":[{"name":"document-job","binding":"DOCUMENT_JOB","class_name":"DocumentJob","jurisdiction":"eu"}]}
+```
+
+实例执行与持久数据受限，**设置本身在辖区外保存**，其他地区 Worker 仍能管理实例。现存 Workflow 的 jurisdiction 不可改；冲突时 `deploy`／`versions upload` 在上传前停止。移除字段保留原值；换名字创建或删除旧对象的迁移须另行设计，删除还会删实例。`script_name` 不能与该字段组合，local dev 会忽略它；用 `wrangler workflows describe` 检查远端配置，本地通过不证明地点约束。[S183]
 
 **长请求与恢复：** Workers 例行 runtime 更新给旧进程最多 20 分钟排空；窗口按进程计算，结束后仍未完成的请求／连接会被终止，其他故障也可提前中断。响应结束或客户端断开后的 `waitUntil()` 仍最多延续 30 秒。需要持久完成的任务继续登记结果与恢复位置；流式连接恢复不等于重新执行整个业务动作。[S125] [S126]
 
@@ -462,6 +484,8 @@ Clef 系列输出定义好选项的概率，适合分类、选择或排序任务
 
 1.0 默认的容器出站能力与旧版不同，应按文档显式选择网络设置或受控 outbound handler。把第三方凭据保留在 handler 之外的控制层、在允许的请求上注入，比把长期密钥写进镜像更容易限制。这个机制仍要经过实际访问测试，不能只看配置写了“deny”。[S72]
 
+10 月 22 日证书修补另按版本处理：0.x 的 SDK 与镜像都升至 **0.12.14**，保留镜像后缀；1.x 重建使用已修补信任链的自有镜像，再在获准维护窗口替换旧容器与旧 snapshots。运行中容器不会因 Worker 部署自动换镜像，旧 snapshot 也可能恢复旧 CA。官方列出的测试主机应由每种实际 TLS client 检查拒绝结果，不能只看镜像标签。[S189]
+
 ### 路线 E：一次可以关闭、恢复和比较的执行实验
 
 选一个无私有凭据的公开仓库版本，在自定义镜像或准备阶段安装准确依赖。第一次只执行确定性的构建或检查，不同时引入自动选模型、互联网自由浏览和生产写权限。
@@ -521,7 +545,9 @@ Kitesurf 是新的浏览器与终端操作入口，可以用于独立实验；�
 | Local Explorer 单次 Cron 调用 | 在既有 dev server 的 `/cdn-cgi/local/explorer` 调用 `scheduled()`，指定 cron／触发时间并查看结果；本地不自动执行 cron 表。[S166] |
 | infrastructure application 默认 24 小时 | 到期关闭 SSH，多个应用采用最短时长；把进程存活、断线与结果恢复分开验收。[S167] |
 | Tunnel／Mesh 默认 50,000 routes | 指 CIDR／hostname routes；不含 published applications。每账户包含 1,000 tunnels，额外 $4.50／tunnel·月。[S168] |
-| Workers Builds 默认工具链升级 | 10-14 默认 Node 24.21.0、Python 3.14.8；环境变量和版本文件固定值继续生效。对照构建镜像、runtime 和 lockfile，不从源码未变推断构建环境未变。[S169] |
+| Workers Builds 默认工具链与 CA | 10-23 镜像更新 Node 22.23.4／24.22.1、Bun 1.4.4、pip 26.2.2 及 CA；覆盖证书路径或自带 CA 的工具仍须核对。[S188] |
+| Workers Builds 选择 npm | 使用精确 `packageManager`，不是 `engines.npm`；与 lockfile 的生成版本一起检查。[S187] |
+| 默认上传 source maps | Wrangler 4.150.0+ 与 cf 默认上传；Wrangler 用 `upload_source_maps: false` 退出，cf／Vite 用 Worker 的 `build.sourcemap: false`。自定义 maps 无法解析默认跳过，显式 `true` 才强制失败。[S186] |
 
 这些是公开文档查阅，没有创建本地云模拟器或执行账号操作。各主题的使用过程见手册对应章节。
 
@@ -898,3 +924,14 @@ GitHub：[github.com/IndelibleVivi](https://github.com/IndelibleVivi)
 [S168]: https://developers.cloudflare.com/changelog/post/2026-10-16-tunnels-for-platforms-and-50k-routes/ "Tunnel 与 Mesh 的五万 routes 和 Tunnels for Platforms"
 
 [S169]: https://developers.cloudflare.com/changelog/post/2026-10-14-workers-builds-default-tooling/ "Workers Builds 默认工具链升级"
+
+[S182]: https://developers.cloudflare.com/changelog/post/2026-10-27-workflow-jurisdictions/ "Workflows jurisdiction 发布"
+[S183]: https://developers.cloudflare.com/workflows/reference/data-location/ "Workflows 数据地点、创建约束与例外"
+[S184]: https://developers.cloudflare.com/changelog/post/2026-10-23-undelete-seven-day-window/ "D1 误删恢复限于删除后七天"
+[S185]: https://developers.cloudflare.com/api/resources/d1/subresources/database/methods/undelete/ "D1 undelete API 与 Time Travel 恢复边界"
+[S186]: https://developers.cloudflare.com/changelog/post/2026-10-20-source-maps-on-by-default/ "Wrangler 与 cf 默认上传 source maps"
+[S187]: https://developers.cloudflare.com/changelog/post/2026-10-23-workers-builds-pin-npm-version/ "Workers Builds 用 packageManager 固定 npm"
+[S188]: https://developers.cloudflare.com/changelog/post/2026-10-23-build-images-emudhra-certificates/ "Workers Builds 与 Pages 构建镜像拒绝受损 eMudhra 证书"
+[S189]: https://developers.cloudflare.com/changelog/post/2026-10-22-emudhra-certificates/ "Sandbox 0.x 与 1.x 的 eMudhra 信任链更新路径"
+[S190]: https://developers.cloudflare.com/changelog/post/2026-10-22-cloudflared-path-normalization/ "cloudflared ingress URL 归一化与默认启用时间"
+[S191]: https://developers.cloudflare.com/changelog/post/2026-10-22-granular-read-and-monitor-ga/ "Tunnel 细粒度 Read And Monitor 角色 GA"
