@@ -75,6 +75,7 @@ python3 -m http.server 8767 --bind 127.0.0.1 --directory .build/site
 python3 tools/fieldbook.py impact data.decision-routes
 python3 tools/fieldbook.py impact-source S117
 python3 tools/fieldbook.py due --as-of 2026-11-01
+python3 tools/fieldbook.py window --from 2026-10-28 --to 2026-11-02 --format text
 python3 tools/fieldbook.py check
 python3 tools/check.py
 python3 tools/content.py check
@@ -86,7 +87,9 @@ Node.js 20+ 用于 Worker 测试；Mermaid 只在修改图示时需要安装。[
 
 `impact-source` 从登记条目的正文引用与 JSON `source` 单值／`sources` 数组定位，复用依赖查询生成复查候选。它不判定项目受影响、不读取外部 repo 或刷新核验日期。项目自身的目标、运行位置或功能改变时，也可用项目判断任务单取回相应机制；当前配置和采用理由仍由各项目自己的已有文档持有，私人证据留在仓库外。
 
-10 月 13 日更新用它处理 Clef 价格／上下文与单值来源漏检；10 月 20 日再次从 S100 定位费用登记与当前正文，将 Observability 公布包含量同步为 10 GB-month，并审阅表外日期、解释与算例。`due` 只查登记的复核日，事实块检查也不证明整页说法正确；操作顺序与边界见[贡献与维护](CONTRIBUTING.md#完成一次来源更新)。
+`window` 把指定日期窗口内的生效事项与复核日放在一起，并单列起点前的逾期复核和未知日期。它从登记来源和依赖定位正文候选；日期冲突保留，历史报告只列为勘误候选并停止传播。省略 `--format text` 可取得 JSON，查询不会刷新日期或修改出版物。
+
+10 月 13 日更新用 `impact-source` 处理 Clef 价格／上下文与单值来源漏检；10 月 20 日再次从 S100 定位费用登记与当前正文，将 Observability 公布包含量同步为 10 GB-month，并审阅表外日期、解释与算例。原有 `due` 仍只查登记的复核日，事实块检查也不证明整页说法正确；日期窗口的范围见[贡献与维护](CONTRIBUTING.md#按日期窗口安排复查)，来源更新顺序见[维护方法](CONTRIBUTING.md#完成一次来源更新)。
 
 ## 状态与边界
 

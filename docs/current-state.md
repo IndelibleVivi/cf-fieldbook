@@ -2,6 +2,8 @@
 
 2026-10-28 · [公共源码](https://github.com/IndelibleVivi/cf-fieldbook)，默认分支 `main`。
 
+- 本地维护 CLI 新增 `window --from … --to …`：合并登记的窗口内生效／复核事项，单列逾期复核和未知日期，并复用来源与依赖查询定位候选。日期冲突保留，历史报告停止传播，原 `due` 保持复核日语义；没有刷新来源日期、重建旧出版物或增加定时监控。用法见[贡献与维护](../CONTRIBUTING.md#按日期窗口安排复查)。
+
 - [10 月 28 日观察](../reports/2026-10-28.md)从官方变更直接调查，纳入 Computer／Think／Pi 迁移和恢复、createAI、MCP 旧入口退役、Workflows 地点、D1 undelete、Tunnel／Access、发布默认值与镜像 CA、观测和安全边界。新增 S175–S203，当前手册／专题资料上界及分享卡推进至 10-28；原来源范围、历史报告与已冻结文件保留，没有新 PDF 或云端执行。
 - 本轮定向复访 Observability／Workers Logs 费用，`observability_as_of` 为 10-28：12-01 生效条款未变，官方算例现已修正为存储 $1.00／总额 $7.25。Artifacts 10-14／15 冲突与 Clairic 65,536／8,192 疑点仍在；AI Search 11-01 计费尚待生效，增加分块／OCR 计量说明。只复核 CF 决策路线的价、输出费与窗口，其他 provider、性能与原复核期限保留。
 

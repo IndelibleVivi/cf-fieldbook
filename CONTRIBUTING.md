@@ -35,6 +35,25 @@ python3 tools/fieldbook.py due --as-of 2026-11-01
 
 `impact-source` 接受来源 ID，先扫描登记条目的正文引用与 JSON `source` 单值／`sources` 数组，再沿同一个 `depends_on` 查询传播；正文代码、注释、来源定义／附录和总书目不构成使用点。直接引用的条目也进入相应候选组；历史条目仍是传播终点。未找到引用仅表示书内登记范围没有命中，不表示项目未使用该接口。项目采用理由、当前调用和重评条件由项目已有文档持有，参考[项目判断任务单](templates/project-context-task.md)。
 
+## 按日期窗口安排复查
+
+在已有登记中找接下来要核对的事项，不需要联网或构建网站：
+
+```sh
+python3 tools/fieldbook.py window --from 2026-10-28 --to 2026-11-02 --format text
+python3 tools/fieldbook.py window --from 2026-10-28 --to 2026-11-02
+```
+
+首尾日期都包含在窗口内，必须显式给出，不能倒置。默认输出 JSON；`--format text` 显示日期、范围、来源和候选文件路径。公告日、核验日仅作为上下文展示，不替代生效日，也不以命令运行当天补日期。
+
+- `items`：`catalog/launches.json` 的 `effective_events` 中落入窗口的已知生效日，以及 current／maintained 条目的窗口内 `next_review_on`。
+- `overdue_reviews`：复核日在窗口起点之前的 current／maintained 条目。这里只表示登记的期限已过，不代表事实已经错误或复核从未发生；局部复核可能仍保留原期限。
+- `unknown_dates`：生效日为 `null`／未登记的事件，以及没有复核日的 current／maintained 条目。它们单列，不推定落入窗口或已经逾期；`candidate_dates` 与 `conflicts` 保留原值，即使候选日期在窗口之外。没有复核日的历史实践也不因此变成必须重写的任务。
+
+生效事项按该 launch 的登记 `sources` 复用 `impact-source`；复核事项以自身及 `impact` 的依赖候选为范围。每项 `impact` 保留直接引用、依赖原因、当前复查、历史勘误、非活动候选和 `related_only`；`entry_paths` 提供对应文件位置。整文件依赖可能扩大候选范围，例如引用 `data.launches` 的页面仍须人工核对具体条款。没有登记引用的事件也会显示，不能把空候选当成实际无影响。
+
+历史报告固定当时资料范围，只进入勘误候选并停止向下游传播；后来的变化不自动构成旧报告的错误，查询也不改写冻结出版物。`related_only` 只供发现，不传播。窗口起点前的已知生效日不会被当作“逾期待办”反复列出；要回看它们，显式查询相应历史窗口。空 `effective_events` 表示没有登记事件，不表示未来没有变化。此命令不发现新公告、不访问项目、也不记录任务完成状态；原有 `due --as-of` 的复核日查询保持不变。
+
 ## 完成一次来源更新
 
 先核对官方原文的公布日期、实际生效日和条件，再登记本次查阅范围。URL 里的日期可能与页面公布日不同；已有 source ID 继续使用。若同一 URL 有多个来源 ID，应合并查询这些 ID，例如 `impact-source S34 S111`；它们可能保留不同历史核查范围，不直接合并记录。
@@ -52,7 +71,7 @@ cf docs search "persist browser session between agent turns"
 
 数据修改后运行 `python3 tools/content.py check`，应能指出尚未同步的事实块；再运行 `python3 tools/content.py sync` 并重新 `check`。只为真正查阅的内容记新日期与范围；局部复核保留尚未复核内容的原期限，不把整个条目的 `next_review_on` 一起顺延。现有历史报告不因后来的改价需要改写。完成后运行下列检查，并构建阅读站查看真实检索与链接。
 
-`due --as-of` 只筛登记的 `next_review_on`。结果为空时，仍可能有新公告或 `catalog/launches.json` 中临近的 `effective_events`；例如 Artifacts 的费用起算可以早于原本安排的复核日。直接引用、依赖传播和 `related_only` 分别判断，较粗的整文件依赖可能多带出候选。维护接口负责找范围与同步数据，正文适用条件仍由来源审阅确认。
+`due --as-of` 只筛登记的 `next_review_on`；用 `window` 可同时查看登记的临近生效事项和未定日期。二者结果为空时，仍可能有尚未登记的新公告；例如费用起算可以早于原本安排的复核日。直接引用、依赖传播和 `related_only` 分别判断，较粗的整文件依赖可能多带出候选。维护接口负责找范围与同步数据，正文适用条件仍由来源审阅确认。
 
 ## 提交前检查
 

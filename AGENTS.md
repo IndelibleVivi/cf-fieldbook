@@ -15,6 +15,7 @@ CF Fieldbook 是独立的参考资料与离线例子仓库。先读 [README](REA
 - `docs/glossary.md` 的词条首段拥有短释义；站点从它生成就地解释，冻结出版物嵌入当版所引用的定义。术语链接保留普通 Markdown 锚点。
 - `styles/search.js` 拥有本地问题别名与排序；索引来自实际正文小节。搜索目标必须有答案，不能用别名掩盖缺失内容。
 - `tools/fieldbook.py impact-source` 从登记条目的正文引用与 JSON `source` 单值／`sources` 数组定位，再复用 `impact`；直接引用也纳入候选，历史条目保持传播终点。来源书目、代码、注释与附录不作为使用点，不推断项目适用性、不改正文或日期。
+- `tools/fieldbook.py window` 只读合并显式日期窗口内的生效／复核事项，另列起点前逾期复核和未知日期。生效事项复用来源影响查询，复核事项包含自身与依赖候选；未知日期与冲突不自动裁定，历史条目仍是传播终点。公告／核验日期不代替生效日，不用运行当天补事实，不写任务状态或冻结出版物。
 - `use-cases/project-context.md` 与 `templates/project-context-task.md` 拥有项目判断的阅读和工单入口；具体项目的配置、采用理由、暂缓条件与当前证据由该项目已有文档持有。本书只保存通用机制、公开来源与合成场景，不建私有跨项目状态表。
 - `examples/api-operations/model.py` 拥有合成分页、总期限和未知写结果核对的教学行为；不是实际 SDK，不引入网络或真实账号。
 - `examples/job-state/model.py` 拥有恢复规则；`tools/recovery_demo.py` 执行模型生成合成场景，`styles/recovery.js` 只控制场景与播放。演示只随 current 例子分发，不增加云端执行。

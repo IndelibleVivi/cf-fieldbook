@@ -173,6 +173,120 @@ def due(catalog:dict,asof:date)->list[dict]:
             result.append({'id':e['id'],'path':e['path'],'next_review_on':when,'last_checked_on':e.get('review',{}).get('checked_on'),'scope':e.get('review',{}).get('scope')})
     return sorted(result,key=lambda e:(e['next_review_on'],e['id']))
 
+WINDOW_NOTE = ('离线登记范围的复查候选，不证明项目适用性或实际生效，也不表示来源已重新核验。'
+               '整文件依赖可能扩大范围；related_only 不传播。未修改正文、日期或出版物。')
+EDITION_NOTE = ('历史条目固定当时范围，只列为勘误候选并停止传播；'
+                '后来的变化不自动构成旧报告的错误，也不回写冻结出版物。')
+
+def date_window(root:Path,catalog:dict,start:date,end:date)->dict:
+    """Combine inclusive effective/review dates, overdue reviews and unknown dates."""
+    if start > end:
+        raise ValueError('window --from must be on or before --to')
+    items=[];overdue=[];unknown=[]
+    for entry in catalog['entries']:
+        if entry['track']!='maintained' or entry['status']!='current':
+            continue
+        review=entry.get('review',{})
+        when=review.get('next_review_on')
+        day=date.fromisoformat(when) if when is not None else None
+        if day is not None and day > end:
+            continue
+        candidates=impact(catalog,[entry['id']])
+        candidates['current_review_candidates']=sorted(
+            [entry['id'],*candidates['current_review_candidates']])
+        item={'type':'review','id':entry['id'],'date':when,'path':entry['path'],
+              'review':dict(review),'impact':candidates}
+        if day is None:
+            item['date_reason']='未登记 next_review_on；不推定已到期。'
+            unknown.append(item)
+        elif day < start:
+            overdue.append(item)
+        else:
+            items.append(item)
+
+    launches=json.loads((root/'catalog/launches.json').read_text(encoding='utf-8'))
+    source_impacts={}
+    for launch in launches:
+        for event in launch['effective_events']:
+            when=event.get('date')
+            day=date.fromisoformat(when) if when is not None else None
+            if day is not None and not start <= day <= end:
+                continue
+            sources=tuple(sorted(set(launch['sources'])))
+            if sources not in source_impacts:
+                source_impacts[sources]=impact_source(root,catalog,list(sources))
+            item={'type':'effective','id':launch['id'],'name':launch['name'],
+                  'date':when,'event':dict(event),'sources':list(sources),
+                  'announced_on':launch.get('announced_on'),
+                  'verified_on':launch.get('verified_on'),
+                  'verification_scope':launch.get('verification_scope'),
+                  'conflicts':launch.get('conflicts',[]),'next_check':launch.get('next_check'),
+                  'impact':source_impacts[sources]}
+            if day is None:
+                item['date_reason']='生效日期未确定；candidate_dates 与 conflicts 保留原值，不替代 date。'
+                unknown.append(item)
+            else:
+                items.append(item)
+
+    def order(item):
+        return (item['date'] or '',item['type'],item['id'],item.get('event',{}).get('kind',''))
+    reached=set()
+    for item in [*items,*overdue,*unknown]:
+        reached.update(item['impact']['dependency_reasons'])
+        reached.update(item['impact']['related_only'])
+    return {'from':start.isoformat(),'to':end.isoformat(),
+            'items':sorted(items,key=order),'overdue_reviews':sorted(overdue,key=order),
+            'unknown_dates':sorted(unknown,key=order),
+            'entry_paths':{e['id']:e['path'] for e in sorted(catalog['entries'],key=lambda e:e['id'])
+                           if e['id'] in reached},
+            'note':WINDOW_NOTE,'edition_note':EDITION_NOTE}
+
+def format_date_window(result:dict)->str:
+    """Human-readable paths and scope; the JSON form retains the full impact graph."""
+    lines=[f"日期窗口：{result['from']} 至 {result['to']}（含首尾）",
+           '逾期仅指复核日在窗口起点之前；已过去的生效日不自动表示待办未完成。',
+           '未知日期不按窗口筛除；空 effective_events 表示没有登记事件。',
+           result['note'],result['edition_note']]
+    groups=(('items','窗口内事项'),('overdue_reviews','起点前逾期复核'),('unknown_dates','未知日期（单列，不推定落入窗口）'))
+    for key,title in groups:
+        lines.extend(['',f"{title}（{len(result[key])}）"])
+        if not result[key]:
+            lines.append('  无登记事项。')
+        for item in result[key]:
+            if item['type']=='effective':
+                label=f"生效 {item['name']} [{item['id']}] / {item['event']['kind']}"
+            else:
+                label=f"复核 {item['id']} — {item['path']}"
+            lines.append(f"- {item['date'] or '未知'} | {label}")
+            if item['type']=='effective':
+                lines.append(f"  来源：{', '.join(item['sources']) or '未登记'}；公告：{item['announced_on'] or '未知'}；核验：{item['verified_on'] or '未知'}")
+                if item['verification_scope']:
+                    lines.append(f"  核验范围：{item['verification_scope']}")
+                if item['event'].get('candidate_dates'):
+                    lines.append('  候选日期（未确认）：'+', '.join(item['event']['candidate_dates']))
+                if item['conflicts']:
+                    lines.append('  登记冲突：'+json.dumps(item['conflicts'],ensure_ascii=False))
+                if item['next_check']:
+                    lines.append(f"  待查：{item['next_check']}")
+            else:
+                review=item['review']
+                lines.append(f"  上次核验：{review.get('checked_on') or '未知'}；范围：{review.get('scope') or '未登记'}")
+            if item.get('date_reason'):
+                lines.append('  '+item['date_reason'])
+            candidates=item['impact']
+            citations={row['id']:row['sources'] for row in candidates.get('direct_citations',[])}
+            for group,label in (('current_review_candidates','当前复查'),
+                                ('edition_errata_candidates','历史勘误（传播终点）'),
+                                ('inactive_candidates','非活动候选'),('related_only','仅相关（不传播）')):
+                if candidates[group]:
+                    lines.append('  '+label+'：')
+                    for ident in candidates[group]:
+                        reason='；直接引用 '+', '.join(citations[ident]) if ident in citations else ''
+                        lines.append(f"    {ident} — {result['entry_paths'][ident]}{reason}")
+            if not candidates['changed']:
+                lines.append('  未找到登记引用或依赖候选；不等于实际无影响。')
+    return '\n'.join(lines)
+
 def validate_diagrams(root:Path)->list[str]:
     errors=[];p=root/'assets/diagrams/manifest.json'
     if not p.is_file():return ['missing diagram manifest']
@@ -228,6 +342,10 @@ def main()->int:
     im=sub.add_parser('impact');im.add_argument('ids',nargs='+')
     ims=sub.add_parser('impact-source');ims.add_argument('ids',nargs='+')
     du=sub.add_parser('due');du.add_argument('--as-of',type=date.fromisoformat,required=True)
+    win=sub.add_parser('window',help='offline effective/review date window, overdue reviews and unknown dates')
+    win.add_argument('--from',dest='start',type=date.fromisoformat,required=True,metavar='YYYY-MM-DD')
+    win.add_argument('--to',dest='end',type=date.fromisoformat,required=True,metavar='YYYY-MM-DD')
+    win.add_argument('--format',choices=('json','text'),default='json')
     args=ap.parse_args();root=args.root.resolve()
     if args.command=='check':
         errors=check(root)
@@ -237,6 +355,9 @@ def main()->int:
     if errors:raise ValueError('\n'.join(errors))
     if args.command=='impact':obj=impact(cat,args.ids)
     elif args.command=='impact-source':obj=impact_source(root,cat,args.ids)
+    elif args.command=='window':
+        obj=date_window(root,cat,args.start,args.end)
+        if args.format=='text':print(format_date_window(obj));return 0
     else:obj=due(cat,args.as_of)
     print(json.dumps(obj,ensure_ascii=False,indent=2));return 0
 if __name__=='__main__':
