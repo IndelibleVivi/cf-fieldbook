@@ -4,6 +4,22 @@
   "releases": [],
   "updates": [
     {
+      "date": "2026-11-06",
+      "families": [
+        "handbook",
+        "comparison"
+      ],
+      "kind": "content",
+      "topics": [
+        "ai-search-billing-delay",
+        "pi-browser-recovery",
+        "durable-object-retries",
+        "gateway-authentication",
+        "compatibility-defaults"
+      ],
+      "summary": "当前手册吸收计费延期、恢复/取消、DO、认证、D1与私网/发布条件；专题只补接入认证。资料上界推进11-06，模型价与未复查条款不刷新；旧报告、冻结PDF与Release保持。"
+    },
+    {
       "date": "2026-10-26",
       "families": [
         "handbook"

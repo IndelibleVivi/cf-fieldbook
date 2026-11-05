@@ -2,8 +2,8 @@
 title: Cloudflare 个人基础设施实践手册
 subtitle: 从一个入口到可恢复的应用与自动化
 edition: 2026.10 · 持续阅读修订
-source_cutoff: 2026-10-28
-observability_as_of: 2026-10-28
+source_cutoff: 2026-11-06
+observability_as_of: 2026-11-06
 presentation_revision: 4
 author: Faye & Cove
 github: https://github.com/IndelibleVivi
@@ -203,6 +203,10 @@ ingress:
 
 WARP 是设备接入与流量策略；Mesh 面向加入组织的设备和私网；Tunnel 发布明确选择的服务。Mesh 当前仍有 beta 标识。与现有 VPN 共存时，先用非关键设备观察路由和 DNS，保留不依赖待改路径的恢复入口。[S61] [S62]
 
+### 私有 IP 回源仍有账户与网络前提
+
+Private origins 的 public-to-private 路线在 10 月 30 日公告 GA，机制文档标题仍标 beta；账户 entitlement、连通性、default virtual network 路由与 WAN／Mesh 的回程条件都须先核对。它把公开应用流量接到私有源站，不等于私有源站具备了用户身份验证；限制与另一条 VPC binding 路线见[实施参考](../reference/implementation.md#private-origins-与-vpc-network-binding-不是同一条路径)。[S226] [S227] [S225]
+
 <!-- chapter: content -->
 
 ## 05 / 保存内容，也保存它的来历
@@ -243,6 +247,10 @@ D1 Time Travel 有计划相关的保留期，原地恢复会改变数据库。�
 ### 有数据地点要求时，逐项检查
 
 D1 新建数据库已支持 `us` jurisdiction，数据库在美国运行并持久化；这个属性不会自动覆盖调用它的 Worker、队列、对象存储或模型服务。先画出实际数据路径，再逐项确认地点约束，不能从一个数据库设置推断整条路径。[S139]
+
+### D1 大查询先控制返回量
+
+D1 自 **2026-11-04** 按公告限制单次查询结果为 **50 MB**，不是数据库容量。按需选择列并分页，检查每页结果；REST import／export 不受这项查询结果上限约束，不能用一个大查询替代完整备份。[S219]
 
 <!-- chapter: jobs -->
 
@@ -297,6 +305,8 @@ Workflows 10 月 27 日也支持这三个 `jurisdiction`，要求 Wrangler **4.1
 
 ### 结果未知，应该有一个明确位置
 
+DO stub 自 11 月 5 日可自动重试特定传输失败，默认首次加 4 次，不在首次开始 10 秒后启动新重试；应用错误、overload、HTTP 错误响应等不适用。`retryable()` 允许已收到的方法再次执行，须先保证幂等；它不把任意外部动作变成安全重放。已有外层重试的系统要合计次数与总期限，细节见[实施参考](../reference/implementation.md#durable-objects-自动重试不等于任意动作可重放)。[S205] [S206]
+
 服务商支持 [idempotency / 幂等](../docs/glossary.md#idempotency--幂等) key 时，一次逻辑动作使用同一个 key，并按其契约查询或重试。不支持幂等、也无法查结果的外部动作，超时后先标为等待核对；离线模型将这一状态写作 [uncertain / 结果未知](../docs/glossary.md#uncertain--结果未知)。
 
 离线示例 [job-state](../examples/job-state/README.md) 演示领取、迟到提交和未知结果的处理。可先用[网页模拟](https://indeliblevivi.github.io/cf-fieldbook/examples/job-state/demo.html)观察合成情景，再按[恢复任务单](../templates/job-recovery-task.md)复现本地输出。模型仍有“外部请求发出后、写入 uncertain 前崩溃”的窗口，不能作为不可逆动作的完整自动重试器。上线之前，还需要注入真实失败：领取后退出、保存结果后丢 ACK、外部成功但客户端超时、取消与执行竞争。检查的是任务没消失、重复没扩大损失，而不只是成功路径能跑通。
@@ -331,7 +341,7 @@ AI Search 可以接管一部分摄取、分块、索引和检索；Workers AI �
 
 用同一套长问句、两字人名、代码标识、语义改写与无答案题比较 keyword／hybrid；先核对入库、分块和重建状态，再决定是否更换 embedding。具体合成原件与查询样本见[检索页](../services/search.md#用同一组问题比较-keyword-与-hybrid)。Workers Paid 的 keyword 实例上限为 500,000 文件，vector-only 为 1,000,000。[S162]
 
-11 月 1 日开始计费后，包含量之外 full-text 查询 $0.10／千次，semantic／vector／hybrid $0.75／千次；内部 Workers AI embedding／reranking 已包含，生成、query rewriting 和外部模型另计。[S10]
+11 月 2 日公告将 AI Search 计费从 11 月 1 日延期至 **12 月 1 日**，单价与包含量不变；包含量之外 full-text 查询 $0.10／千次，semantic／vector／hybrid $0.75／千次，生成、query rewriting 与外部模型另计。默认同步间隔同时从 6 小时改为 **24 小时**，实际实例仍须核对设置；撤回内容不能等定时同步才停止返回。[S204] [S10]
 
 ### 让每个结果带着回原处的路
 
@@ -368,6 +378,10 @@ Agents SDK 自 10 月 21 日用 `createAI` 替代旧 provider；fallback 与流�
 资料架问“撤下规则在哪里”时，允许动作可以是读标题、读第二份原文、或停止并报告材料不足。完整输入见[Clef / Jev 的首个有限决策任务](../comparisons/clef-vs-jev.md)；离线阅读例子没有调用模型。
 
 先记录模型、时间、结果、token 和费用。确实需要正文调试时，再限定内容和保留期。首次创建 Gateway 在 2026-09-24 或之后的账户走新的 Workers Logs 规则；Unified Billing 充值另收 5%。[S15]
+
+### Gateway 准入与模型池分开检查
+
+11 月 3 日起新 AI Gateway 必须认证，已有未认证 gateway 可保留旧设置，但开启后不可关闭。REST 用标准 `Authorization`，provider-native URL 用 `cf-aig-authorization`；AI Gateway Run token 是账户级能力，不能只限制单个 gateway。11 月 4 日新增 model alias 可按 `custom/<name>` 组织模型池，但输入兼容、权限与预算仍分别判断，见[模型页](../services/decision-models.md#gateway-认证与模型池别名)。[S213] [S214] [S215] [S216]
 
 ### 小判断可以先在现有入口比较
 
@@ -432,7 +446,7 @@ Clef 系列适合分类、筛选和下一步建议，不一定要为一个小判
 
 PiHarness 为 beta，Pi Durable 为 experimental。官方工具示例的 `replay: "safe"` 用在无副作用的字数统计，不能推导邮件、付款或发布都可随意重放。把它和第 6 章的[未知结果](#结果未知应该有一个明确位置)一起读，再看[agent 运行分工](../services/agent-runtime.md)，选择是否研究这条实现，而不是因新 SDK 自动迁移。[S104]
 
-Agents SDK **0.30.0**／Pi **1.4** 增强休眠、存储错误恢复与反复崩溃任务的 `parked` 状态，但会升级会话 schema，Pi 1.3 无法读回。升级前确认存储恢复安排，不能只准备旧代码回滚。[S178]
+Agents SDK **0.33.0**／Pi **1.5** 默认将流式进度在最多约 1 秒内批量保存，崩溃可能丢失该窗口。`session.watch()` 替代 events，idle session 可 `continue()`；旧 `parked`／`retry()` 移除，反复中断任务达到 restart limit 后结束。1.5 会话不能由 1.4 读取，升级前确认存储与向前修复安排，不能只准备旧代码回滚。[S209] [S105]
 
 Computer 的 JavaScript backend 从 **v0.7.0** 提供 experimental journal replay 和等待批准；未记下结果的动作仍可能重复，须用稳定 `callId`／幂等或 `unsafeToRepeat()` 处理。Think 从旧 shell 工作区升级没有自动文件迁移。具体边界见[Agent runtime](../services/agent-runtime.md#computer重放执行记录仍要保护外部动作)。[S175] [S177]
 
@@ -478,7 +492,9 @@ Cloudflare OS 则适合观察更完整的文件、工具与工作空间。当前
 
 ### 跨轮次浏览器仍有失效和取消边界
 
-Agents SDK 的 Browser／browserTool 可以重连仍然存活的远端浏览器，保留 tabs、cookies 和登录态；默认空闲保活 10 分钟，到期或崩溃会丢失旧状态。Pi 不自动重放中断的浏览器调用；停止对话也不取消已经开始的调用，完成与超时须另行确认。登录隔离、Live View 与接入条件见[Agent runtime](../services/agent-runtime.md)。[S143] [S144]
+Agents SDK 的 Browser／browserTool 可以重连仍然存活的远端浏览器，保留 tabs、cookies 和登录态；默认空闲保活 10 分钟，到期或崩溃会丢失旧状态。Pi 不自动重放中断调用；当前 adapter 在 harness abort 后结束等待或运行的调用并释放 tab，**已经发生的动作不会撤回**。这更新了旧版停止对话不取消调用的边界；登录隔离、Live View 与自定义 session 关闭条件见[Agent runtime](../services/agent-runtime.md)。[S209] [S144]
+
+Browser internal hostnames（Agents SDK **0.31.0+**）可在不公开 URL 的情况下检查 Workspace 或 Sandbox dev server，目标映射可保存，进程与浏览器状态却不会因此持久化。当前只支持 HTTP port 80、不支持 WebSocket，普通 hostname guardrails 不覆盖内部 host，应用应限制可用端口、路径与数据。[S212] [S144]
 
 <!-- chapter: release -->
 
@@ -492,11 +508,21 @@ Workers Builds 当前 Paid 包含每月 6,000 分钟、6 并发，单次限 20 �
 
 10 月 14 日的 Workers Builds 工具链更新后，10 月 23 日镜像又纳入修补 CA 与 Node.js 22.23.4／24.22.1、Bun 1.4.4、pip 26.2.2。自带 CA、旧 Bun 或覆盖证书环境变量的项目仍须单查；固定版本与修补信任链是两项判断。[S169] [S188]
 
+### DO 部署后可能暂用旧代码
+
+DO 代码更新现在默认最多延迟 **300 秒**等待 active object 休眠，仍活跃则 reset；这是 best effort，发布返回后也可能暂用旧代码。连续部署可跳过中间版本，需要新旧调用兼容与明确的恢复安排，不能把它混同于 runtime 排空。[S207] [S208]
+
 ### 固定 npm，也核对默认上传的 source maps
 
 Workers Builds 现以 `package.json` 的 `packageManager` 精确选择 npm／Yarn／pnpm／Bun，例如 `npm@11.19.1`；`engines.npm` 不负责选版本。它不改变本仓库的 GitHub Pages 构建路线。[S187]
 
 Wrangler **4.150.0+** 默认生成并上传 source maps；`cf deploy` 也默认上传，Vite plugin **1.64.0+** 默认生成。部署前检查原始源码与路径是否适合上传；Wrangler 可设 `upload_source_maps: false`，cf／Vite 用对应 Worker 的 `build.sourcemap: false`。自定义 build 的 map 无法解析时默认跳过，显式 `true` 才要求失败；这与静态资料架四文件 allowlist 是不同边界。[S186]
+
+### 更新 compatibility date 前先验证
+
+11 月 17 日两项新默认值仅在 `compatibility_date >= 2026-11-17` 时应用：JavaScript Worker 的新 module registry，以及客户端断开时的 `request.signal`。检查 top-level await／import attributes，并显式传递 signal 给可取消操作；保留原日期不会自动切换，`request_signal_passthrough` 也未随之启用。[S217] [S218]
+
+Workers Builds 的构建与日志保留 **90 天**，versions／deployments 继续保留；需要长期证据时另行导出。Static Assets 可用 `assets.base_path` 挂 URL 前缀，仍须验证链接、原文下载和 404；本书资料架继续根路径发布，未改实际模板。[S223] [S222]
 
 ### 预览也会使用真实资源
 
@@ -555,7 +581,7 @@ R2 Standard 的标价为 $0.015 / GB-month、Class A $4.50 / 百万次、Class B
 ### Observability：当前与已公布的费用分开读
 
 <!-- facts: observability-costs -->
-固定资料日期：**2026-10-28**。
+固定资料日期：**2026-11-06**。
 
 | 条款 | Free | Paid |
 |---|---|---|
@@ -573,7 +599,7 @@ R2 Standard 的标价为 $0.015 / GB-month、Class A $4.50 / 百万次、Class B
 
 ### 免费也有三种含义
 
-免费计划可能在达到上限后停止；Paid 包含量之外可能继续计费；beta 免费可能有未来起算日。10 月 28 日复看时，Artifacts 价格页仍写 **10 月 14 日**起算，博客写 15 日；两日均已过去，应按已经进入公开计费期安排预算，具体账号扣款未验证，来源冲突继续登记。AI Search 的 **11 月 1 日**起算仍属临近生效事项。[S07] [S08] [S10]
+免费计划可能在达到上限后停止；Paid 包含量之外可能继续计费；beta 免费可能有未来起算日。11 月 6 日复看时，Artifacts 价格页写 **11 月 12 日**起算，旧 changelog 写 10 月 14 日、博客写 15 日；三处尚未对齐，不再笼统认定已经进入计费期。按现行单价预留预算，实际起算与历史用量未核验。AI Search 已明确延期至 **12 月 1 日**，也不能沿旧日期推定收费。[S07] [S08] [S135] [S204] [S10]
 
 Artifacts 限 Workers Paid，每月含 10,000 operations 与 1 GB 存储；超额分别为 $0.15／1,000 operations 与 $0.50／GB-month。仓库保留会继续计入存储，不能只统计任务活跃时长；这里给出公开计价单位，没有实际账户账单测量。[S08]
 
@@ -624,6 +650,8 @@ Artifacts 限 Workers Paid，每月含 10,000 operations 与 1 GB 存储；超�
 **2026-10-26 定向补充：** 同一资料架的完整取得、漏重建观察、8768 临时分享与 Workers Static Assets 发布路线；S172–S174 只核对静态配置与 CLI，Wrangler 实际安装为 `4.152.0`。本地预览、发布目录与候选出版分别检查；没有部署、更新或删除远端资源。`source_cutoff` 表示本版纳入资料的上界，Observability 费用表仍固定 10 月 20 日，旧来源与历史观察不整体改期。
 
 **2026-10-28 定向更新：** Computer／Think／Pi 迁移与恢复、createAI、Workflows 地点、D1 undelete、MCP 旧入口退役、Tunnel 路径匹配、Access 页面、发布默认值、证书镜像及观测变化。来源与选择范围见[当期观察](../reports/2026-10-28.md)；仅查公开文档，没有安装这些 SDK、升级 schema 或执行账号操作，历史报告和冻结候选保留。
+
+**2026-11-06 定向更新：** AI Search 收费延期与同步节奏、Pi 1.5 与浏览器取消、Skills 文件迁移、DO 延迟更新／自动重试、Gateway 认证／alias、D1 结果上限、私网路径、Static Assets 前缀与 Builds 保留期。11 月 17 日的 Worker 默认值取决于 compatibility date。范围与疑点见[本期观察](../reports/2026-11-06.md)；没有更新例子依赖、迁移 schema、执行账号或云端实验，也没有重出 PDF。
 
 ### 保留问题，更新做法
 
@@ -883,3 +911,41 @@ GitHub：[github.com/IndelibleVivi](https://github.com/IndelibleVivi)
 [S200]: https://blog.cloudflare.com/kv-cache-exposure-remediation/ "Workers AI GLM-5.3 跨请求 KV cache 暴露事故与修复披露"
 [S201]: https://blog.cloudflare.com/full-transaction-waf/ "WAF 全事务检测与响应规则"
 [S202]: https://developers.cloudflare.com/changelog/post/2026-10-25-emergency-waf-release/ "WAF Brotli 与 Next.js 紧急规则的 Log 默认动作"
+
+[S204]: https://developers.cloudflare.com/changelog/post/2026-11-02-billing-postponed-default-sync-interval/ "AI Search 计费延期与默认同步间隔变更"
+
+[S205]: https://developers.cloudflare.com/changelog/post/2026-11-05-durable-objects-automatic-retries/ "Durable Objects 自动重试发布"
+
+[S206]: https://developers.cloudflare.com/durable-objects/best-practices/automatic-retries/ "Durable Objects 自动重试的范围与限制"
+
+[S207]: https://developers.cloudflare.com/changelog/post/2026-10-30-durable-objects-deferred-code-updates/ "Durable Objects 默认延迟代码更新"
+
+[S208]: https://developers.cloudflare.com/durable-objects/deployments/durable-objects-code-updates/ "Durable Objects 代码更新策略"
+
+[S209]: https://developers.cloudflare.com/changelog/post/2026-11-03-pi-harness-pi-1-5/ "Agents SDK 0.33.0 与 Pi 1.5 迁移"
+
+[S212]: https://developers.cloudflare.com/changelog/post/2026-10-28-browser-internal-hostnames/ "Browser internal hostnames 私有预览"
+
+[S213]: https://developers.cloudflare.com/changelog/post/2026-11-03-required-authentication/ "新 AI Gateway 强制认证"
+
+[S214]: https://developers.cloudflare.com/ai-gateway/configuration/authentication/ "AI Gateway 认证头与账户级 token 范围"
+
+[S215]: https://developers.cloudflare.com/changelog/post/2026-11-04-model-aliases/ "AI Gateway model aliases 发布"
+
+[S216]: https://developers.cloudflare.com/ai-gateway/features/routing/model-aliases/ "Model aliases 的路由与输入边界"
+
+[S217]: https://developers.cloudflare.com/changelog/post/2026-11-02-module-registry-default/ "Workers 新 module registry 的 11-17 默认值"
+
+[S218]: https://developers.cloudflare.com/changelog/post/2026-11-02-request-signal-default/ "Workers Request.signal 的 11-17 默认值"
+
+[S219]: https://developers.cloudflare.com/changelog/post/2026-10-30-query-result-size-limit/ "D1 查询结果 50 MB 上限"
+
+[S222]: https://developers.cloudflare.com/changelog/post/2026-10-28-static-assets-base-path/ "Static Assets 从 URL 路径前缀分发"
+
+[S223]: https://developers.cloudflare.com/changelog/post/2026-10-28-workers-builds-90-day-retention/ "Workers Builds 构建与日志保留 90 天"
+
+[S225]: https://developers.cloudflare.com/changelog/post/2026-10-28-virtual-network-bindings/ "VPC Network binding 选择 virtual network"
+
+[S226]: https://blog.cloudflare.com/private-origins-public-to-private/ "Private origins public-to-private GA 公告"
+
+[S227]: https://developers.cloudflare.com/dns/private-origins/ "Private origins 账户、网络与当前限制"

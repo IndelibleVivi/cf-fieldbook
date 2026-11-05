@@ -73,7 +73,7 @@
     "status": "public_beta",
     "access": "Workers Paid",
     "announced_on": "2026-10-01",
-    "verified_on": "2026-10-28",
+    "verified_on": "2026-11-06",
     "sources": [
       "S07",
       "S08",
@@ -86,7 +86,8 @@
         "date": null,
         "candidate_dates": [
           "2026-10-14",
-          "2026-10-15"
+          "2026-10-15",
+          "2026-11-12"
         ]
       }
     ],
@@ -96,7 +97,8 @@
         "claims": [
           {
             "date": "2026-10-14",
-            "source": "S08"
+            "source": "S08",
+            "observed_on": "2026-10-28"
           },
           {
             "date": "2026-10-15",
@@ -105,12 +107,17 @@
           {
             "date": "2026-10-14",
             "source": "S135"
+          },
+          {
+            "date": "2026-11-12",
+            "source": "S08",
+            "observed_on": "2026-11-06"
           }
         ]
       }
     ],
-    "next_check": "10-14／15 均已过去，按公开计费期预算；保留来源日期冲突，未核对实际账单",
-    "verification_scope": "S07/S08 price and stated dates only; 10-14/15 conflict remains; limits retain prior scope; no bill readback"
+    "next_check": "11-12 是现价页给出的起点；与旧10-14/15公告未对齐，核对官方澄清与实际账单，不裁定历史收费",
+    "verification_scope": "S08_current_price_page_says_November_12; S07_blog_October_15_and_S135_changelog_October_14_remain; prior_S08_October_14_observation_retained; no_bill_readback"
   },
   {
     "id": "ai-search",
@@ -118,22 +125,23 @@
     "status": "ga",
     "access": "账号额度与模型条件分别检查",
     "announced_on": "2026-10-01",
-    "verified_on": "2026-10-28",
+    "verified_on": "2026-11-06",
     "sources": [
       "S09",
       "S10",
       "S161",
-      "S162"
+      "S162",
+      "S204"
     ],
     "effective_events": [
       {
         "kind": "billing_start",
-        "date": "2026-11-01"
+        "date": "2026-12-01"
       }
     ],
     "conflicts": [],
-    "next_check": "11-01 计费、tokenizer 重建与短词召回；真实用量和质量仍须另行验证",
-    "verification_scope": "S10 pricing, start date, chunk/OCR metering and legacy bucket only; CJK limits retain prior scope"
+    "next_check": "12-01 延期后计费与实际同步设置；CJK、用量及质量分别验证",
+    "verification_scope": "11-02 official postponement and default sync change; existing price and CJK retain their recorded scope; no_bill_readback"
   },
   {
     "id": "clef",
@@ -380,7 +388,7 @@
     "status": "public_beta",
     "access": "Cloudflare Traces 与 SQL API 为 beta；dataset 与账号条件分别核对",
     "announced_on": "2026-10-02",
-    "verified_on": "2026-10-28",
+    "verified_on": "2026-11-06",
     "sources": [
       "S98",
       "S99",
@@ -410,7 +418,7 @@
       "report.2026-10-03"
     ],
     "next_check": "12-01 transition and retained-data storage; example now matches $7.25; no account or bill acceptance",
-    "verification_scope": "S100/S111 pricing and corrected example; span APIs, SQL attributes and account Logpush; other mechanisms retain prior scope"
+    "verification_scope": "S100_and_S111_rates_allowances_retention_transition_and_example_only; no_account_billing_verification"
   },
   {
     "id": "pi-harness",
@@ -418,11 +426,12 @@
     "status": "public_beta",
     "access": "PiHarness beta；Pi Durable experimental",
     "announced_on": "2026-10-02",
-    "verified_on": "2026-10-28",
+    "verified_on": "2026-11-06",
     "sources": [
       "S104",
       "S105",
-      "S178"
+      "S178",
+      "S209"
     ],
     "effective_events": [],
     "conflicts": [],
@@ -435,7 +444,7 @@
       "report.2026-10-03"
     ],
     "next_check": "开放条件、来源差异与生效条款；未进行云端调用",
-    "verification_scope": "Agents SDK 0.30.0/Pi 1.4 upgrade and recovery notes only; original harness scope retained"
+    "verification_scope": "Agents SDK 0.33.0/Pi 1.5 watch, continuation, progress checkpoint, restart limit and one-way schema; no_migration"
   },
   {
     "id": "web-search",
@@ -1148,5 +1157,311 @@
     "conflicts": [],
     "next_check": "源站副作用不可撤销；紧急规则最终动作与override",
     "verification_scope": "targeted_public_document_review_only; no_account_or_cloud_execution"
+  },
+  {
+    "id": "durable-objects-retries",
+    "name": "Durable Objects 自动重试",
+    "status": "released",
+    "access": "特定可重发传输失败；标记方法须幂等",
+    "announced_on": "2026-11-05",
+    "verified_on": "2026-11-06",
+    "sources": [
+      "S205",
+      "S206"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "采用前核对具体版本、账户与当前机制；没有云端实测",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "durable-objects-code-updates",
+    "name": "Durable Objects 延迟代码更新",
+    "status": "released",
+    "access": "默认 deferred 300 秒；best effort，不保证操作完成",
+    "announced_on": "2026-10-30",
+    "verified_on": "2026-11-06",
+    "sources": [
+      "S207",
+      "S208"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "采用前核对具体版本、账户与当前机制；没有云端实测",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "agent-skills-files",
+    "name": "Agent Skills 文件来源",
+    "status": "released_sdk",
+    "access": "Agents SDK 0.32.0+／Think 0.23.0+；旧编译与registry移除",
+    "announced_on": "2026-10-29",
+    "verified_on": "2026-11-06",
+    "sources": [
+      "S210",
+      "S211"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "采用前核对具体版本、账户与当前机制；没有云端实测",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "browser-internal-hostnames",
+    "name": "Browser 内部主机名",
+    "status": "released_sdk",
+    "access": "Agents SDK 0.31.0+；8 hosts／HTTP 80／无WebSocket",
+    "announced_on": "2026-10-28",
+    "verified_on": "2026-11-06",
+    "sources": [
+      "S212",
+      "S144"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "采用前核对具体版本、账户与当前机制；没有云端实测",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "ai-gateway-required-auth",
+    "name": "新 AI Gateway 强制认证",
+    "status": "released",
+    "access": "新建强制，旧未认证可保留；开启后不可关闭",
+    "announced_on": "2026-11-03",
+    "verified_on": "2026-11-06",
+    "sources": [
+      "S213",
+      "S214"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "采用前核对具体版本、账户与当前机制；没有云端实测",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "ai-gateway-model-aliases",
+    "name": "AI Gateway model aliases",
+    "status": "released",
+    "access": "gateway内模型池；输入格式、权限与计费仍分别验证",
+    "announced_on": "2026-11-04",
+    "verified_on": "2026-11-06",
+    "sources": [
+      "S215",
+      "S216"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "采用前核对具体版本、账户与当前机制；没有云端实测",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "workers-module-registry-default",
+    "name": "Workers module registry 新默认值",
+    "status": "scheduled",
+    "access": "JS且compatibility date>=2026-11-17；Python不变",
+    "announced_on": "2026-11-02",
+    "verified_on": "2026-11-06",
+    "sources": [
+      "S217"
+    ],
+    "effective_events": [
+      {
+        "kind": "compatibility_default",
+        "date": "2026-11-17"
+      }
+    ],
+    "conflicts": [],
+    "next_check": "采用前核对具体版本、账户与当前机制；没有云端实测",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "workers-request-signal-default",
+    "name": "Workers request.signal 新默认值",
+    "status": "scheduled",
+    "access": "compatibility date>=2026-11-17；不启用signal passthrough",
+    "announced_on": "2026-11-02",
+    "verified_on": "2026-11-06",
+    "sources": [
+      "S218"
+    ],
+    "effective_events": [
+      {
+        "kind": "compatibility_default",
+        "date": "2026-11-17"
+      }
+    ],
+    "conflicts": [],
+    "next_check": "采用前核对具体版本、账户与当前机制；没有云端实测",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "d1-query-result-size",
+    "name": "D1 单次查询结果上限",
+    "status": "released",
+    "access": "50 MB；REST import/export不受此项限制",
+    "announced_on": "2026-10-30",
+    "verified_on": "2026-11-06",
+    "sources": [
+      "S219"
+    ],
+    "effective_events": [
+      {
+        "kind": "query_result_limit",
+        "date": "2026-11-04"
+      }
+    ],
+    "conflicts": [],
+    "next_check": "采用前核对具体版本、账户与当前机制；没有云端实测",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "browser-chrome-152",
+    "name": "Browser Run Chrome 152",
+    "status": "released",
+    "access": "引擎、Quick Actions UA、绝对链接与证书变化",
+    "announced_on": "2026-10-30",
+    "verified_on": "2026-11-06",
+    "sources": [
+      "S220"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "采用前核对具体版本、账户与当前机制；没有云端实测",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "browser-crawl-diagnostics",
+    "name": "Browser Run crawl 诊断",
+    "status": "released",
+    "access": "每URL outcome与最多50个origin robots诊断",
+    "announced_on": "2026-11-03",
+    "verified_on": "2026-11-06",
+    "sources": [
+      "S221"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "采用前核对具体版本、账户与当前机制；没有云端实测",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "static-assets-base-path",
+    "name": "Static Assets 路径前缀",
+    "status": "released",
+    "access": "Wrangler4.148.0+／cf beta.13+；应用链接另验",
+    "announced_on": "2026-10-28",
+    "verified_on": "2026-11-06",
+    "sources": [
+      "S222"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "采用前核对具体版本、账户与当前机制；没有云端实测",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "workers-builds-retention",
+    "name": "Workers Builds 90天保留",
+    "status": "released",
+    "access": "build与logs90天；version/deployment保留",
+    "announced_on": "2026-10-28",
+    "verified_on": "2026-11-06",
+    "sources": [
+      "S223"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "采用前核对具体版本、账户与当前机制；没有云端实测",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "access-service-token-tags",
+    "name": "Access Service Token tags",
+    "status": "released",
+    "access": "每token5tags；精确匹配有效token用于Service Auth",
+    "announced_on": "2026-11-02",
+    "verified_on": "2026-11-06",
+    "sources": [
+      "S224"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "采用前核对具体版本、账户与当前机制；没有云端实测",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "vpc-network-vnet",
+    "name": "VPC Network binding 选择网络",
+    "status": "released",
+    "access": "cf1:vnet:<UUID>；DNS private origins限制不变",
+    "announced_on": "2026-10-28",
+    "verified_on": "2026-11-06",
+    "sources": [
+      "S225"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "采用前核对具体版本、账户与当前机制；没有云端实测",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "private-origins-ga",
+    "name": "Private origins public-to-private",
+    "status": "ga_announced",
+    "access": "仍需账户entitlement和default vnet；机制文档标题保留beta",
+    "announced_on": "2026-10-30",
+    "verified_on": "2026-11-06",
+    "sources": [
+      "S226",
+      "S227"
+    ],
+    "effective_events": [],
+    "conflicts": [
+      {
+        "topic": "availability_label",
+        "claims": [
+          {
+            "status": "GA announcement",
+            "source": "S226"
+          },
+          {
+            "status": "documentation title beta",
+            "source": "S227"
+          }
+        ]
+      }
+    ],
+    "next_check": "采用前核对具体版本、账户与当前机制；没有云端实测",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "r2-request-metrics",
+    "name": "R2 地区与状态码指标",
+    "status": "released",
+    "access": "指标不是数据存储地点证据",
+    "announced_on": "2026-11-03",
+    "verified_on": "2026-11-06",
+    "sources": [
+      "S228"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "采用前核对具体版本、账户与当前机制；没有云端实测",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "flagship-local-store",
+    "name": "Flagship 本地flag store",
+    "status": "released",
+    "access": "本地初始空store返回代码默认值；remote:true另选",
+    "announced_on": "2026-11-02",
+    "verified_on": "2026-11-06",
+    "sources": [
+      "S229"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "采用前核对具体版本、账户与当前机制；没有云端实测",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
   }
 ]

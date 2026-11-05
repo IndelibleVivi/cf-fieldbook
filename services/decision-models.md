@@ -1,7 +1,8 @@
 ---
 id: service.decision-models
-reviewed_on: 2026-10-28
-review_scope: 10-28 复看 CF 四条决策路线的标价、输出费与窗口及 Clairic 疑点；补 createAI 与 GLM 事故披露，原性能和其他 provider 保留范围
+reviewed_on: 2026-11-06
+source_cutoff: 2026-11-06
+review_scope: 11-06 仅补 Gateway 认证、账户级 token 与 model aliases；模型价格、窗口、Clairic 疑点和性能保留原核验范围
 evidence: official-documents-only
 ---
 
@@ -33,6 +34,14 @@ Cloudflare 自有的 Clef／Clef-flash／Clef-omni 与第三方 Jev 都能进入
 | 写解释、代码或长文，做开放式推理 | 通用生成模型 | 事实与推理、工具调用、生成内容 |
 
 这个区分围绕输出空间；同为小模型不表示任务相同。Clairic 也支持计算、估计与预测，但类型正确并不证明内容正确，长算式宜抽取输入后交给代码。[S163] [S165]
+
+## Gateway 认证与模型池别名
+
+11 月 3 日起新 AI Gateway 必须认证；创建时省略 `authentication` 等于 `true`，显式 `false` 返回 400。旧的未认证 gateway 可继续原设置，但一旦开启就不可关闭。REST `/ai/run` 使用标准 `Authorization`；`gateway.ai.cloudflare.com` 的 provider-native URL 使用 `cf-aig-authorization`，Workers binding 保持预认证。[S213] [S214]
+
+AI Gateway Read／Run／Edit token 是 **account-scoped**，不能限制单个 gateway；Run token 可调用同账户其他 gateway，包括它们存储的 provider keys。按不同 gateway 名称或 alias 分组不提供这种权限隔离；官方建议按需使用独立账户或 Worker-side binding。[S214]
+
+11 月 4 日新增 model alias：应用以 `custom/<name>` 调用一组模型，REST 用 `cf-aig-gateway-id` 指定 gateway，可按顺序 fallback 或 smart routing。alias 不转换不同模型的输入协议，配置也可能暂时命中缓存；条件分支、百分比分流和流程内限制仍使用 dynamic routes。它改变接入和路由，不提供本书的模型质量结论。[S215] [S216]
 
 ## 接入方式与模型隔离，另看两项变化
 
@@ -89,3 +98,21 @@ Workers AI 新增 `@cf/deepseek-ai/deepseek-v4.1-flash-1017`，模型卡列 **1,
 [S179]: https://developers.cloudflare.com/changelog/post/2026-10-21-createai/ "createAI 替代旧 Workers AI 与 Gateway provider"
 [S180]: https://developers.cloudflare.com/agents/models/ "Agents Models：连接、fallback 与 stream resume"
 [S200]: https://blog.cloudflare.com/kv-cache-exposure-remediation/ "Workers AI GLM-5.3 跨请求 KV cache 暴露事故与修复披露"
+
+[S17]: https://developers.cloudflare.com/workers-ai/models/clef/ "Clef 模型卡"
+
+[S18]: https://developers.cloudflare.com/workers-ai/models/clef-flash/ "Clef-flash 模型卡"
+
+[S73]: https://developers.cloudflare.com/ai/models/typesafe/jev/ "Jev：Cloudflare 第三方模型目录"
+
+[S123]: https://developers.cloudflare.com/changelog/post/2026-10-09-clef-omni-workers-ai/ "Clef-omni 发布与 Clef-flash 降价／上下文收缩"
+
+[S124]: https://developers.cloudflare.com/workers-ai/models/clef-omni/ "Clef-omni 模型卡与媒体输入预算"
+
+[S213]: https://developers.cloudflare.com/changelog/post/2026-11-03-required-authentication/ "新 AI Gateway 强制认证"
+
+[S214]: https://developers.cloudflare.com/ai-gateway/configuration/authentication/ "AI Gateway 认证头与账户级 token 范围"
+
+[S215]: https://developers.cloudflare.com/changelog/post/2026-11-04-model-aliases/ "AI Gateway model aliases 发布"
+
+[S216]: https://developers.cloudflare.com/ai-gateway/features/routing/model-aliases/ "Model aliases 的路由与输入边界"

@@ -1,18 +1,20 @@
 ---
 title: 自己的材料，还是互联网上的新信息
 subtitle: AI Search、Vectorize 与 Web Search API 分别搜什么
-source_cutoff: 2026-10-28
+source_cutoff: 2026-11-06
 ---
 
 # 自己的材料，还是互联网上的新信息
 
 问“这三份资料哪份写了撤下规则”，证据在自己持有的集合；问“今天官方更新了什么”，证据在当前互联网。先确定需要哪一边，才选择检索入口。网页搜索不会因同属 Cloudflare 就读取私有 R2 内容。
 
-2026-10-20 定向复核 AI Search 中日韩关键词查询、索引限制与 11 月计费；10 月 13 日的 SDK 搜索、读页与流式转换范围保留。Vectorize 及下方互联网 provider 价格／保留表仍按 2026-10-03 阅读，没有检索质量 benchmark。
+2026-11-06 定向复核 AI Search 计费延期与默认同步间隔；10 月 20 日的 CJK 关键词、索引限制和计费构成，以及 10 月 13 日的 SDK 搜索、读页与流式转换范围保留。Vectorize 及下方互联网 provider 价格／保留表仍按 2026-10-03 阅读，没有检索质量 benchmark。
 
 ## 让自己的集合回到原件
 
 AI Search 管一部分摄取、分块与检索，Vectorize 适合由应用自己安排管线。权限、版本、撤下状态与回读原文仍属于应用；索引只帮助找到候选。现有[手册的检索章节](../guides/handbook.md#retrieval)说明两条路线。[S09] [S10] [S40]
+
+AI Search 的默认同步间隔由 6 小时改为 **24 小时**；实例设置或 API 的 `sync_interval` 仍可选 15 分钟至 24 小时。资料更新后暂时搜不到时，除了检查入库、分块与索引状态，还要核对实际同步间隔。这是默认值变化，不证明既有实例都已改用新值。[S204]
 
 ## 中文明明在原文里，为什么搜不到
 
@@ -34,9 +36,13 @@ AI Search 管一部分摄取、分块与检索，Vectorize 适合由应用自己
 
 出现漏检，先核对原件是否入库、分块是否含证据、索引是否完成，再检查 tokenizer 与匹配模式；然后才比较 embedding／reranking。权限和撤下状态仍由应用核验。
 
-### 11 月的两类查询费用
+<!-- chapter: 11-月的两类查询费用 -->
 
-AI Search 从 **2026-11-01** 开始计费。每月含 5M 摄取 tokens、10 GB-month 存储、各 1,000 次 semantic 和 full-text 查询。超出部分 full-text 为 **$0.10／千次**，semantic／vector／hybrid 为 **$0.75／千次**；Workers AI embedding 与 reranking 已包含，生成、query rewriting 与外部模型继续另计。比较检索路线时同时观察每题查询次数与额外模型调用。[S10]
+## 12 月起算的两类查询费用
+
+11 月 2 日公告把 AI Search 的计费起点从 **2026-11-01** 延到 **2026-12-01**；2026-12-01 前不收取 AI Search 使用费，公布单价与包含量不变。每月含 5M 摄取 tokens、10 GB-month 存储、各 1,000 次 semantic 和 full-text 查询。超出部分 full-text 为 **$0.10／千次**，semantic／vector／hybrid 为 **$0.75／千次**；Workers AI embedding 与 reranking 已包含，生成、query rewriting 与外部模型继续另计。比较检索路线时同时观察每题查询次数与额外模型调用。公开延期不等于已核对账户账单；其他产品仍按各自条款计费。[S204] [S10]
+
+11 月 6 日定向复看的价格表另列 Paid 账户前 **5,000** 个实例包含，超过后每实例 **$0.10／月**；默认创建上限为 5,000，提高需申请。它按账户跨 namespaces 合计，namespace 本身不另收资源费。查询／摄取预算之外也要数实际实例，不能把“Unlimited”理解成任意数量免费。[S10]
 
 ## 当前互联网：先搜索，再读来源
 
@@ -72,9 +78,11 @@ const results = await response.json();
 
 网站转换的 6 MiB 上限与 SDK 读页的 5,000,000 bytes 默认预算约束不同环节。调整其中一项不会自动放宽另一项；处理长文时应一起检查转换、传输和返回给模型的窗口。
 
-## 11 月计费前，先数分块后的 tokens
+<!-- chapter: 11-月计费前先数分块后的-tokens -->
 
-10 月 28 日复看 S10，11 月 1 日起算与已登记单价未变。摄取按最终入索引的 chunks 用 `cl100k_base` 计数，overlap 重复的文字在每个 chunk 都计入；不能拿原文件字数直接当账单。OCR 提取文字同时计基础与 image processing 摄取，图片处理量共用每月 5M tokens 包含量。[S10]
+## 计费前，先数分块后的 tokens
+
+11 月 6 日复看 S10 的计量方式与延期后的价格，公布查询单价与包含量未变。摄取按最终入索引的 chunks 用 `cl100k_base` 计数，overlap 重复的文字在每个 chunk 都计入；不能拿原文件字数直接当账单。OCR 提取文字同时计基础与 image processing 摄取，图片处理量共用每月 5M tokens 包含量。[S204] [S10]
 
 每账户每月包含 10 GB-month 存储、1,000 semantic 和 1,000 full-text 查询；内部 Workers AI embedding／reranking 不另记模型账单，生成、query rewriting 和外部模型仍分别计费。旧网站抓取专用 R2 bucket 现已不再写入，但残留对象仍可能计 R2 存储；删除前先核对是否仍需要，不因新索引正常就清理所有旧对象。[S10]
 
@@ -102,6 +110,7 @@ const results = await response.json();
 
 [S09]: https://blog.cloudflare.com/ai-search-ga/ "AI Search GA"
 [S10]: https://developers.cloudflare.com/ai-search/platform/limits-pricing/ "AI Search 限制与价格"
+[S204]: https://developers.cloudflare.com/changelog/post/2026-11-02-billing-postponed-default-sync-interval/ "AI Search 计费延期与默认同步间隔变更"
 [S106]: https://developers.cloudflare.com/changelog/post/2026-10-02-introducing-web-search-api/ "Web Search API 发布"
 [S107]: https://developers.cloudflare.com/web-search/providers/ "Web Search API providers"
 [S108]: https://developers.cloudflare.com/web-search/how-to-use/ "Web Search API 调用与响应"

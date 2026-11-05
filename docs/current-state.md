@@ -1,11 +1,15 @@
 # 当前状态
 
-2026-10-28 · [公共源码](https://github.com/IndelibleVivi/cf-fieldbook)，默认分支 `main`。
+2026-11-06 · [公共源码](https://github.com/IndelibleVivi/cf-fieldbook)，默认分支 `main`。
+
+- [11 月 6 日观察](../reports/2026-11-06.md)定向吸收 10-28 至 11-05 的官方变化：AI Search 收费延期与同步节奏、Pi 1.5／Browser 取消、Skills 文件迁移、DO 代码延迟与自动重试、Gateway 强制认证与 alias、D1 50 MB 结果、compatibility 默认值及私网／发布条件。新增 S204–S229，当前手册／专题资料上界与分享卡同步；模型价格、未复查条款、历史报告和冻结 PDF 不改。
+- AI Search 的登记计费日改为 12-01；11-17 的 module registry／request.signal 默认值只对相应 compatibility date 生效。Private origins 的 GA 公告与机制文档 beta 标题并存，账户与路由前提保留；没有新 SDK 安装、schema 迁移、模型／账单／云端实验或 PDF Release。静态阅读站沿现有 main workflow 更新，实际结果以 [Actions](https://github.com/IndelibleVivi/cf-fieldbook/actions)为准。
+- 11-06 单独复看 S07／S08／S10／S100／S111／S135：Artifacts 现价页写 11-12，旧 changelog／博客仍写 10-14／15，登记三项候选并保留未知日期，当前正文撤回“已经进入计费期”的定论。AI Search 补 Paid 超过 5,000 实例的计量；Observability 数值与 12-01 切换未变，费用固定日期单独推进 11-06。没有实际账单验收。
 
 - 本地维护 CLI 新增 `window --from … --to …`：合并登记的窗口内生效／复核事项，单列逾期复核和未知日期，并复用来源与依赖查询定位候选。日期冲突保留，历史报告停止传播，原 `due` 保持复核日语义；没有刷新来源日期、重建旧出版物或增加定时监控。用法见[贡献与维护](../CONTRIBUTING.md#按日期窗口安排复查)。
 
 - [10 月 28 日观察](../reports/2026-10-28.md)从官方变更直接调查，纳入 Computer／Think／Pi 迁移和恢复、createAI、MCP 旧入口退役、Workflows 地点、D1 undelete、Tunnel／Access、发布默认值与镜像 CA、观测和安全边界。新增 S175–S203，当前手册／专题资料上界及分享卡推进至 10-28；原来源范围、历史报告与已冻结文件保留，没有新 PDF 或云端执行。
-- 本轮定向复访 Observability／Workers Logs 费用，`observability_as_of` 为 10-28：12-01 生效条款未变，官方算例现已修正为存储 $1.00／总额 $7.25。Artifacts 10-14／15 冲突与 Clairic 65,536／8,192 疑点仍在；AI Search 11-01 计费尚待生效，增加分块／OCR 计量说明。只复核 CF 决策路线的价、输出费与窗口，其他 provider、性能与原复核期限保留。
+- 10-28 定向复访 Observability／Workers Logs 时，12-01 生效条款未变，官方算例已修正为存储 $1.00／总额 $7.25。Artifacts 10-14／15 冲突与 Clairic 65,536／8,192 疑点保留；当时 AI Search 登记的 11-01 收费现已由 11-02 公告延期至 12-01。CF 决策路线的价、输出费与窗口保留 10-28 定向范围，其他 provider、性能与原复核期限不因本轮改期。
 
 - 资料架提供普通成品入口与保留目录、署名和许可的完整 ZIP；解压根目录可沿用既有命令。8768 的本地阅读与临时分享接续一致，新增“改原文但暂不 build”的观察。站点包和出版例子闭包共用显式文件清单，归档／撤下后重建停止分发执行附件，npm 依赖、本地发布配置和 `public/` 不进入包或冻结。
 - 新增[同一资料架的静态发布路线](../use-cases/publish-reading-shelf.md)，只准备四个公开文件到独立 `public/`。例子目录实际安装并固定 Wrangler `4.152.0` 与真实 lockfile；本地预览和 dry run 通过，原文一致、未知路径与源码路径返回 404。S172–S174 仅定向核对静态配置和 CLI；没有登录、部署、更新或删除远端资源，也没有新云端例子 runner。

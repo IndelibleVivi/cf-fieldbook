@@ -1,7 +1,7 @@
 ---
 title: 把同一个资料架公开发布
 subtitle: 从本地阅读到关机后仍可访问、更新与停用
-source_cutoff: 2026-10-26
+source_cutoff: 2026-11-06
 ---
 
 # 把同一个资料架公开发布
@@ -104,6 +104,12 @@ npx --no-install wrangler delete --config wrangler.publish.jsonc
 
 删除请求返回后，仍要从独立客户端重新访问原 URL，并在账户内读回资源状态。记录实际状态码／错误和资源是否仍列出；删除命令成功不等于所有缓存、副本或账单立即消失。分享给读者的本地下载副本也不会被远程收回。本地 `public/` 可以保留供以后重建，不需要删除原件或源仓库。
 
+## 如果只想挂到一个路径前缀
+
+10 月 28 日的 Static Assets 支持 `assets.base_path`，Wrangler **4.148.0+** 可在不移动目录的情况下将静态内容挂到 `/blog` 一类前缀；cf 对应 `worker.assets.basePath`，要求 **1.0.0-beta.13+**。[S222]
+
+这是另一个明确选择，当前四文件模板仍从根路径分发。改变前缀后，要重新核对页面导航、三份原文下载、未知路径和源码路径的拒绝；不能只改配置就宣布成品链接已经正确。本轮没有修改模板、安装新版工具或执行远端部署。
+
 ## 本节检查到哪里
 
 本节核对的是 2026-10-26 官方静态配置与 CLI 文档、实际安装的 Wrangler 版本、本地发布目录和预览。仓库默认检查不登录、不部署、不上传，也不执行上面的删除。一次真实云实验还须完成第 3–5 节的部署、关闭本机后的读取、原文下载、更新与停用读回；该结果仅适用于那次账号和资源。
@@ -115,3 +121,5 @@ npx --no-install wrangler delete --config wrangler.publish.jsonc
 [S172]: https://developers.cloudflare.com/workers/static-assets/get-started/ "Workers Static Assets 静态站起步"
 [S173]: https://developers.cloudflare.com/workers/static-assets/migration-guides/migrate-from-pages/ "纯静态 assets.directory 与可省略的脚本和 binding"
 [S174]: https://developers.cloudflare.com/workers/wrangler/commands/workers/ "Wrangler 预览、部署与删除"
+
+[S222]: https://developers.cloudflare.com/changelog/post/2026-10-28-static-assets-base-path/ "Static Assets 从 URL 路径前缀分发"

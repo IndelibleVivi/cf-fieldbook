@@ -2,7 +2,7 @@
 title: Clef 与 Jev：模型、入口与判断成本
 subtitle: 一份面向个人开发者的决策模型比较
 edition: 2026.10 · 专题 01 · 阅读版 3
-source_cutoff: 2026-10-28
+source_cutoff: 2026-11-06
 reviewed_on: 2026-10-28
 review_scope: CF 三款 Clef 与 Jev 目录标价、输出费及窗口；其他 provider、性能与输入细节保留原核对范围
 presentation_revision: 3
@@ -83,6 +83,12 @@ status: source-verified-comparison-not-live-benchmark
 TypeSafe 原厂使用 `/v1/systemone`。OpenRouter 既有 `/api/alpha/decisions`，也有适配 TypeSafe SDK 的 `/api/v1/systemone`，使用 OpenRouter 的 key 与账单。CF 则提供 AI binding 和 `/accounts/{account}/ai/run` 统一 REST 入口，不能自行猜一个 CF `/decisions` 路由。[S74] [S76] [S79]
 
 OpenRouter 的 Jev 供应商仍列为 TypeSafe，CF 目录也标明 Jev 为第三方。多接几个网关可以改变入口和结算方式，但不能据此声称已经获得几套相互独立的模型后端。[S73] [S75]
+
+### 新 Gateway 的认证条件
+
+11 月 3 日起，新建 CF AI Gateway 必须认证，旧的未认证 gateway 可保留原设置，但开启后不可关闭。统一 REST 使用标准 `Authorization`，provider-native URL 使用 `cf-aig-authorization`；AI Gateway Run token 为账户级，不按单个 gateway 隔离。model alias 只组织模型池，也不会把不同输入协议变成相同协议。[S213] [S214] [S216]
+
+本次只补接入条件，原模型单价、窗口、provider 与性能保留各自核验范围；不能用新资料截止日推定价格重新确认。更多路由条件见[模型页](../services/decision-models.md#gateway-认证与模型池别名)。
 
 ### 开放权重是另一条路线
 
@@ -239,3 +245,9 @@ GitHub：[github.com/IndelibleVivi](https://github.com/IndelibleVivi)
 [S163]: https://developers.cloudflare.com/changelog/post/2026-10-19-clairic-workers-ai/ "Clairic preview：有类型的字段抽取"
 
 [S164]: https://developers.cloudflare.com/workers-ai/models/clairic/ "Clairic 模型卡、输入字段与上下文说明"
+
+[S213]: https://developers.cloudflare.com/changelog/post/2026-11-03-required-authentication/ "新 AI Gateway 强制认证"
+
+[S214]: https://developers.cloudflare.com/ai-gateway/configuration/authentication/ "AI Gateway 认证头与账户级 token 范围"
+
+[S216]: https://developers.cloudflare.com/ai-gateway/features/routing/model-aliases/ "Model aliases 的路由与输入边界"

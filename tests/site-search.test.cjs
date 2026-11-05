@@ -206,5 +206,25 @@ test('new retrieval, extraction and browser questions reach their actual boundar
   assert.match(extraction.text, /fields/);
   const browser = first('停止对话会取消浏览器吗');
   assert.ok(browser.url.startsWith('services/agent-runtime.html#'), browser.url);
-  assert.match(browser.text, /不会取消/);
+  assert.match(browser.text, /harness abort/);
+  assert.match(browser.text, /错误结束并释放 tab/);
+  assert.match(browser.text, /不会撤回/);
+});
+
+test('November questions find current dates, migration and retry limits', () => {
+  const cases = [
+    ['AI Search 什么时候收费', 'services/search.html#', /12-01|12 月 1 日/],
+    ['DO 自动重试会重复执行吗', 'reference/implementation.html#', /retryable\(\)/],
+    ['Pi parked 不见了', 'services/agent-runtime.html#', /restart_limit/],
+    ['Gateway 认证能关掉吗', 'services/decision-models.html#', /不可关闭/],
+    ['D1 查询结果太大', 'reference/implementation.html#', /50 MB/],
+  ];
+  for (const [query, prefix, answer] of cases) {
+    const item = first(query);
+    assert.ok(item.url.startsWith(prefix), `${query}: ${item.url}`);
+    assert.match(item.text, answer);
+    assert.deepEqual(search(index, query + ' 未存在的条件987'), []);
+  }
+  assert.match(first('DO 自动重试会重复执行吗').text, /应用抛错|overloaded/);
+  assert.match(first('Pi parked 不见了').text, /1\.4.*读取|1\.4.*移除/s);
 });

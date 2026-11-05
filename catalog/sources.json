@@ -51,17 +51,17 @@
     "id": "S07",
     "title": "Artifacts 公开测试发布",
     "url": "https://blog.cloudflare.com/next-git-platform-on-cloudflare/",
-    "accessed": "2026-10-28",
+    "accessed": "2026-11-06",
     "kind": "official_primary",
-    "verification_scope": "targeted_stated_billing_start_only; no_bill_verification"
+    "verification_scope": "stated_October_15_billing_date_only; no_bill_verification"
   },
   {
     "id": "S08",
     "title": "Artifacts 价格",
     "url": "https://developers.cloudflare.com/artifacts/platform/pricing/",
-    "accessed": "2026-10-28",
+    "accessed": "2026-11-06",
     "kind": "official_primary",
-    "verification_scope": "targeted_pricing_and_billing_start_only; no_bill_verification"
+    "verification_scope": "current_pricing_page_November_12_billing_date_and_operations_storage_prices_only; conflicts_with_old_launches_retained; no_bill_readback"
   },
   {
     "id": "S09",
@@ -75,9 +75,9 @@
     "id": "S10",
     "title": "AI Search 限制与价格",
     "url": "https://developers.cloudflare.com/ai-search/platform/limits-pricing/",
-    "accessed": "2026-10-28",
+    "accessed": "2026-11-06",
     "kind": "official_primary",
-    "verification_scope": "targeted_billing_start_pricing_ingestion_metering_and_legacy_bucket_only; retrieval_limits_not_rechecked"
+    "verification_scope": "billing_start_rates_allowances_instance_metering_chunk_OCR_and_legacy_bucket_only; CJK_provider_SDK_not_rechecked"
   },
   {
     "id": "S11",
@@ -779,9 +779,9 @@
     "id": "S100",
     "title": "Cloudflare Observability 价格",
     "url": "https://developers.cloudflare.com/observability/pricing/",
-    "accessed": "2026-10-28",
+    "accessed": "2026-11-06",
     "kind": "official_primary",
-    "verification_scope": "targeted_plan_terms_meters_transition_retention_and_corrected_example; no_bill_verification"
+    "verification_scope": "current_and_December_plan_terms_meters_retention_transition_and_corrected_example_only; no_bill_readback"
   },
   {
     "id": "S101",
@@ -819,9 +819,9 @@
     "id": "S105",
     "title": "PiHarness 状态与 Lifecycle",
     "url": "https://developers.cloudflare.com/agents/harnesses/pi/",
-    "accessed": "2026-10-03",
+    "accessed": "2026-11-06",
     "kind": "official_primary",
-    "verification_scope": "public_document_consulted; not_account_or_live_deployment"
+    "verification_scope": "Pi_1_5_session_watch_continue_checkpoint_restart_limit_and_abort_only; no_SDK_install_or_schema_migration"
   },
   {
     "id": "S106",
@@ -867,9 +867,9 @@
     "id": "S111",
     "title": "Workers Logs 迁移前计费",
     "url": "https://developers.cloudflare.com/workers/platform/pricing/",
-    "accessed": "2026-10-28",
+    "accessed": "2026-11-06",
     "kind": "official_primary",
-    "verification_scope": "targeted_Workers_Logs_current_price_and_December_transition_only"
+    "verification_scope": "Workers_Logs_events_price_retention_and_December_transition_only; other_Workers_prices_not_rechecked"
   },
   {
     "id": "S112",
@@ -1067,9 +1067,9 @@
     "id": "S135",
     "title": "Artifacts open beta 与计费起算公告",
     "url": "https://developers.cloudflare.com/changelog/post/2026-10-01-artifacts-open-beta/",
-    "accessed": "2026-10-13",
+    "accessed": "2026-11-06",
     "kind": "official_primary",
-    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
+    "verification_scope": "stated_October_14_billing_date_only; current_price_page_disagrees; no_bill_readback",
     "published_on": "2026-10-01"
   },
   {
@@ -1148,9 +1148,9 @@
     "id": "S144",
     "title": "Browser 会话、tab、中断与 Live View",
     "url": "https://developers.cloudflare.com/agents/tools/browser/",
-    "accessed": "2026-10-20",
+    "accessed": "2026-11-06",
     "kind": "official_primary",
-    "verification_scope": "targeted_official_document_text_or_excerpt_consulted; no_account_or_live_cloud_execution"
+    "verification_scope": "current_Browser_internal_hosts_notice_and_harness_abort_adapters_only; no_browser_cloud_execution"
   },
   {
     "id": "S145",
@@ -1637,5 +1637,233 @@
     "kind": "official_primary",
     "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_or_model_execution",
     "published_on": "2026-10-21"
+  },
+  {
+    "id": "S204",
+    "title": "AI Search 计费延期与默认同步间隔变更",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-02-billing-postponed-default-sync-interval/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-02"
+  },
+  {
+    "id": "S205",
+    "title": "Durable Objects 自动重试发布",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-05-durable-objects-automatic-retries/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-05"
+  },
+  {
+    "id": "S206",
+    "title": "Durable Objects 自动重试的范围与限制",
+    "url": "https://developers.cloudflare.com/durable-objects/best-practices/automatic-retries/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification"
+  },
+  {
+    "id": "S207",
+    "title": "Durable Objects 默认延迟代码更新",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-30-durable-objects-deferred-code-updates/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-10-30"
+  },
+  {
+    "id": "S208",
+    "title": "Durable Objects 代码更新策略",
+    "url": "https://developers.cloudflare.com/durable-objects/deployments/durable-objects-code-updates/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification"
+  },
+  {
+    "id": "S209",
+    "title": "Agents SDK 0.33.0 与 Pi 1.5 迁移",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-03-pi-harness-pi-1-5/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-03"
+  },
+  {
+    "id": "S210",
+    "title": "Agent Skills 从 Workspace 文件加载",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-29-agent-skills-from-files/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-10-29"
+  },
+  {
+    "id": "S211",
+    "title": "Agent Skills 来源、校验与执行",
+    "url": "https://developers.cloudflare.com/agents/skills/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification"
+  },
+  {
+    "id": "S212",
+    "title": "Browser internal hostnames 私有预览",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-28-browser-internal-hostnames/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-10-28"
+  },
+  {
+    "id": "S213",
+    "title": "新 AI Gateway 强制认证",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-03-required-authentication/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-03"
+  },
+  {
+    "id": "S214",
+    "title": "AI Gateway 认证头与账户级 token 范围",
+    "url": "https://developers.cloudflare.com/ai-gateway/configuration/authentication/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification"
+  },
+  {
+    "id": "S215",
+    "title": "AI Gateway model aliases 发布",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-04-model-aliases/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-04"
+  },
+  {
+    "id": "S216",
+    "title": "Model aliases 的路由与输入边界",
+    "url": "https://developers.cloudflare.com/ai-gateway/features/routing/model-aliases/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification"
+  },
+  {
+    "id": "S217",
+    "title": "Workers 新 module registry 的 11-17 默认值",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-02-module-registry-default/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-02"
+  },
+  {
+    "id": "S218",
+    "title": "Workers Request.signal 的 11-17 默认值",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-02-request-signal-default/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-02"
+  },
+  {
+    "id": "S219",
+    "title": "D1 查询结果 50 MB 上限",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-30-query-result-size-limit/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-10-30"
+  },
+  {
+    "id": "S220",
+    "title": "Browser Run 更新到 Chrome 152",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-30-chrome-152/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-10-30"
+  },
+  {
+    "id": "S221",
+    "title": "Browser Run crawl 结果与 robots.txt 诊断",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-03-crawl-result-diagnostics/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-03"
+  },
+  {
+    "id": "S222",
+    "title": "Static Assets 从 URL 路径前缀分发",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-28-static-assets-base-path/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-10-28"
+  },
+  {
+    "id": "S223",
+    "title": "Workers Builds 构建与日志保留 90 天",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-28-workers-builds-90-day-retention/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-10-28"
+  },
+  {
+    "id": "S224",
+    "title": "Access Service Token 标签与授权",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-02-service-token-tags/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-02"
+  },
+  {
+    "id": "S225",
+    "title": "VPC Network binding 选择 virtual network",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-10-28-virtual-network-bindings/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-10-28"
+  },
+  {
+    "id": "S226",
+    "title": "Private origins public-to-private GA 公告",
+    "url": "https://blog.cloudflare.com/private-origins-public-to-private/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-10-30"
+  },
+  {
+    "id": "S227",
+    "title": "Private origins 账户、网络与当前限制",
+    "url": "https://developers.cloudflare.com/dns/private-origins/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification"
+  },
+  {
+    "id": "S228",
+    "title": "R2 按地区和 HTTP 状态拆分请求指标",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-03-r2-request-error-breakdowns/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-03"
+  },
+  {
+    "id": "S229",
+    "title": "Flagship 本地 flag store",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-02-local-flag-store/",
+    "accessed": "2026-11-06",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-02"
   }
 ]

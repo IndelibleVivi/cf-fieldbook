@@ -1,8 +1,8 @@
 ---
 title: 沿着一条请求，找到问题发生的地方
 subtitle: Cloudflare Traces、SQL 调查、采样与保留
-source_cutoff: 2026-10-28
-observability_as_of: 2026-10-28
+source_cutoff: 2026-11-06
+observability_as_of: 2026-11-06
 ---
 
 # 沿着一条请求，找到问题发生的地方
@@ -12,6 +12,8 @@ observability_as_of: 2026-10-28
 2026-10-20 定向复核 Observability 新方案包含量、迁移前 Workers Logs 价格，并补充 Issues 的 MCP Events 入口；10 月 13 日的 HTTP/3 取消与 Logpush 复核范围保留，其他机制未整体重核。没有账户或账单实测。
 
 2026-10-28 复看费用条款与算例，并补充 custom spans、SQL 属性发现与账户级 Logpush。费用仍在 12 月 1 日切换，官方算例现已与条款一致；其他机制沿各自原核验范围。
+
+2026-11-06 只定向复看 S100／S111 的当前费用、新方案计量与迁移条款及算例，数值未变，固定费用日期单独推进至 11-06；采样、span、SQL 与 Logpush 机制没有因此整体重新核验。
 
 ## 请求经过哪里，时间就在哪里分段
 
@@ -62,7 +64,7 @@ Workers Issues 将错误与部署版本、源码上下文连起来。Alerts 用�
 ## 费用：当前适用与将来生效
 
 <!-- facts: observability-costs -->
-固定资料日期：**2026-10-28**。
+固定资料日期：**2026-11-06**。
 
 | 条款 | Free | Paid |
 |---|---|---|
@@ -70,13 +72,13 @@ Workers Issues 将错误与部署版本、源码上下文连起来。Alerts 用�
 | 已公布；将在 2026-12-01 生效 [S100] | 0.5 GB 摄取 / 日；7 天 | 50 GB 摄取 + 10 GB-month / billing cycle；超出 $0.25 / GB + $0.10 / GB-month |
 <!-- /facts -->
 
-表格读取同一[费用记录](../catalog/observability-pricing.json)与[公告生效事件](../catalog/launches.json)，固定资料日期为 2026-10-28。Paid 存储包含量仍为 **10 GB-month**，摄取与存储分别扣量、不能互抵或滚存。Log Explorer datasets 不消费共享包含量；Enterprise 在合同续约时迁移。[S100]
+表格读取同一[费用记录](../catalog/observability-pricing.json)与[公告生效事件](../catalog/launches.json)，固定资料日期为 2026-11-06。Paid 存储包含量仍为 **10 GB-month**，摄取与存储分别扣量、不能互抵或滚存。Log Explorer datasets 不消费共享包含量；Enterprise 在合同续约时迁移。[S100]
 
 价格页的算例已修正：75 GB 摄取和 20 GB-month 存储，对应 `(75−50)×$0.25 + (20−10)×$0.10 = $7.25`，其中存储为 $1.00。10 月 20 日观察中的旧差异保留历史位置，不再作为当前问题。[S100]
 
 12 月 1 日前用量不会追溯收费，但 Paid 当天仍可查询的旧数据从当天起计入存储；只停止发送新日志，不一定消除存储计量。默认保留仍为七天，30／90／365 天可配置保留只是未来计划。[S100]
 
-摄取按压缩前的内容及 attributes 计量，采样会影响摄取与保存；查询、dashboard、alerts 没有额外收费。Free 达到每天摄取限额后停止接收新数据，已有数据在其保留期内仍可查。不要把十二月的公布条款提前写成十月已经适用的账单。[S100]
+摄取按压缩前的内容及 attributes 计量，采样会影响摄取与保存；查询、dashboard、alerts 没有额外收费。Free 达到每天摄取限额后停止接收新数据，已有数据在其保留期内仍可查。不要把十二月的公布条款提前写成当前已经适用的账单。[S100]
 
 <!-- SOURCES -->
 

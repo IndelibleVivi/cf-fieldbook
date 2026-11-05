@@ -8,6 +8,16 @@
   const normalize = value => String(value).normalize('NFKC').toLocaleLowerCase().replace(/\s+/g, ' ').trim();
   // These phrases name reading intentions. They only match words already in a section.
   const aliases = [
+    { phrases: ['ai search 什么时候收费', 'ai search 延期收费了吗', 'ai search为什么还没收费'],
+      words: ['12-01', '12 月 1 日'], required: ['ai search'], intent: 'search-billing' },
+    { phrases: ['do 自动重试会重复执行吗', 'durable objects 重试会重复吗'],
+      words: ['自动重试'], required: ['durable objects'], intent: 'do-retries' },
+    { phrases: ['pi parked 不见了', 'pi 1.5 怎么继续'],
+      words: ['parked', 'continue'], required: ['pi'], intent: 'pi-continuation' },
+    { phrases: ['gateway 认证能关掉吗', '新 gateway 为什么必须认证'],
+      words: ['认证'], required: ['gateway', '不可关闭'], intent: 'gateway-auth' },
+    { phrases: ['d1 查询结果太大', 'd1 50mb 查询失败'],
+      words: ['50 mb'], required: ['d1'], intent: 'd1-result-size' },
     { phrases: ['d1 误删怎么办', 'd1误删怎么办'], words: ['undelete'], required: ['d1'], intent: 'd1-undelete' },
     { phrases: ['mcp 连不上 410', 'mcp连接410', 'mcp 410'], words: ['410'], required: ['mcp'], intent: 'mcp-transport' },
     { phrases: ['computer 重放会重复吗', 'computer重放会重复吗'],
@@ -134,6 +144,11 @@
       if (parsed.intents.includes('lease') && mechanism && body.includes('租约')) score += 80;
       if (parsed.intents.includes('lease') && mechanism && item.section && body.includes('租约')) score += 18;
       if (parsed.intents.includes('api') && url.startsWith('reference/api-maintenance.html#')) score += 90;
+      if (parsed.intents.includes('search-billing') && url.startsWith('services/search.html#') && /费用|计费|收费/.test(heading)) score += 100;
+      if (parsed.intents.includes('do-retries') && url.startsWith('reference/implementation.html#') && heading.includes('自动重试')) score += 100;
+      if (parsed.intents.includes('pi-continuation') && url.startsWith('services/agent-runtime.html#') && heading.includes('pi 1.5')) score += 100;
+      if (parsed.intents.includes('gateway-auth') && url.startsWith('services/decision-models.html#') && heading.includes('gateway 认证')) score += 100;
+      if (parsed.intents.includes('d1-result-size') && url.startsWith('reference/implementation.html#') && heading.includes('50 mb')) score += 100;
       if (parsed.intents.includes('project') && url.startsWith('use-cases/project-context.html#')) score += 90;
       if (parsed.intents.includes('cjk-keyword') && url.startsWith('services/search.html#')) score += 90;
       if (parsed.intents.includes('extraction') && url.startsWith('services/decision-models.html#')) score += 90;

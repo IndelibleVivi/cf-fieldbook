@@ -2,7 +2,7 @@
 title: Cloudflare 实施参考
 subtitle: 从一个入口到可恢复的应用与自动化
 edition: 2026.10 · 修订 1
-source_cutoff: 2026-10-28
+source_cutoff: 2026-11-06
 author: Faye & Cove
 github: https://github.com/IndelibleVivi
 status: implementation-reference-snapshot
@@ -11,9 +11,11 @@ scope: 不含邮件；示例与实际账户分离
 
 # Cloudflare 实施参考
 
-**面向实施、审查与 agent 的完整技术材料 · 资料截至 2026-10-20**
+**面向实施、审查与 agent 的完整技术材料 · 资料截至 2026-11-06**
 
 本文件集中保存实现说明、代码、恢复语义和来源；按用途阅读可从[实践手册](../guides/handbook.md)开始。本文按资料截止日阅读，实际部署需要验证自己的环境。
+
+2026-11-06 定向补充 D1 查询结果上限、DO 自动重试与延迟代码更新、Worker compatibility 默认值、Access token tags、Gateway 认证和私网路线。当前条件见[11 月 6 日观察](../reports/2026-11-06.md)，未核验条款仍按下文原范围阅读。
 
 2026-10-13 定向补充 Workers 排空、Queues／D1 地点约束、Clef 输入预算和 Artifacts 计费／限制；2026-10-20 再纳入 CJK 检索、Clairic、Artifacts 时间，以及 Cron、SSH、Tunnel 和构建条件。10 月 28 日补 D1 undelete、Workflows 地点、Tunnel 路径与角色、发布默认值和镜像 CA；其余保留原范围。API／SDK 入口见[维护参考](api-maintenance.md)，本期资料范围见[10 月 28 日观察](../reports/2026-10-28.md)，此前记录见[10 月 20 日](../reports/2026-10-20.md)与[10 月 13 日](../reports/2026-10-13.md)。
 
@@ -191,6 +193,8 @@ Cookie 会话的写请求还要考虑 CSRF 与 Origin。对未通过校验的请
 
 Service Tokens 适合机器通过 Access，不需要模拟人类登录。单独签发、设有效期并保留撤销路径。Service Auth 通过之后，应用仍要把该机器映射到允许的操作和数据范围。[S49]
 
+11 月 2 日起每个 token 可有最多 **5 个** key-value tags；Service Auth policy 的 `service_token_tag` selector 精确匹配有效 token 的 key／value。标签变更可改变准入范围，应与凭据生命周期一起审阅；它不代替应用的资源授权，也不改变此前严格 Service Token 的请求头条件。[S224] [S116]
+
 不要把包含真实 token 的 `curl` 命令放进聊天或终端历史。把凭据放入受控的配置、系统 secret store 或执行环境，并防止进程调试和日志输出它们。测试记录只需写凭据身份标签、测试时间和通过/拒绝结果。
 
 ### 所有替代入口都要检查
@@ -255,6 +259,14 @@ Cloudflare One Client / WARP 是终端接入和流量策略；Mesh 连接加入�
 
 与现有 VPN 共存时，先在非关键设备观察默认路由、DNS、虚拟接口与私网路径。Split Tunnel 的 IP 排除不自动证明 DNS 也走原来的解析路径，应按客户端实际配置检查。面向个人的小型环境，不需要为了使用 Cloudflare 服务而同时换掉已经稳定的网络层。[S62]
 
+### Private origins 与 VPC Network binding 不是同一条路径
+
+10 月 30 日 private origins 的 public-to-private 路线有 GA 公告，机制文档标题仍标 beta。采用前确认账户 entitlement、已有 Cloudflare One 连通性与 **default virtual network** 中的路由；WAN／Mesh 还需要 Unified Routing 和回程路由，Tunnel 不需要这两项。不能从公告标题推定所有账户自动开放。[S226] [S227]
+
+该路径把 proxied A／AAAA 的私有 IP 交给私网回源，WAF、缓存和 Worker 仍在应用服务路径。当前不支持 Argo Smart Routing／Dedicated CDN Egress IPs，健康检查要求 Load Balancing；WAN 与 Tiered Cache 的部分 miss 可能在 upper tier 返回 403。按具体源站与缓存路径检查，不能把它当成无需验证的 Tunnel 替代品。[S227]
+
+VPC Network binding 另可用 `network_id: "cf1:vnet:<UUID>"` 选择 virtual network，`cf1:network` 仍指默认网络。这不改变上述 DNS private origins 仅用 default virtual network 的限制；相同私有 IP 位于不同网络时，调用者必须明确目标网络。[S225] [S227]
+
 ## 07 / 数据：保存内容，也保存重新解释它的条件
 
 ### D1 与 R2 的分工
@@ -283,6 +295,10 @@ CREATE TABLE document_versions (
 ```
 
 写新版本时使用比较并交换：只有 `current_revision` 仍等于用户开始编辑时的值，才提交新版本。否则返回冲突，让调用者重读，而不是让较旧页面覆盖新内容。用数据库实际支持的原子操作实现，不把几次独立网络请求假装成一个事务。
+
+### D1 查询结果为什么在 50 MB 处失败
+
+10 月 30 日公告指定 **2026-11-04** 起执行单次查询结果 **50 MB** 上限；超出返回 `D1 query result exceeded the maximum response size limit of 50 MB`。减少列与分批查询，分页未完成或后页失败就保留部分结果状态；REST import／export 不受这项限制。它不是数据库容量，也不延长 undelete 或 Time Travel 窗口。[S219]
 
 ### R2 权限与文件处理
 
@@ -369,6 +385,14 @@ Workflows 当前按请求、CPU、存储与步骤计费，步骤和存储计费�
 
 Cron 使用 UTC。业务想按当地日期执行时，把时区与夏令时语义明确写在任务定义里。每次触发携带逻辑时间窗，例如“处理上一个已结束日期”，避免重触发产生两份不同身份的同日任务。[S56]
 
+### Durable Objects 自动重试不等于任意动作可重放
+
+11 月 5 日的 runtime 自动重试覆盖 namespace 所建 stub 的 `fetch()`／RPC，条件是可重发且具有 `.retryable` 的特定传输失败。默认首次加 **4 次**重试、不在首次开始 **10 秒**后启动新重试；应用抛错、`.overloaded`、HTTP 错误响应、stream body、不可复制 RPC 参数和 promise pipelining 等不适用。[S205] [S206]
+
+未知接收结果使用同一请求身份；对象已收到首个调用则拒绝重试，只有 `retryable()` 显式允许该方法再次执行。此标记不增加幂等保证，应先证明重复设置状态或外部动作可安全核对；不要直接标记累加、付款或发布。[S206]
+
+Wrangler **4.158.0+** 可导入 `cloudflare:durable-objects` 的 `retryable()`，并为 `get()`／`getByName()` 指定 `retry: { maxRetries, timeoutMs }`。`maxRetries` 为 0–10，`timeoutMs` 为 500–60,000 ms，默认 4／10,000；此期限不取消首个 attempt。外层重试需把平台内层次数计入总预算，可在自己完整负责时设 `maxRetries: 0`。本书合成 API 例子不调用 DO，未据此改模型行为。[S205] [S206]
+
 ## 09 / 检索与记忆：先让人找回原件，再让模型组织答案
 
 ### 两条路径分别解决不同问题
@@ -430,6 +454,10 @@ Cloudflare Agent Memory 当前仍为 private beta，与 AI Search 的 GA 状态�
 ## 10 / 模型调用：先知道谁在付费，再决定谁来回答
 
 ### Gateway 是流量控制面，不是另一个模型
+
+11 月 3 日后新建 Gateway 强制认证；API 创建省略 `authentication` 等于 `true`，显式 `false` 返回 400。更新旧 gateway 时省略字段保留原设置，但开启后不可关闭。REST `/ai/run` 用标准 `Authorization`，provider-native endpoints 用 `cf-aig-authorization`；binding 保持预认证。Run token 为账户级，不能按单个 gateway 隔离。[S213] [S214]
+
+Model alias 用 `custom/<name>` 选择 gateway 内的模型池，REST 另用 `cf-aig-gateway-id` 指定所属 gateway；同名 alias 在不同 gateway 各自独立。输入格式与路由目标仍须兼容，不以 alias 代替租户隔离或预算限制。[S215] [S216]
 
 Workers AI 运行模型；AI Gateway 位于应用与支持的模型服务之间，组织身份、观察、路由与费用。通过绑定或受控凭据可以减少业务代码直接持有 provider key，但访问 Gateway 的资格本身仍然是敏感权限。[S41] [S45] [S15]
 
@@ -522,6 +550,16 @@ Workers Builds 当前 Paid 包含每月 6,000 分钟、6 并发，但单次构�
 
 建议流水线依次输出：固定依赖安装结果、类型与单元测试、构建物、隔离预览、浏览器检查和可归档验收材料。正式发布使用已经检查的同一源版本，避免检查 A、上线 B。
 
+### DO 何时采用新代码
+
+DO 默认延迟代码更新最多 **300 秒**等待 active object 休眠，到期则 reset；发布后验证必须确认具体对象已采用新代码。`durable_objects.code_update_strategy` 可选 `deferred`／`immediate`；延迟是 best effort，连续部署的第一个 timer 可让对象直接采用最新部署，不能假定逐个运行中间版本。[S207] [S208]
+
+### compatibility date 的 11 月 17 日边界
+
+对 `compatibility_date >= 2026-11-17`，JavaScript Worker 默认启用新 module registry，Python 保留旧 registry；无效 import attributes 被拒绝，`require()` 加载 ES module 及其依赖不能带 top-level `await`。提前试用设 `new_module_registry`，保留旧行为设 `legacy_module_registry`。[S217]
+
+同日起该日期范围默认启用 `request.signal` 的客户端断开通知；取消出站请求时显式传 signal，不会同时启用 `request_signal_passthrough`。提前试用用 `enable_request_signal`，opt out 用 `disable_request_signal`。旧日期不因日历推进自动变化，断开也不撤销已有副作用。[S218]
+
 ### Preview URL 不证明数据隔离
 
 当前资源规则中，某些预览状态（例如 DO 和 Containers）有自动隔离支持，其他数据资源则依赖配置。D1、R2、KV、队列或 Vectorize 若指向同一目标，预览仍可能操作正式数据。逐项看绑定，不用一个“Preview”标签代替确认。[S63]
@@ -595,7 +633,7 @@ Workers 侧的观测不会自动看到所有本机脚本、第三方平台和离
 
 ### 免费、包含、测试期间不收费是三种承诺
 
-免费计划可能达到上限就失败；Paid 包含量之外可能继续计费；beta 免费则可能有明确未来起算日。10 月 20 日复核后，Artifacts 价格页写 10 月 14 日计费、博客仍写 15 日；两日均已过去，按公开条款已进入计费期，实际账单未核验。AI Search 的 11 月 1 日起算本次重新核对，尚未到达。核验日期与生效日期分别记录。[S07] [S08] [S135] [S10]
+免费计划可能达到上限就失败；Paid 包含量之外可能继续计费；beta 免费则可能有明确未来起算日。11 月 6 日查阅时，Artifacts 价格页改写 **11 月 12 日**起算，旧 changelog／博客仍写 10 月 14／15 日；三处不一致，不能继续把“已进入计费期”当作定论，按现价预留预算并保留历史用量未知。AI Search 已明确将收费延期至 **12 月 1 日**。核验、公告与生效日期分别记录。[S07] [S08] [S135] [S204] [S10]
 
 ## 15 / 排障、恢复与停用
 
@@ -641,7 +679,7 @@ Workers 侧的观测不会自动看到所有本机脚本、第三方平台和离
 | 队列先登记、重复就 ACK | 设计可恢复任务状态、outbox、租约与未知结果 | 登记后退出可能导致任务被跳过；第 8 章给出故障路径。[S53] [S55] |
 | 沿用 Sandbox 0.x 的调用方式 | 按 1.0 原生容器接口逐项检查迁移 | 不混用旧类、旧镜像假设和新 API。[S72] |
 | 临时磁盘丢失，因此所有恢复靠外部存储 | 补充文件系统快照，仍区分长期结果 | 快照不保存进程，且有镜像与期限条件。[S05] |
-| 把 AI Search 当作仍在 beta，或沿用旧费用 | 按 GA、多模态与 11 月新计费分别核对 | 价格和额外收费判断应按生效条件逐项检查。[S09] [S10] |
+| 把 AI Search 当作仍在 beta，或沿用旧费用 | 按 GA、多模态与延期至 12 月的计费分别核对 | 价格和额外收费判断应按生效条件逐项检查。[S09] [S10] [S204] |
 | 对所有 Gateway 使用旧固定日志额度 | 按首次创建日期区分日志规则 | 2026-09-24 之后的新客户走 Workers Logs。[S15] |
 | 把 Cloudflare OS 的托管版当作已开放 | 区分自部署源码与托管版候补 | 两种交付形态与状态不同。[S20] |
 | 把 D1 SQL 导出当作通用恢复方案 | 检查虚拟表、导入格式与恢复演练限制 | 不能把全文索引数据库假设成随时可全库导出。[S50] [S51] |
@@ -935,3 +973,37 @@ GitHub：[github.com/IndelibleVivi](https://github.com/IndelibleVivi)
 [S189]: https://developers.cloudflare.com/changelog/post/2026-10-22-emudhra-certificates/ "Sandbox 0.x 与 1.x 的 eMudhra 信任链更新路径"
 [S190]: https://developers.cloudflare.com/changelog/post/2026-10-22-cloudflared-path-normalization/ "cloudflared ingress URL 归一化与默认启用时间"
 [S191]: https://developers.cloudflare.com/changelog/post/2026-10-22-granular-read-and-monitor-ga/ "Tunnel 细粒度 Read And Monitor 角色 GA"
+
+[S116]: https://developers.cloudflare.com/changelog/post/2026-10-02-strict-service-token-authentication/ "Access 严格 Service Token 认证"
+
+[S204]: https://developers.cloudflare.com/changelog/post/2026-11-02-billing-postponed-default-sync-interval/ "AI Search 计费延期与默认同步间隔变更"
+
+[S205]: https://developers.cloudflare.com/changelog/post/2026-11-05-durable-objects-automatic-retries/ "Durable Objects 自动重试发布"
+
+[S206]: https://developers.cloudflare.com/durable-objects/best-practices/automatic-retries/ "Durable Objects 自动重试的范围与限制"
+
+[S207]: https://developers.cloudflare.com/changelog/post/2026-10-30-durable-objects-deferred-code-updates/ "Durable Objects 默认延迟代码更新"
+
+[S208]: https://developers.cloudflare.com/durable-objects/deployments/durable-objects-code-updates/ "Durable Objects 代码更新策略"
+
+[S213]: https://developers.cloudflare.com/changelog/post/2026-11-03-required-authentication/ "新 AI Gateway 强制认证"
+
+[S214]: https://developers.cloudflare.com/ai-gateway/configuration/authentication/ "AI Gateway 认证头与账户级 token 范围"
+
+[S215]: https://developers.cloudflare.com/changelog/post/2026-11-04-model-aliases/ "AI Gateway model aliases 发布"
+
+[S216]: https://developers.cloudflare.com/ai-gateway/features/routing/model-aliases/ "Model aliases 的路由与输入边界"
+
+[S217]: https://developers.cloudflare.com/changelog/post/2026-11-02-module-registry-default/ "Workers 新 module registry 的 11-17 默认值"
+
+[S218]: https://developers.cloudflare.com/changelog/post/2026-11-02-request-signal-default/ "Workers Request.signal 的 11-17 默认值"
+
+[S219]: https://developers.cloudflare.com/changelog/post/2026-10-30-query-result-size-limit/ "D1 查询结果 50 MB 上限"
+
+[S224]: https://developers.cloudflare.com/changelog/post/2026-11-02-service-token-tags/ "Access Service Token 标签与授权"
+
+[S225]: https://developers.cloudflare.com/changelog/post/2026-10-28-virtual-network-bindings/ "VPC Network binding 选择 virtual network"
+
+[S226]: https://blog.cloudflare.com/private-origins-public-to-private/ "Private origins public-to-private GA 公告"
+
+[S227]: https://developers.cloudflare.com/dns/private-origins/ "Private origins 账户、网络与当前限制"

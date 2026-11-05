@@ -1,7 +1,7 @@
 ---
 title: 用程序维护 Cloudflare 资源
 subtitle: 选择调用入口，取得完整结果，再判断变更是否完成
-source_cutoff: 2026-10-28
+source_cutoff: 2026-11-06
 ---
 
 # 用程序维护 Cloudflare 资源
@@ -90,6 +90,12 @@ SQL introspection 另有 `include_attributes`／`attributes` 新名字，发现�
 
 旧 `apiKey` 参数改为 `apiToken`。fallback 只在首选模型**产生输出之前**失败时尝试后续模型；binding 的 catalog／dynamic stream resume 是另一项能力，不能推定外部工具动作也可恢复。迁移时检查凭据、模型身份、用量与错误路径；本书的离线 REST 请求例子不依赖这些 provider，无需为了接口名变化重写。[S179] [S180]
 
+### Gateway 新建认证与 alias 管理分别核对
+
+新 AI Gateway 从 11 月 3 日强制认证，开启后不可关闭；更新既有 gateway 时省略 `authentication` 才保留其原值。REST 调用用标准 `Authorization`，provider-native URL 用 `cf-aig-authorization`；Run token 不能按单个 gateway 限制。alias 的配置管理权限与推理权限也分别判断，不能从可管理模型池推定可推理，或反过来。[S213] [S214] [S216]
+
+按 `custom/<name>` 调用模型池时附所属 `cf-aig-gateway-id`，输入协议、fallback 和配置缓存仍须核对；它不自动升级旧 provider 或改造本书的离线适配例子。精确接入条件见[模型页](../services/decision-models.md#gateway-认证与模型池别名)。[S215] [S216]
+
 ## Agent 怎样取得官方操作指导
 
 10 月 10 日起，Cloudflare API MCP 在 `https://mcp.cloudflare.com/mcp` 提供 Skills over MCP：支持该扩展的客户端可用 `skills/list` 发现，再从 `skill://<name>/<path>` 读取。客户端具备 MCP 工具能力不自动说明它支持 Skills 扩展；接线时分别确认资源发现、内容读取和实际操作权限。本书没有连接真实账户验证此入口。[S134]
@@ -167,3 +173,11 @@ cf analytics_engine sql query           -> cf analytics-engine sql query
 [S181]: https://developers.cloudflare.com/changelog/post/2026-10-22-cloudflare-mcp-servers-retire-sse/ "Cloudflare 产品 MCP 退役 /sse 入口"
 [S196]: https://developers.cloudflare.com/changelog/post/2026-10-27-introspection-include-attributes/ "SQL API introspection 的 include_attributes 字段"
 [S198]: https://developers.cloudflare.com/changelog/post/2026-10-26-foundation-dns-nameserver-type/ "Advanced Nameservers 类型与兼容字段迁移"
+
+[S213]: https://developers.cloudflare.com/changelog/post/2026-11-03-required-authentication/ "新 AI Gateway 强制认证"
+
+[S214]: https://developers.cloudflare.com/ai-gateway/configuration/authentication/ "AI Gateway 认证头与账户级 token 范围"
+
+[S215]: https://developers.cloudflare.com/changelog/post/2026-11-04-model-aliases/ "AI Gateway model aliases 发布"
+
+[S216]: https://developers.cloudflare.com/ai-gateway/features/routing/model-aliases/ "Model aliases 的路由与输入边界"
