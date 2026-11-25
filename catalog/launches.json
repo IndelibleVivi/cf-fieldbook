@@ -73,7 +73,7 @@
     "status": "public_beta",
     "access": "Workers Paid",
     "announced_on": "2026-10-01",
-    "verified_on": "2026-11-06",
+    "verified_on": "2026-11-26",
     "sources": [
       "S07",
       "S08",
@@ -87,7 +87,8 @@
         "candidate_dates": [
           "2026-10-14",
           "2026-10-15",
-          "2026-11-12"
+          "2026-11-12",
+          "2026-11-19"
         ]
       }
     ],
@@ -112,12 +113,37 @@
             "date": "2026-11-12",
             "source": "S08",
             "observed_on": "2026-11-06"
+          },
+          {
+            "date": "2026-11-19",
+            "source": "S08",
+            "observed_on": "2026-11-26"
           }
         ]
       }
     ],
-    "next_check": "11-12 是现价页给出的起点；与旧10-14/15公告未对齐，核对官方澄清与实际账单，不裁定历史收费",
-    "verification_scope": "S08_current_price_page_says_November_12; S07_blog_October_15_and_S135_changelog_October_14_remain; prior_S08_October_14_observation_retained; no_bill_readback"
+    "next_check": "现价页写 11-19 operations／storage 起算；与 10-14／15、11-12 记录并存，历史实际起算及仓库数量费日期待查",
+    "verification_scope": "S08_November_19_price_page_and_coming_repository_fee; S07_and_S135_dates_rechecked; no_bill_readback"
+  },
+  {
+    "id": "artifacts-repository-pricing",
+    "name": "Artifacts 仓库数量费",
+    "status": "announced",
+    "access": "Workers Paid；每月前 100,000 个包含，超额 $0.01／个",
+    "announced_on": null,
+    "verified_on": "2026-11-26",
+    "sources": [
+      "S08"
+    ],
+    "effective_events": [
+      {
+        "kind": "repository_billing_start",
+        "date": null
+      }
+    ],
+    "conflicts": [],
+    "next_check": "Cloudflare 会另通知起算日；与 operations／storage 计费分开",
+    "verification_scope": "future_public_repository_tariff_only; no_start_date_or_bill_readback"
   },
   {
     "id": "ai-search",
@@ -125,7 +151,7 @@
     "status": "ga",
     "access": "账号额度与模型条件分别检查",
     "announced_on": "2026-10-01",
-    "verified_on": "2026-11-06",
+    "verified_on": "2026-11-26",
     "sources": [
       "S09",
       "S10",
@@ -141,7 +167,7 @@
     ],
     "conflicts": [],
     "next_check": "12-01 延期后计费与实际同步设置；CJK、用量及质量分别验证",
-    "verification_scope": "11-02 official postponement and default sync change; existing price and CJK retain their recorded scope; no_bill_readback"
+    "verification_scope": "December_1_and_current_rates_allowances_confirmed_S10_S204; summary_charges_separate; no_bill_readback"
   },
   {
     "id": "clef",
@@ -388,7 +414,7 @@
     "status": "public_beta",
     "access": "Cloudflare Traces 与 SQL API 为 beta；dataset 与账号条件分别核对",
     "announced_on": "2026-10-02",
-    "verified_on": "2026-11-06",
+    "verified_on": "2026-11-26",
     "sources": [
       "S98",
       "S99",
@@ -417,8 +443,8 @@
       "guide.handbook",
       "report.2026-10-03"
     ],
-    "next_check": "12-01 transition and retained-data storage; example now matches $7.25; no account or bill acceptance",
-    "verification_scope": "S100_and_S111_rates_allowances_retention_transition_and_example_only; no_account_billing_verification"
+    "next_check": "12-01 按新方案读回计量；当前官方稳态算例为 $7.00，实际存储按日峰值计",
+    "verification_scope": "S100_S111_rates_allowances_transition_retention_daily_peak_and_new_example_only; no_account_billing_verification"
   },
   {
     "id": "pi-harness",
@@ -727,33 +753,43 @@
     "id": "clairic",
     "name": "Clairic 字段抽取",
     "status": "preview",
-    "access": "Workers AI；字段值与有限决策分开",
+    "access": "Workers AI 原选择器原位换 27B；独立 9B Flash；两者已发布权重，托管卡仍有 preview 措辞",
     "announced_on": "2026-10-19",
-    "verified_on": "2026-10-28",
+    "verified_on": "2026-11-26",
     "sources": [
       "S163",
       "S164",
-      "S165"
+      "S165",
+      "S235",
+      "S236",
+      "S237"
     ],
-    "effective_events": [],
+    "effective_events": [
+      {
+        "kind": "price_change",
+        "date": "2026-12-01"
+      }
+    ],
     "conflicts": [
       {
         "topic": "context_vs_pass",
         "claims": [
           {
             "value": "65,536-token context",
-            "source": "S164"
+            "source": "S164",
+            "observed_on": "2026-10-28"
           },
           {
             "value": "8,192-token pass beside state and fields",
-            "source": "S164"
+            "source": "S164",
+            "observed_on": "2026-10-28"
           }
         ],
-        "resolution": "同页关系未解释；保留疑点，短材料先测 truncated、尾部证据和实际 usage"
+        "resolution": "旧卡表述保留为历史观察；11-26 模型卡列 65,536，8,192 字样已移除并说明各 pass 计量。有效输入长度仍须实测。"
       }
     ],
-    "next_check": "澄清 context/pass、usage计量与输入完整性；preview质量需另测",
-    "verification_scope": "S164 price and unresolved 65536-context/8192-pass relationship only; no inference test"
+    "next_check": "12-01 Clairic 优惠结束；Flash 不变。用固定样本核对字段、尾部证据与每 pass 实际用量",
+    "verification_scope": "November_rollout_context_meter_promo_end_and_flash_price; no_inference_test"
   },
   {
     "id": "local-explorer-cron",
@@ -1350,14 +1386,15 @@
     "status": "released",
     "access": "Wrangler4.148.0+／cf beta.13+；应用链接另验",
     "announced_on": "2026-10-28",
-    "verified_on": "2026-11-06",
+    "verified_on": "2026-11-26",
     "sources": [
-      "S222"
+      "S222",
+      "S252"
     ],
     "effective_events": [],
     "conflicts": [],
     "next_check": "采用前核对具体版本、账户与当前机制；没有云端实测",
-    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+    "verification_scope": "Wrangler_and_cf_base_path_interface_rechecked; no_cloud_deployment"
   },
   {
     "id": "workers-builds-retention",
@@ -1462,6 +1499,232 @@
     "effective_events": [],
     "conflicts": [],
     "next_check": "采用前核对具体版本、账户与当前机制；没有云端实测",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "search-for-agents",
+    "name": "Search for Agents",
+    "status": "public_beta",
+    "access": "已接入域名；各计划；只索引预期公开内容",
+    "announced_on": "2026-11-25",
+    "verified_on": "2026-11-26",
+    "sources": [
+      "S230",
+      "S231"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核对索引范围、公开端点与撤下时效",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "ai-search-d1-source",
+    "name": "AI Search 的 D1 数据源",
+    "status": "public_beta",
+    "access": "同账户 D1；只读查询每行入索引",
+    "announced_on": "2026-11-12",
+    "verified_on": "2026-11-26",
+    "sources": [
+      "S232",
+      "S233"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核对查询列、行 ID、过滤和权限",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "ai-search-file-summaries",
+    "name": "AI Search 索引文件摘要",
+    "status": "released",
+    "access": "默认关闭；全量重建；独立 Workers AI 用量",
+    "announced_on": "2026-11-17",
+    "verified_on": "2026-11-26",
+    "sources": [
+      "S234",
+      "S10"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核对重建前配置和实际模型用量",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "pi-1-6",
+    "name": "Pi 1.6 工具挂起与唤醒",
+    "status": "released",
+    "access": "Agents SDK 0.34.0；已运行会话无法回退至 1.5",
+    "announced_on": "2026-11-20",
+    "verified_on": "2026-11-26",
+    "sources": [
+      "S238"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "验证唤醒重跑、外部动作幂等和向前迁移",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "per-workflow-concurrency",
+    "name": "Workflow 单条并发上限",
+    "status": "released",
+    "access": "部署保留 concurrency.limit；受账户上限约束",
+    "announced_on": "2026-11-10",
+    "verified_on": "2026-11-26",
+    "sources": [
+      "S239"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "检查积压与正在运行实例",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "do-runtime-storage-reliability",
+    "name": "DO runtime 更新与存储组",
+    "status": "released",
+    "access": "SQLite-backed DO 重置频率可能下降",
+    "announced_on": "2026-11-19",
+    "verified_on": "2026-11-26",
+    "sources": [
+      "S240"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "继续验证重连与补状态",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "workers-pages-version-retention",
+    "name": "Workers 版本与 Pages 部署保留期",
+    "status": "released",
+    "access": "30 天；最近 100 个与现有部署例外",
+    "announced_on": "2026-11-19",
+    "verified_on": "2026-11-26",
+    "sources": [
+      "S241",
+      "S242",
+      "S243"
+    ],
+    "effective_events": [
+      {
+        "kind": "retention_policy",
+        "date": "2026-11-19"
+      }
+    ],
+    "conflicts": [],
+    "next_check": "读回实际版本清单和可回滚目标",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "workers-preview-profiling",
+    "name": "Worker Previews CPU／heap profiling",
+    "status": "released",
+    "access": "按 Preview deployment 和 DO ID 区分",
+    "announced_on": "2026-11-23",
+    "verified_on": "2026-11-26",
+    "sources": [
+      "S244"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "使用相同负载对比版本",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "workers-do-spend-management",
+    "name": "Workers 与 DO 支出限制",
+    "status": "released",
+    "access": "每产品跨账户内应用；可单设告警",
+    "announced_on": "2026-11-13",
+    "verified_on": "2026-11-26",
+    "sources": [
+      "S245",
+      "S246"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核对暂停范围、排除项和计量延迟",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "cf-cli-1-0-rc",
+    "name": "Cloudflare CLI 1.0 release candidate",
+    "status": "released",
+    "access": "RC；Build Output v1",
+    "announced_on": "2026-11-17",
+    "verified_on": "2026-11-26",
+    "sources": [
+      "S247"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "核对项目锁定的工具与构建输出",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "cf-subscription-activation",
+    "name": "CF CLI 与 MCP 开通订阅",
+    "status": "released",
+    "access": "cf rc.5+ OAuth；MCP 有 elicitation 条件",
+    "announced_on": "2026-11-25",
+    "verified_on": "2026-11-26",
+    "sources": [
+      "S248"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "确认账户、费用及明确的订阅授权",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "workers-temporal-default",
+    "name": "Workers Temporal 默认值",
+    "status": "released",
+    "access": "compatibility date ≥ 2026-12-01；可用 temporal／no_temporal",
+    "announced_on": null,
+    "verified_on": "2026-11-26",
+    "sources": [
+      "S249"
+    ],
+    "effective_events": [
+      {
+        "kind": "compatibility_default",
+        "date": "2026-12-01"
+      }
+    ],
+    "conflicts": [],
+    "next_check": "核对具体 Worker flags 与日期处理",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "artifacts-local-development",
+    "name": "Artifacts 本地开发",
+    "status": "released",
+    "access": "本地模拟 repo；remote=true 可选",
+    "announced_on": "2026-11-16",
+    "verified_on": "2026-11-26",
+    "sources": [
+      "S250"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "确认 binding 模式和外部 import 的网络边界",
+    "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
+  },
+  {
+    "id": "browser-local-quick-actions",
+    "name": "Browser Run 本地 Quick Actions",
+    "status": "released",
+    "access": "Wrangler dev；json 仅占位，无 Kitesurf",
+    "announced_on": "2026-11-13",
+    "verified_on": "2026-11-26",
+    "sources": [
+      "S251"
+    ],
+    "effective_events": [],
+    "conflicts": [],
+    "next_check": "使用真实执行另验抽取质量",
     "verification_scope": "targeted_public_sources_only; no_account_or_runtime_execution"
   }
 ]

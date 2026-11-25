@@ -1,20 +1,32 @@
 ---
 title: 自己的材料，还是互联网上的新信息
 subtitle: AI Search、Vectorize 与 Web Search API 分别搜什么
-source_cutoff: 2026-11-06
+source_cutoff: 2026-11-26
 ---
 
 # 自己的材料，还是互联网上的新信息
 
 问“这三份资料哪份写了撤下规则”，证据在自己持有的集合；问“今天官方更新了什么”，证据在当前互联网。先确定需要哪一边，才选择检索入口。网页搜索不会因同属 Cloudflare 就读取私有 R2 内容。
 
-2026-11-06 定向复核 AI Search 计费延期与默认同步间隔；10 月 20 日的 CJK 关键词、索引限制和计费构成，以及 10 月 13 日的 SDK 搜索、读页与流式转换范围保留。Vectorize 及下方互联网 provider 价格／保留表仍按 2026-10-03 阅读，没有检索质量 benchmark。
+2026-11-26 定向查阅公开站点搜索、D1 数据源、文件摘要与 AI Search 计价；CJK、Vectorize 与下方互联网 provider 保留各自原核验范围，未做检索质量 benchmark。
 
 ## 让自己的集合回到原件
 
 AI Search 管一部分摄取、分块与检索，Vectorize 适合由应用自己安排管线。权限、版本、撤下状态与回读原文仍属于应用；索引只帮助找到候选。现有[手册的检索章节](../guides/handbook.md#retrieval)说明两条路线。[S09] [S10] [S40]
 
 AI Search 的默认同步间隔由 6 小时改为 **24 小时**；实例设置或 API 的 `sync_interval` 仍可选 15 分钟至 24 小时。资料更新后暂时搜不到时，除了检查入库、分块与索引状态，还要核对实际同步间隔。这是默认值变化，不证明既有实例都已改用新值。[S204]
+
+## 网站公开搜索与私有集合
+
+Search for Agents 是面向已接入域名的各计划 beta。启用后建立网站索引与 `/.well-known/search`，GET 的 `q` 或 HTTP QUERY 返回带来源的 Markdown 检索片段。默认沿 sitemap 与链接发现、不开子域、24 小时同步，hybrid 检索的相似查询缓存默认可留 48 小时。只索引预期公开的内容，撤下后用同一个问题检查端点何时停止返回旧片段；私有集合应保留应用自己的权限判断与原文回读。[S230] [S231]
+
+### D1 每行入索引，先约定身份和输出列
+
+AI Search 的 D1 数据源 beta 接受一条只读查询，每行成为一份文档。它需要唯一、非空、类型一致的 `id`，结果最多 100,000 行，由服务按 ID 分页。REST 或 binding 需要同账户 D1 和 service API token ID。先检查返回列及读取权限，尤其是加入 `content` 或 `meta_*` 的字段；数据库可读权限和检索结果的访问权限分别确认。[S232] [S233]
+
+### 文件摘要要算重建与模型费用
+
+`indexing_options.file_summary` 默认关闭，适用于至少三块的文本文件；生成摘要和关键词进入 item `context`，保留已有值，主题加入 chunk header。切换会全量重建。更新时回传其余 `indexing_options`，否则会恢复那些选项的默认值。摘要模型调用通过实例 AI Gateway（缺省走 `default`），按 Workers AI 用量另计。[S234] [S10]
 
 ## 中文明明在原文里，为什么搜不到
 
@@ -82,7 +94,7 @@ const results = await response.json();
 
 ## 计费前，先数分块后的 tokens
 
-11 月 6 日复看 S10 的计量方式与延期后的价格，公布查询单价与包含量未变。摄取按最终入索引的 chunks 用 `cl100k_base` 计数，overlap 重复的文字在每个 chunk 都计入；不能拿原文件字数直接当账单。OCR 提取文字同时计基础与 image processing 摄取，图片处理量共用每月 5M tokens 包含量。[S204] [S10]
+11 月 26 日复看 S10 的计量方式与 12 月 1 日起的价格，公布查询单价与包含量未变。摄取按最终入索引的 chunks 用 `cl100k_base` 计数，overlap 重复的文字在每个 chunk 都计入；不能拿原文件字数直接当账单。OCR 提取文字同时计基础与 image processing 摄取，图片处理量共用每月 5M tokens 包含量。[S204] [S10]
 
 每账户每月包含 10 GB-month 存储、1,000 semantic 和 1,000 full-text 查询；内部 Workers AI embedding／reranking 不另记模型账单，生成、query rewriting 和外部模型仍分别计费。旧网站抓取专用 R2 bucket 现已不再写入，但残留对象仍可能计 R2 存储；删除前先核对是否仍需要，不因新索引正常就清理所有旧对象。[S10]
 
@@ -124,3 +136,9 @@ const results = await response.json();
 [S161]: https://developers.cloudflare.com/changelog/post/2026-10-16-cjk-keyword-search/ "AI Search 中日韩关键词查询修复"
 
 [S162]: https://developers.cloudflare.com/ai-search/configuration/indexing/keyword-search/ "AI Search keyword tokenizer、匹配模式与索引限制"
+
+[S230]: https://developers.cloudflare.com/changelog/post/2026-11-25-search-for-agents/ "Search for Agents 公告"
+[S231]: https://developers.cloudflare.com/ai-search/how-to/search-for-agents/ "Search for Agents 入口、索引默认值与公开边界"
+[S232]: https://developers.cloudflare.com/changelog/post/2026-11-12-d1-data-source/ "AI Search 的 D1 数据源 beta 公告"
+[S233]: https://developers.cloudflare.com/ai-search/configuration/data-source/d1/ "D1 数据源查询、身份与结果列"
+[S234]: https://developers.cloudflare.com/changelog/post/2026-11-17-file-summaries/ "AI Search 文件摘要、重建与独立计费"

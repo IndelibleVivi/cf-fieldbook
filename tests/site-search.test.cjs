@@ -228,3 +228,23 @@ test('November questions find current dates, migration and retry limits', () => 
   assert.match(first('DO 自动重试会重复执行吗').text, /应用抛错|overloaded/);
   assert.match(first('Pi parked 不见了').text, /1\.4.*读取|1\.4.*移除/s);
 });
+
+test('late November questions reach public search, runtime, retention and costs', () => {
+  const cases = [
+    ['怎么让 AI 搜我的网站', 'services/search.html#', /\.well-known\/search/],
+    ['D1 怎么接 AI Search', 'services/search.html#', /100,000 行/],
+    ['AI Search 文件摘要怎么收费', 'services/search.html#', /按 Workers AI 用量另计/],
+    ['Clairic 12月怎么收费', 'services/decision-models.html#', /\$0\.24.*Clairic-flash.*\$0\.10/s],
+    ['Pi 工具怎么等用户批准', 'services/agent-runtime.html#', /harness\.signal\(\).*重新运行工具/s],
+    ['Workers 旧版本保留多久', 'reports/2026-11-26.html#', /30 天.*100.*Version URL/s],
+    ['Pages 旧部署保留多久', 'guides/handbook.html#', /Pages deployments.*30 天.*100/s],
+    ['Workers 怎么设支出上限', 'reference/implementation.html#', /Billing.*Spend Management.*阻断/s],
+    ['Observability 75 GB 要多少钱', 'services/observability.html#', /17\.5 GB-month.*\$7\.00/s],
+  ];
+  for (const [query, prefix, answer] of cases) {
+    const item = first(query);
+    assert.ok(item.url.startsWith(prefix), `${query}: ${item.url}`);
+    assert.match(item.text, answer);
+    assert.deepEqual(search(index, query + ' 未存在的条件987'), []);
+  }
+});

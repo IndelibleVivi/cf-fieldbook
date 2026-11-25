@@ -2,8 +2,8 @@
 title: Cloudflare 个人基础设施实践手册
 subtitle: 从一个入口到可恢复的应用与自动化
 edition: 2026.10 · 持续阅读修订
-source_cutoff: 2026-11-06
-observability_as_of: 2026-11-06
+source_cutoff: 2026-11-26
+observability_as_of: 2026-11-26
 presentation_revision: 4
 author: Faye & Cove
 github: https://github.com/IndelibleVivi
@@ -329,7 +329,9 @@ Workflows 当前 Paid 包含每月 50 万步骤与 1 GB·月状态，步骤和�
 
 ### 托管检索与自己的管线
 
-AI Search 可以接管一部分摄取、分块、索引和检索；Workers AI 加 Vectorize 则让应用自己安排这些环节。前者省维护，后者留下更多可修改的接口。两者都应先接受同一组真实问题的检验。[S09] [S10] [S40] [S41]
+AI Search 可以接管一部分摄取、分块、索引和检索；Workers AI 加 Vectorize 则让应用自己安排这些环节。两条路线都先用同一组问题验证原文命中和更新时效。[S09] [S10] [S40] [S41]
+
+Search for Agents 可为公开站点创建索引和 `/.well-known/search`，返回带来源的 Markdown 片段；检查索引范围与缓存，私有材料继续由应用把身份约束带进检索。AI Search 的 D1 beta 可把只读查询的每一行变成一份文档，保留稳定 ID 并审阅输出列。可选文件摘要会触发全量重建，并另计 Workers AI 用量。默认值和请求条件见[检索页](../services/search.md#网站公开搜索与私有集合)。[S230] [S231] [S232] [S233] [S234]
 
 准备一组小集合：精确术语、同义改写、模糊描述、旧名称、没有答案的问题，以及不该返回的内容。记录已知答案在哪里，不只挑五个漂亮结果展示。
 
@@ -406,9 +408,9 @@ Clef、Clef-flash、Clef-omni 与 Jev 都有 Cloudflare 接入路线；Clef 家�
 
 ### 字段抽取与有限决策分开选择
 
-Clairic 的 preview 接收材料与字段定义，输出编号、日期、数值、列表或可定位原文；不必先枚举所有答案。它适合把合成部署通知整理成版本、时间、错误代码，再交给后续判断。输入价 $0.10／M，无生成输出 token 费；缺失值、截断、原文位置与 confidence 仍须逐项核对。[S163] [S164]
+Clairic 与 Clairic-flash 接收材料和字段定义，可从合成部署通知抽取版本、时间、错误代码与可定位原文。原 Clairic 选择器在 11 月原位换到 27B，独立 Flash 为 9B。两者目前为 $0.10／M 输入 tokens，12 月 1 日起只有 Clairic 变为 **$0.24／M**；两者无输出 token 费。[S235] [S237]
 
-模型卡的 65,536-token context 与参数中的 8,192-token pass 目前关系不明；字段分 pass 后实际费用应看返回用量。短材料试验与完整疑点放在[模型页](../services/decision-models.md)。复杂语义解释继续使用适合的生成模型，不能只因 typed value 合法就认定内容成立。[S164]
+当前卡片列 65,536 tokens，每个 pass 重计整份材料与图片，文本仍可能被截断。用[模型页](../services/decision-models.md)的短材料验证尾部证据、缺失值、原文位置和实际用量；复杂语义解释继续用适合的生成路线。[S164] [S236]
 
 ### “缓存命中”究竟复用了什么
 
@@ -444,7 +446,9 @@ Clef 系列适合分类、筛选和下一步建议，不一定要为一个小判
 
 如果资料更新任务读到一半进程重启，要保留的是对话、未完成工作与下一步；如果工具要跑系统命令，需要的是执行环境。这两份状态不能靠一张磁盘快照代替。PiHarness 把 Pi 的 loop、transcript 和 inbox 接入 DO SQLite，由 Agents Lifecycle 在有未完成工作时唤醒；Containers / Sandbox 仍承担需要 Linux 的工具环境。[S105]
 
-PiHarness 为 beta，Pi Durable 为 experimental。官方工具示例的 `replay: "safe"` 用在无副作用的字数统计，不能推导邮件、付款或发布都可随意重放。把它和第 6 章的[未知结果](#结果未知应该有一个明确位置)一起读，再看[agent 运行分工](../services/agent-runtime.md)，选择是否研究这条实现，而不是因新 SDK 自动迁移。[S104]
+PiHarness 为 beta，Pi Durable 为 experimental。官方工具示例的 `replay: "safe"` 用于无副作用的字数统计；邮件、付款和发布要有独立的回执与结果核对。[S104]
+
+Pi 1.6 可把工具停在审批、信号或期限上，让 DO 休眠；唤醒会重新进入工具，确定已有提问或动作的回执后再继续。已运行会话不能由 1.5 接续。单条 Workflow 另可声明 `concurrency.limit`，降低上限不会中断已有实例，配置须随每次部署保留。详见[运行时页](../services/agent-runtime.md#pi-16工具挂起与唤醒)和[实施参考](../reference/implementation.md#workflow-的并发上限)。[S238] [S239]
 
 Agents SDK **0.33.0**／Pi **1.5** 默认将流式进度在最多约 1 秒内批量保存，崩溃可能丢失该窗口。`session.watch()` 替代 events，idle session 可 `continue()`；旧 `parked`／`retry()` 移除，反复中断任务达到 restart limit 后结束。1.5 会话不能由 1.4 读取，升级前确认存储与向前修复安排，不能只准备旧代码回滚。[S209] [S105]
 
@@ -522,7 +526,11 @@ Wrangler **4.150.0+** 默认生成并上传 source maps；`cf deploy` 也默认�
 
 11 月 17 日两项新默认值仅在 `compatibility_date >= 2026-11-17` 时应用：JavaScript Worker 的新 module registry，以及客户端断开时的 `request.signal`。检查 top-level await／import attributes，并显式传递 signal 给可取消操作；保留原日期不会自动切换，`request_signal_passthrough` 也未随之启用。[S217] [S218]
 
-Workers Builds 的构建与日志保留 **90 天**，versions／deployments 继续保留；需要长期证据时另行导出。Static Assets 可用 `assets.base_path` 挂 URL 前缀，仍须验证链接、原文下载和 404；本书资料架继续根路径发布，未改实际模板。[S223] [S222]
+### Workers 与 Pages 版本保留
+
+Workers Builds 的构建与日志保留 **90 天**。Workers versions 和 Pages deployments 分别保留 **30 天**、最近 **100** 个以及当前部署。被清理的单次 URL 或 Worker Version URL alias 会失效。分支预览可以看当前部署，需要回看某次结果时另外保存对应的 commit、构建产物和验收数据。[S223] [S241] [S242] [S243]
+
+Static Assets 可用 `assets.base_path` 挂 URL 前缀，验证链接、原文下载和 404；资料架示例继续用根路径配置。[S222] [S252]
 
 ### 预览也会使用真实资源
 
@@ -581,7 +589,7 @@ R2 Standard 的标价为 $0.015 / GB-month、Class A $4.50 / 百万次、Class B
 ### Observability：当前与已公布的费用分开读
 
 <!-- facts: observability-costs -->
-固定资料日期：**2026-11-06**。
+固定资料日期：**2026-11-26**。
 
 | 条款 | Free | Paid |
 |---|---|---|
@@ -589,7 +597,7 @@ R2 Standard 的标价为 $0.015 / GB-month、Class A $4.50 / 百万次、Class B
 | 已公布；将在 2026-12-01 生效 [S100] | 0.5 GB 摄取 / 日；7 天 | 50 GB 摄取 + 10 GB-month / billing cycle；超出 $0.25 / GB + $0.10 / GB-month |
 <!-- /facts -->
 
-上表共用 [费用记录](../catalog/observability-pricing.json)与[生效事件](../catalog/launches.json)，固定资料日期为 10 月 28 日。Paid 存储包含量仍为 **10 GB-month**，生效日仍为 **12 月 1 日**，官方算例已对齐存储 $1.00／总额 $7.25。此前用量不追溯收费，但当天仍可查询的旧数据开始计入存储；摄取与存储量分别使用。Log Explorer dataset 不消费共享包含量；Enterprise 在合同续约时迁移。[S100]
+上表共用 [费用记录](../catalog/observability-pricing.json)与[生效事件](../catalog/launches.json)，本次费用复核于 **11 月 26 日**。Paid 包含 **10 GB-month**，12 月 1 日起仍可查询的旧数据会计入存储，摄取与存储分别使用。现价页对均匀摄取 75 GB、保留 7 天估算 17.5 GB-month，超量合计 **$7.00**。Log Explorer dataset 与 Enterprise 合同各有计费条件，见[观测费用说明](../services/observability.md#费用当前适用与将来生效)。[S100]
 
 ### 给每次实验记一笔小账
 
@@ -599,9 +607,11 @@ R2 Standard 的标价为 $0.015 / GB-month、Class A $4.50 / 百万次、Class B
 
 ### 免费也有三种含义
 
-免费计划可能在达到上限后停止；Paid 包含量之外可能继续计费；beta 免费可能有未来起算日。11 月 6 日复看时，Artifacts 价格页写 **11 月 12 日**起算，旧 changelog 写 10 月 14 日、博客写 15 日；三处尚未对齐，不再笼统认定已经进入计费期。按现行单价预留预算，实际起算与历史用量未核验。AI Search 已明确延期至 **12 月 1 日**，也不能沿旧日期推定收费。[S07] [S08] [S135] [S204] [S10]
+免费计划可能达到上限后停止接收请求，Paid 超出包含量后可能继续计费。11 月 26 日复看时，Artifacts 现价页写 **11 月 19 日**开始计操作和存储，旧记录有 10 月 14／15 日与 11 月 12 日；真实历史起算仍待核对。AI Search 公布起算日为 **12 月 1 日**。[S07] [S08] [S135] [S204] [S10]
 
-Artifacts 限 Workers Paid，每月含 10,000 operations 与 1 GB 存储；超额分别为 $0.15／1,000 operations 与 $0.50／GB-month。仓库保留会继续计入存储，不能只统计任务活跃时长；这里给出公开计价单位，没有实际账户账单测量。[S08]
+Workers、DO 各有账户级 spend limit。告警让业务继续跑，阻断可能暂停同账户其他应用依赖的操作；计量延迟和不在限额内的费用仍需预留。使用 CLI／MCP 开通订阅属于独立的付费决定，先由账户所有者核对价格、账号和授权。[S245] [S246] [S248]
+
+Artifacts 限 Workers Paid，每月含 10,000 operations 与 1 GB 存储，超额分别 $0.15／1,000 operations 与 $0.50／GB-month。任务停止后仍保存的 repo 继续占用存储。仓库数量费写为未来条款，公布每月含前 100,000 个、超额 $0.01／个，起算日尚未公布。[S08]
 
 普通 KV 与 KV Instant 也不能混看。后者面向特殊读重型负载，写入、删除、列举每次 $0.10，存储每 MB·月 $100，不适合作为普通个人状态库的默认选项。[S42] [S25]
 
@@ -674,6 +684,8 @@ Artifacts 限 Workers Paid，每月含 10,000 operations 与 1 GB 存储；超�
 这里的检查分为资料与示例的本地验证、实际云端验证两类。本包包含前者，不包含账户登录、部署、迁移或模型实测。新的实践结果应按自己的输入、版本和范围补充，不无声地改写旧期判断。
 
 <!-- SOURCES -->
+
+**2026-11-26 定向更新。** 公开站点搜索、D1 数据源与摘要成本、Clairic 原位更新、Pi 1.6 与 Workflow 并发、版本保留和支出控制接回对应章节。观测费用单独复核，更新储存估算。见[当期观察](../reports/2026-11-26.md)。
 
 ## 来源索引
 
@@ -949,3 +961,21 @@ GitHub：[github.com/IndelibleVivi](https://github.com/IndelibleVivi)
 [S226]: https://blog.cloudflare.com/private-origins-public-to-private/ "Private origins public-to-private GA 公告"
 
 [S227]: https://developers.cloudflare.com/dns/private-origins/ "Private origins 账户、网络与当前限制"
+
+[S230]: https://developers.cloudflare.com/changelog/post/2026-11-25-search-for-agents/ "Search for Agents 公告"
+[S231]: https://developers.cloudflare.com/ai-search/how-to/search-for-agents/ "Search for Agents 入口、索引默认值与公开边界"
+[S232]: https://developers.cloudflare.com/changelog/post/2026-11-12-d1-data-source/ "AI Search 的 D1 数据源 beta 公告"
+[S233]: https://developers.cloudflare.com/ai-search/configuration/data-source/d1/ "D1 数据源查询、身份与结果列"
+[S234]: https://developers.cloudflare.com/changelog/post/2026-11-17-file-summaries/ "AI Search 文件摘要、重建与独立计费"
+[S235]: https://blog.cloudflare.com/open-clairic/ "Clairic 原位更新、Flash、开放权重与优惠"
+[S236]: https://developers.cloudflare.com/workers-ai/models/clairic-flash/ "Clairic-flash 模型卡与输入计量"
+[S237]: https://developers.cloudflare.com/workers-ai/platform/pricing/ "Workers AI 的 Clairic 系列价格与优惠终止"
+[S238]: https://developers.cloudflare.com/changelog/post/2026-11-20-pi-harness-pi-1-6/ "Agents SDK 0.34.0 与 Pi 1.6 挂起、信号及迁移"
+[S239]: https://developers.cloudflare.com/changelog/post/2026-11-10-per-workflow-concurrency-limits/ "单条 Workflow 的并发上限"
+[S241]: https://developers.cloudflare.com/changelog/post/2026-11-19-workers-pages-version-retention/ "Workers 版本与 Pages 部署保留期公告"
+[S242]: https://developers.cloudflare.com/workers/versions-and-deployments/#version-retention "Workers 版本保留、Version URL 与回滚范围"
+[S243]: https://developers.cloudflare.com/pages/platform/limits/#deployments "Pages 部署保留与回滚范围"
+[S245]: https://developers.cloudflare.com/changelog/post/2026-11-13-spend-management/ "Workers 和 DO 的 spend limits 公告"
+[S246]: https://developers.cloudflare.com/billing/manage/spend-management/ "支出限制的阻断范围及计量排除项"
+[S248]: https://developers.cloudflare.com/changelog/post/2026-11-25-activate-pay-as-you-go-cli-mcp/ "CLI 与 MCP 可开通 Cloudflare 订阅"
+[S252]: https://developers.cloudflare.com/changelog/post/2026-11-11-static-assets-base-path/ "Static Assets 路径前缀与 CLI 版本"

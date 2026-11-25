@@ -51,7 +51,7 @@
     "id": "S07",
     "title": "Artifacts 公开测试发布",
     "url": "https://blog.cloudflare.com/next-git-platform-on-cloudflare/",
-    "accessed": "2026-11-06",
+    "accessed": "2026-11-26",
     "kind": "official_primary",
     "verification_scope": "stated_October_15_billing_date_only; no_bill_verification"
   },
@@ -59,9 +59,9 @@
     "id": "S08",
     "title": "Artifacts 价格",
     "url": "https://developers.cloudflare.com/artifacts/platform/pricing/",
-    "accessed": "2026-11-06",
+    "accessed": "2026-11-26",
     "kind": "official_primary",
-    "verification_scope": "current_pricing_page_November_12_billing_date_and_operations_storage_prices_only; conflicts_with_old_launches_retained; no_bill_readback"
+    "verification_scope": "current_November_19_date_operations_storage_and_future_repository_tariff; earlier_claims_retained; no_bill_readback"
   },
   {
     "id": "S09",
@@ -75,9 +75,9 @@
     "id": "S10",
     "title": "AI Search 限制与价格",
     "url": "https://developers.cloudflare.com/ai-search/platform/limits-pricing/",
-    "accessed": "2026-11-06",
+    "accessed": "2026-11-26",
     "kind": "official_primary",
-    "verification_scope": "billing_start_rates_allowances_instance_metering_chunk_OCR_and_legacy_bucket_only; CJK_provider_SDK_not_rechecked"
+    "verification_scope": "December_1_rates_allowances_and_separate_file_summary_usage; no_bill_readback_or_CJK_retest"
   },
   {
     "id": "S11",
@@ -779,9 +779,9 @@
     "id": "S100",
     "title": "Cloudflare Observability 价格",
     "url": "https://developers.cloudflare.com/observability/pricing/",
-    "accessed": "2026-11-06",
+    "accessed": "2026-11-26",
     "kind": "official_primary",
-    "verification_scope": "current_and_December_plan_terms_meters_retention_transition_and_corrected_example_only; no_bill_readback"
+    "verification_scope": "rates_allowances_retention_transition_daily_peak_and_steady_state_example_only; no_bill_readback"
   },
   {
     "id": "S101",
@@ -867,9 +867,9 @@
     "id": "S111",
     "title": "Workers Logs 迁移前计费",
     "url": "https://developers.cloudflare.com/workers/platform/pricing/",
-    "accessed": "2026-11-06",
+    "accessed": "2026-11-26",
     "kind": "official_primary",
-    "verification_scope": "Workers_Logs_events_price_retention_and_December_transition_only; other_Workers_prices_not_rechecked"
+    "verification_scope": "Workers_Logs_rates_retention_and_transition_only; other_Workers_prices_not_rechecked"
   },
   {
     "id": "S112",
@@ -1067,7 +1067,7 @@
     "id": "S135",
     "title": "Artifacts open beta 与计费起算公告",
     "url": "https://developers.cloudflare.com/changelog/post/2026-10-01-artifacts-open-beta/",
-    "accessed": "2026-11-06",
+    "accessed": "2026-11-26",
     "kind": "official_primary",
     "verification_scope": "stated_October_14_billing_date_only; current_price_page_disagrees; no_bill_readback",
     "published_on": "2026-10-01"
@@ -1293,9 +1293,9 @@
     "id": "S164",
     "title": "Clairic 模型卡、输入字段与上下文说明",
     "url": "https://developers.cloudflare.com/workers-ai/models/clairic/",
-    "accessed": "2026-10-28",
+    "accessed": "2026-11-26",
     "kind": "official_primary",
-    "verification_scope": "targeted_price_context_and_pass_ambiguity_only; no_model_execution"
+    "verification_scope": "November_model_card_context_pass_meter_and_promotional_pricing; old_8192_reference_absent; no_inference_test"
   },
   {
     "id": "S165",
@@ -1642,9 +1642,9 @@
     "id": "S204",
     "title": "AI Search 计费延期与默认同步间隔变更",
     "url": "https://developers.cloudflare.com/changelog/post/2026-11-02-billing-postponed-default-sync-interval/",
-    "accessed": "2026-11-06",
+    "accessed": "2026-11-26",
     "kind": "official_primary",
-    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "verification_scope": "December_1_postponement_and_sync_default_only; no_instance_or_bill_readback",
     "published_on": "2026-11-02"
   },
   {
@@ -1865,5 +1865,204 @@
     "kind": "official_primary",
     "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
     "published_on": "2026-11-02"
+  },
+  {
+    "id": "S230",
+    "title": "Search for Agents 公告",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-25-search-for-agents/",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-25"
+  },
+  {
+    "id": "S231",
+    "title": "Search for Agents 入口、索引默认值与公开边界",
+    "url": "https://developers.cloudflare.com/ai-search/how-to/search-for-agents/",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification"
+  },
+  {
+    "id": "S232",
+    "title": "AI Search 的 D1 数据源 beta 公告",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-12-d1-data-source/",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-12"
+  },
+  {
+    "id": "S233",
+    "title": "D1 数据源查询、身份与结果列",
+    "url": "https://developers.cloudflare.com/ai-search/configuration/data-source/d1/",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification"
+  },
+  {
+    "id": "S234",
+    "title": "AI Search 文件摘要、重建与独立计费",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-17-file-summaries/",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-17"
+  },
+  {
+    "id": "S235",
+    "title": "Clairic 原位更新、Flash、开放权重与优惠",
+    "url": "https://blog.cloudflare.com/open-clairic/",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-18"
+  },
+  {
+    "id": "S236",
+    "title": "Clairic-flash 模型卡与输入计量",
+    "url": "https://developers.cloudflare.com/workers-ai/models/clairic-flash/",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification"
+  },
+  {
+    "id": "S237",
+    "title": "Workers AI 的 Clairic 系列价格与优惠终止",
+    "url": "https://developers.cloudflare.com/workers-ai/platform/pricing/",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "Clairic_and_Clairic_flash_unit_rates_and_promo_end_only; other_model_rates_not_rechecked"
+  },
+  {
+    "id": "S238",
+    "title": "Agents SDK 0.34.0 与 Pi 1.6 挂起、信号及迁移",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-20-pi-harness-pi-1-6/",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-20"
+  },
+  {
+    "id": "S239",
+    "title": "单条 Workflow 的并发上限",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-10-per-workflow-concurrency-limits/",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-10"
+  },
+  {
+    "id": "S240",
+    "title": "DO runtime 更新时的存储组调整",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-19-durable-objects-runtime-update-reliability/",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-19"
+  },
+  {
+    "id": "S241",
+    "title": "Workers 版本与 Pages 部署保留期公告",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-19-workers-pages-version-retention/",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-19"
+  },
+  {
+    "id": "S242",
+    "title": "Workers 版本保留、Version URL 与回滚范围",
+    "url": "https://developers.cloudflare.com/workers/versions-and-deployments/#version-retention",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification"
+  },
+  {
+    "id": "S243",
+    "title": "Pages 部署保留与回滚范围",
+    "url": "https://developers.cloudflare.com/pages/platform/limits/#deployments",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification"
+  },
+  {
+    "id": "S244",
+    "title": "Worker Previews 的 CPU 与 heap profiling",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-23-previews-profiling/",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-23"
+  },
+  {
+    "id": "S245",
+    "title": "Workers 和 DO 的 spend limits 公告",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-13-spend-management/",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-13"
+  },
+  {
+    "id": "S246",
+    "title": "支出限制的阻断范围及计量排除项",
+    "url": "https://developers.cloudflare.com/billing/manage/spend-management/",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification"
+  },
+  {
+    "id": "S247",
+    "title": "Cloudflare CLI 1.0 RC 与 Build Output v1",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-17-release-candidate/",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-17"
+  },
+  {
+    "id": "S248",
+    "title": "CLI 与 MCP 可开通 Cloudflare 订阅",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-25-activate-pay-as-you-go-cli-mcp/",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-25"
+  },
+  {
+    "id": "S249",
+    "title": "Workers Temporal compatibility flag",
+    "url": "https://developers.cloudflare.com/workers/configuration/compatibility-flags/#enable-the-temporal-api",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification"
+  },
+  {
+    "id": "S250",
+    "title": "Artifacts 本地模拟器与远端绑定",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-16-local-artifacts-development/",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-16"
+  },
+  {
+    "id": "S251",
+    "title": "Browser Run Quick Actions 本地模式与占位输出",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-13-quick-actions-local-dev/",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-13"
+  },
+  {
+    "id": "S252",
+    "title": "Static Assets 路径前缀与 CLI 版本",
+    "url": "https://developers.cloudflare.com/changelog/post/2026-11-11-static-assets-base-path/",
+    "accessed": "2026-11-26",
+    "kind": "official_primary",
+    "verification_scope": "targeted_public_document_consulted; no_account_or_live_cloud_model_or_billing_verification",
+    "published_on": "2026-11-11"
   }
 ]

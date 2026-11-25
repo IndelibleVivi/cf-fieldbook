@@ -1,6 +1,9 @@
 # 当前状态
 
-2026-11-06 · [公共源码](https://github.com/IndelibleVivi/cf-fieldbook)，默认分支 `main`。
+2026-11-26 · [公共源码](https://github.com/IndelibleVivi/cf-fieldbook)，默认分支 `main`。
+
+- [11 月 26 日观察](../reports/2026-11-26.md)定向吸收 11-06 至 11-25 的官方变更：网站公开搜索与 D1 来源、AI Search 文件摘要、Clairic 原位升级与 Flash、Pi 1.6 等待与迁移、Workflow 并发、Workers／Pages 版本保留、支出限制及 CLI／MCP 订阅条件。新增 S230–S252，手册／专题资料上界、阅读入口与分享卡同步。页面部署沿既有 GitHub Pages workflow，结果见 [Actions](https://github.com/IndelibleVivi/cf-fieldbook/actions)。
+- 11-26 复看公开费用页。12-01 的 AI Search 起算和 Observability 切换仍按原条款；Observability 补每日可查询数据峰值算法，75 GB 稳态摄取示例为 $7.00。Clairic 同日结束优惠、Flash 维持公布单价。Artifacts 现价页写 11-19，早期字段保留，历史实际起算未知。无新云端、模型、账单或 PDF 验收。
 
 - [11 月 6 日观察](../reports/2026-11-06.md)定向吸收 10-28 至 11-05 的官方变化：AI Search 收费延期与同步节奏、Pi 1.5／Browser 取消、Skills 文件迁移、DO 代码延迟与自动重试、Gateway 强制认证与 alias、D1 50 MB 结果、compatibility 默认值及私网／发布条件。新增 S204–S229，当前手册／专题资料上界与分享卡同步；模型价格、未复查条款、历史报告和冻结 PDF 不改。
 - AI Search 的登记计费日改为 12-01；11-17 的 module registry／request.signal 默认值只对相应 compatibility date 生效。Private origins 的 GA 公告与机制文档 beta 标题并存，账户与路由前提保留；没有新 SDK 安装、schema 迁移、模型／账单／云端实验或 PDF Release。静态阅读站沿现有 main workflow 更新，实际结果以 [Actions](https://github.com/IndelibleVivi/cf-fieldbook/actions)为准。
@@ -17,7 +20,7 @@
 - 新手册候选 `handbook-20261026-r2` 已生成 Markdown／HTML／31 页 PDF，并通过身份、链接、字体、Poppler 与 macOS PDFKit 的全页渲染复看，以及 Preview 新正文检查。未做 iPhone／微信验收，没有登记为 Release 或当前 PDF 下载；旧 r4、增补与 `dist/` 保留。正式上传和真实读者观察仍是独立后续。
 
 - [10 月 20 日观察](../reports/2026-10-20.md)纳入费用修正、中文关键词检索、Clairic typed extraction、Browser／MCP、出站控制与四项运维条件。新增[云 API 与 HTTP 出站控制](../services/egress-controls.md)和 Gateway Forward 流程图，当时资料上界为 10-20；旧事实核验范围与原复核期限分别保留。
-- 10 月 20 日 Observability 包含量改为 10 GB-month，解决旧 12／10 冲突；当时未修正的官方算例在 10-28 复看时已对齐。Artifacts 公开计费期已到；没有实际账单、账号、模型或云端运行验收。
+- 10 月 20 日 Observability 包含量改为 10 GB-month，解决旧 12／10 冲突；当时未修正的官方算例在 10-28 复看时已对齐。当时按公开资料判断 Artifacts 已进入计费期；之后价格页日期改写，当前保留历史实际起算未知。没有实际账单、账号、模型或云端运行验收。
 - 新报告是独立条目，原 10-02／03／13 报告、首发编排、`dist/` 与已冻结 PDF 不覆盖。手册／专题的网页、版本身份与分享卡同步资料上界；原三册没有重出；另将三册之后的更新编成[独立增补](../reports/2026-10-update-supplement.md)，完成 14 页本地 PDF 候选、文字／链接与 Poppler／macOS 原生正文检查，没有新 Release。站点沿既有 main workflow 发布，具体运行结果见 [Actions](https://github.com/IndelibleVivi/cf-fieldbook/actions)。
 - [10 月 13 日更新](../reports/2026-10-13.md)由 [PR #1](https://github.com/IndelibleVivi/cf-fieldbook/pull/1)合入：来源传播补齐 JSON `source` 单值，`sync/check` 继续只处理登记事实块，表外条件须编辑复查；`due` 仍只查复核日，较粗的 launches 依赖本轮人工筛选，没有扩建维护系统。
 

@@ -1,7 +1,7 @@
 ---
 title: 用程序维护 Cloudflare 资源
 subtitle: 选择调用入口，取得完整结果，再判断变更是否完成
-source_cutoff: 2026-11-06
+source_cutoff: 2026-11-26
 ---
 
 # 用程序维护 Cloudflare 资源
@@ -105,6 +105,12 @@ SQL introspection 另有 `include_attributes`／`attributes` 新名字，发现�
 10 月 22 日起，Cloudflare **产品专用** MCP servers 只提供 `/mcp`；旧 `/sse` 返回 **410 Gone**，附新地址。将客户端配置改为服务器公布的 `/mcp`，例如 `https://docs.mcp.cloudflare.com/mcp`；原来经 `/sse` 登录的客户端需要重新登录。已经用 `/mcp` 的连接不受此项变化影响。它不表示所有第三方 MCP 都采用同一迁移安排。[S181]
 
 
+### cf 1.0 RC 与订阅权限
+
+11 月 17 日发布的 cf 1.0 RC 切换至 `.cloudflare/output/v1/`。RC 首次 deploy 会重建旧格式产物；Vite 项目需 `@cloudflare/vite-plugin` **2.0.0-rc.0+**，依赖 Wrangler 的旧项目需 **4.163.0+**。检查本项目锁定工具、build 目录和脚本调用，再决定迁移。[S247]
+
+11 月 25 日新增从 CLI／MCP 开通 Workers Paid、R2 与 Zero Trust 的能力。CLI 需要 **rc.5+**、重新认证拿到 scopes，账户也要有已核验邮箱及含付款方式的 billing profile。支持 MCP **2026-07-28** 与 elicitation 的客户端展示价格并请求确认，其余客户端回到 Dashboard。文档搜索、查看用量与授权订阅是不同权限，自动化应明确停在所有者同意之前。[S248]
+
 ## 先搜文档，再读取原页
 
 2026-10-16 公告介绍 CLI `1.0.0-beta.16` 的 `cf docs search`：它搜索 guides、tutorials、examples 和产品文档，返回**最多五条按相关度排序的 JSON**，每项含 title、description 与 documentation URL。该命令需要互联网连接；公告示例未要求 Cloudflare 登录。[S160]
@@ -181,3 +187,6 @@ cf analytics_engine sql query           -> cf analytics-engine sql query
 [S215]: https://developers.cloudflare.com/changelog/post/2026-11-04-model-aliases/ "AI Gateway model aliases 发布"
 
 [S216]: https://developers.cloudflare.com/ai-gateway/features/routing/model-aliases/ "Model aliases 的路由与输入边界"
+
+[S247]: https://developers.cloudflare.com/changelog/post/2026-11-17-release-candidate/ "Cloudflare CLI 1.0 RC 与 Build Output v1"
+[S248]: https://developers.cloudflare.com/changelog/post/2026-11-25-activate-pay-as-you-go-cli-mcp/ "CLI 与 MCP 可开通 Cloudflare 订阅"

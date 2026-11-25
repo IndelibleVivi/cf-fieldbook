@@ -1,8 +1,8 @@
 ---
 id: service.decision-models
 reviewed_on: 2026-11-06
-source_cutoff: 2026-11-06
-review_scope: 11-06 仅补 Gateway 认证、账户级 token 与 model aliases；模型价格、窗口、Clairic 疑点和性能保留原核验范围
+source_cutoff: 2026-11-26
+review_scope: 11-26 定向复看 Clairic 原位升级、Flash、输入计量及价格；其他模型与路线保留原范围
 evidence: official-documents-only
 ---
 
@@ -51,7 +51,9 @@ AI Gateway Read／Run／Edit token 是 **account-scoped**，不能限制单个 g
 
 ## Clairic：有类型的值与可定位原文
 
-Clairic 于 **2026-10-19** 进入 preview，Workers AI 选择器为 `@cf/cloudflare/clairic`。传入 `state` 和 `fields`，返回每个字段的 typed value；`text` 可附原文字符位置，缺少依据时 `value` 可为 `null`。输入标价 **$0.10／百万 tokens**，没有生成输出 token 费用。[S163] [S164]
+11 月 18 日，原 Workers AI 选择器 `@cf/cloudflare/clairic` 原位更新为 27B 版本，另提供 9B 的 `@cf/cloudflare/clairic-flash`；两者均发布权重，托管模型卡仍有 preview 字样。传入 `state` 和 `fields`，返回有类型的字段值、confidence，`text` 可附字符位置，证据缺失时可返回 `null`。[S163] [S164] [S235] [S236]
+
+两者当前均为 **$0.10／百万输入 tokens**。从 **2026-12-01** 起，Clairic 优惠结束，售价变为 **$0.24／M**，Clairic-flash 维持 **$0.10／M**。输出 token 不收费。[S237]
 
 例如下面的合成部署通知可以定义版本、时间、错误代码和缺失的负责人字段。这只是供另行授权试验使用的 binding 输入形状，没有发出模型请求：
 
@@ -70,9 +72,11 @@ Clairic 于 **2026-10-19** 进入 preview，Workers AI 选择器为 `@cf/cloudfl
 
 先检查 `answers.*.value` 与已知材料相符、缺失负责人返回 `null`；字符 span 能定位回原文。把错误代码移至材料尾部，再检查 `truncated` 和尾部证据是否仍可见，记录 `p_null`、confidence 与实际失败。中文、emoji 的 offset 应以返回位置回读确认，不能假定所有语言运行时的字符串索引等价。[S164]
 
-### 65,536 与 8,192：暂不能合并成一个输入承诺
+<!-- chapter: 65536-与-8192暂不能合并成一个输入承诺 -->
 
-10 月 20 日查阅、10 月 28 日复看时，同一模型页的表格仍写 **65,536-token context**，`fields` 说明写字段和材料装入 **8,192-token pass**。两者关系没有解释清楚，本书保留疑点；先用短材料验证，不把较大的数字当成完整读取保证。字段会拆分为多个 pass，费用看响应的 `usage.input_tokens` 和 `usage.passes`，不能仅以原文长度乘单价。多 pass 可能重复计入材料是费用核查理由，具体计量仍以实际响应与后续官方澄清为准。[S164]
+### 65,536 上下文与每个 pass 的输入费用
+
+两张现行模型卡均列 **65,536 tokens**，旧 Clairic 卡的 8,192-token pass 字样已移除。各 pass 重计整个 `state` 和全部图片，字段与媒体要占同一个上下文预算，文字仍可能被截断。保留合成样本的尾部证据，检查 `truncated`、`usage.input_tokens` 和 `usage.passes`，再估算真实材料的费用。[S164] [S236]
 
 从长聊天判断一个人重视什么，还涉及语境、修订和评价标准；字段类型齐全不能替代这类质量验证。本页没有把抽取能力写成已经通过的记忆理解实验。
 
@@ -83,7 +87,7 @@ Workers AI 新增 `@cf/deepseek-ai/deepseek-v4.1-flash-1017`，模型卡列 **1,
 
 从实际问题进入：[材料到来后，下一步做什么](../use-cases/bounded-decision.md)。准备请求：[离线适配示例](../examples/decision-routing/README.md)。
 
-本页 2026-10-20 新增 Clairic 与 DeepSeek 路线；Clef 系列的标价、托管上下文与输入字段保留 2026-10-13 核对范围，Jev 沿用 2026-10-02。此条目只说明公开接口和用途，不声称任何个人账户已取得全部模型权限或完成实测。
+Clairic 家族于 2026-11-26 定向查阅；原 10 月 20 日 DeepSeek 记录、10 月 13 日 Clef 价格／输入与 10 月 2 日 Jev 资料仍按各自范围阅读。
 
 [S163]: https://developers.cloudflare.com/changelog/post/2026-10-19-clairic-workers-ai/ "Clairic preview：有类型的字段抽取"
 
@@ -116,3 +120,9 @@ Workers AI 新增 `@cf/deepseek-ai/deepseek-v4.1-flash-1017`，模型卡列 **1,
 [S215]: https://developers.cloudflare.com/changelog/post/2026-11-04-model-aliases/ "AI Gateway model aliases 发布"
 
 [S216]: https://developers.cloudflare.com/ai-gateway/features/routing/model-aliases/ "Model aliases 的路由与输入边界"
+
+<!-- SOURCES -->
+
+[S235]: https://blog.cloudflare.com/open-clairic/ "Clairic 原位更新、Flash、开放权重与优惠"
+[S236]: https://developers.cloudflare.com/workers-ai/models/clairic-flash/ "Clairic-flash 模型卡与输入计量"
+[S237]: https://developers.cloudflare.com/workers-ai/platform/pricing/ "Workers AI 的 Clairic 系列价格与优惠终止"

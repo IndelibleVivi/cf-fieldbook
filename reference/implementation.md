@@ -2,7 +2,7 @@
 title: Cloudflare 实施参考
 subtitle: 从一个入口到可恢复的应用与自动化
 edition: 2026.10 · 修订 1
-source_cutoff: 2026-11-06
+source_cutoff: 2026-11-26
 author: Faye & Cove
 github: https://github.com/IndelibleVivi
 status: implementation-reference-snapshot
@@ -11,11 +11,11 @@ scope: 不含邮件；示例与实际账户分离
 
 # Cloudflare 实施参考
 
-**面向实施、审查与 agent 的完整技术材料 · 资料截至 2026-11-06**
+**面向实施、审查与 agent 的完整技术材料 · 资料截至 2026-11-26**
 
 本文件集中保存实现说明、代码、恢复语义和来源；按用途阅读可从[实践手册](../guides/handbook.md)开始。本文按资料截止日阅读，实际部署需要验证自己的环境。
 
-2026-11-06 定向补充 D1 查询结果上限、DO 自动重试与延迟代码更新、Worker compatibility 默认值、Access token tags、Gateway 认证和私网路线。当前条件见[11 月 6 日观察](../reports/2026-11-06.md)，未核验条款仍按下文原范围阅读。
+2026-11-26 定向补充 Workflow 并发、公开检索、Clairic、Worker／Pages 版本保留与支出限制，见[当期观察](../reports/2026-11-26.md)。[11 月 6 日观察](../reports/2026-11-06.md)保留 D1 结果上限、DO 重试、Worker compatibility 默认值、Access、Gateway 和私网条件的原范围。
 
 2026-10-13 定向补充 Workers 排空、Queues／D1 地点约束、Clef 输入预算和 Artifacts 计费／限制；2026-10-20 再纳入 CJK 检索、Clairic、Artifacts 时间，以及 Cron、SSH、Tunnel 和构建条件。10 月 28 日补 D1 undelete、Workflows 地点、Tunnel 路径与角色、发布默认值和镜像 CA；其余保留原范围。API／SDK 入口见[维护参考](api-maintenance.md)，本期资料范围见[10 月 28 日观察](../reports/2026-10-28.md)，此前记录见[10 月 20 日](../reports/2026-10-20.md)与[10 月 13 日](../reports/2026-10-13.md)。
 
@@ -393,6 +393,10 @@ Cron 使用 UTC。业务想按当地日期执行时，把时区与夏令时语�
 
 Wrangler **4.158.0+** 可导入 `cloudflare:durable-objects` 的 `retryable()`，并为 `get()`／`getByName()` 指定 `retry: { maxRetries, timeoutMs }`。`maxRetries` 为 0–10，`timeoutMs` 为 500–60,000 ms，默认 4／10,000；此期限不取消首个 attempt。外层重试需把平台内层次数计入总预算，可在自己完整负责时设 `maxRetries: 0`。本书合成 API 例子不调用 DO，未据此改模型行为。[S205] [S206]
 
+### Workflow 的并发上限
+
+在该 Workflow binding 上保留 `concurrency.limit`，取不高于账户上限的正整数。降低值以后已运行实例继续执行；下次部署省略该值会移除上限。用有限的合成负载检查排队和下游连接数，单独核对重试与截止时间。[S239]
+
 ## 09 / 检索与记忆：先让人找回原件，再让模型组织答案
 
 ### 两条路径分别解决不同问题
@@ -447,7 +451,7 @@ Cloudflare Agent Memory 当前仍为 private beta，与 AI Search 的 GA 状态�
 
 ### 检索的成本也要按阶段观察
 
-分别记录摄取、embedding、候选查询、重排、原文核验和生成耗时。AI Search 11 月新计费把内部 embedding、重排与存储等纳入服务规则，但生成与外部模型仍需另看；自行使用 Workers AI + Vectorize 则仍按各产品计费。[S10] [S40] [S41]
+分别记录摄取、embedding、候选查询、重排、原文核验和生成耗时。AI Search 公布费用于 12 月 1 日起算，托管 embedding 与重排计入 AI Search；文件摘要、生成、查询改写及外部模型仍需按相应产品计费。开启摘要会全量重建，更新时带回原有 `indexing_options`。D1 数据源和公开站点端点的权限／索引边界见[检索页](../services/search.md#网站公开搜索与私有集合)。[S10] [S204] [S234] [S40] [S41]
 
 若一个搜索需要十几秒，先看各阶段，而不是立刻换模型。重复生成查询向量、串行权限查询、取回过大上下文、冷启动和远端超时都可能占时间。保留“只检索、不生成”的基线，才能知道生成式回答增加了多少延迟与收益。
 
@@ -493,7 +497,7 @@ Clef 系列输出定义好选项的概率，适合分类、选择或排序任务
 
 ### Clairic 抽取：字段结果仍须回到原文
 
-`@cf/cloudflare/clairic` 的输入使用 `model: "clairic"`、`state` 与 `fields`，与决策模型的 `questions` 分开适配。先用[模型页的短合成材料](../services/decision-models.md)检查缺失值、尾部证据、原文位置、`truncated` 与 `usage.input_tokens`。65,536 context 与 8,192-token pass 的同页差异未解决，不能直接套较大预算；多步算术先抽取值，再用代码计算。未做真实模型调用。[S163] [S164]
+原选择器 `@cf/cloudflare/clairic` 已原位更新为 27B，轻量选择器为 `@cf/cloudflare/clairic-flash`；`state` 与 `fields` 仍是字段抽取接口。先固定一套[短合成材料](../services/decision-models.md)，检查缺失值、尾部证据、原文位置、`truncated` 和实测 pass 用量。每 pass 重计完整文字与媒体；多步算术可以将字段值交给代码处理。[S164] [S235] [S236]
 
 
 ## 11 / Agent 执行：持久身份、Linux 环境与文件历史分开
@@ -558,11 +562,15 @@ DO 默认延迟代码更新最多 **300 秒**等待 active object 休眠，到�
 
 对 `compatibility_date >= 2026-11-17`，JavaScript Worker 默认启用新 module registry，Python 保留旧 registry；无效 import attributes 被拒绝，`require()` 加载 ES module 及其依赖不能带 top-level `await`。提前试用设 `new_module_registry`，保留旧行为设 `legacy_module_registry`。[S217]
 
+`Temporal` 对 `compatibility_date >= 2026-12-01` 默认可用。早期日期可用 `temporal` 开启，`no_temporal` 可关闭；日期处理库、兼容日期与目标 runtime 要一起核对。[S249]
+
 同日起该日期范围默认启用 `request.signal` 的客户端断开通知；取消出站请求时显式传 signal，不会同时启用 `request_signal_passthrough`。提前试用用 `enable_request_signal`，opt out 用 `disable_request_signal`。旧日期不因日历推进自动变化，断开也不撤销已有副作用。[S218]
 
 ### Preview URL 不证明数据隔离
 
 当前资源规则中，某些预览状态（例如 DO 和 Containers）有自动隔离支持，其他数据资源则依赖配置。D1、R2、KV、队列或 Vectorize 若指向同一目标，预览仍可能操作正式数据。逐项看绑定，不用一个“Preview”标签代替确认。[S63]
+
+Workers versions 与 Pages deployments 保留 **30 天**，分别保留各自最新 **100** 个和当前部署。Worker Version URL 与 Pages 单次部署 URL 会随对应版本删除而失效。分支或 PR 用 Worker Previews 时，Preview URL 指向该 Preview 的最新部署；CPU／heap profiling 可按具体 deployment 取样。需要长期验收时，另存版本 ID、提交与产物，并确认回滚目标仍可用。[S241] [S242] [S243] [S244]
 
 外部贡献的 PR 不应自动拿到生产 token、真实用户数据和宽泛出站权限。预览用合成数据；需要特定外部服务时使用独立测试身份并限制费用。部署结束记得清理预览产生的文件、队列和临时资源。
 
@@ -633,7 +641,11 @@ Workers 侧的观测不会自动看到所有本机脚本、第三方平台和离
 
 ### 免费、包含、测试期间不收费是三种承诺
 
-免费计划可能达到上限就失败；Paid 包含量之外可能继续计费；beta 免费则可能有明确未来起算日。11 月 6 日查阅时，Artifacts 价格页改写 **11 月 12 日**起算，旧 changelog／博客仍写 10 月 14／15 日；三处不一致，不能继续把“已进入计费期”当作定论，按现价预留预算并保留历史用量未知。AI Search 已明确将收费延期至 **12 月 1 日**。核验、公告与生效日期分别记录。[S07] [S08] [S135] [S204] [S10]
+Artifacts 的 operations／storage 现价页写 **11 月 19 日**起算，较早的记录列 10 月 14／15 日和 11 月 12 日；历史实际起算未知，仓库数量费另候公告。AI Search 公布 **12 月 1 日**起算，Clairic 同日结束优惠。[S07] [S08] [S135] [S10] [S204] [S237]
+
+### Workers 与 DO 的支出限制
+
+到对应账户的 **Billing → Spend Management** 为 Workers 或 DO 选择支出阈值、告警或阻断。阻断会暂停该产品支持的操作，告警则继续服务。已发生用量、计量延迟、DO 存储和基础订阅费仍要计入总预算。CLI／MCP 已可在符合客户端与账户条件时开通订阅，流程须取得账户所有者对这次费用的授权。[S245] [S246] [S248]
 
 ## 15 / 排障、恢复与停用
 
@@ -1007,3 +1019,17 @@ GitHub：[github.com/IndelibleVivi](https://github.com/IndelibleVivi)
 [S226]: https://blog.cloudflare.com/private-origins-public-to-private/ "Private origins public-to-private GA 公告"
 
 [S227]: https://developers.cloudflare.com/dns/private-origins/ "Private origins 账户、网络与当前限制"
+
+[S234]: https://developers.cloudflare.com/changelog/post/2026-11-17-file-summaries/ "AI Search 文件摘要、重建与独立计费"
+[S235]: https://blog.cloudflare.com/open-clairic/ "Clairic 原位更新、Flash、开放权重与优惠"
+[S236]: https://developers.cloudflare.com/workers-ai/models/clairic-flash/ "Clairic-flash 模型卡与输入计量"
+[S237]: https://developers.cloudflare.com/workers-ai/platform/pricing/ "Workers AI 的 Clairic 系列价格与优惠终止"
+[S239]: https://developers.cloudflare.com/changelog/post/2026-11-10-per-workflow-concurrency-limits/ "单条 Workflow 的并发上限"
+[S241]: https://developers.cloudflare.com/changelog/post/2026-11-19-workers-pages-version-retention/ "Workers 版本与 Pages 部署保留期公告"
+[S242]: https://developers.cloudflare.com/workers/versions-and-deployments/#version-retention "Workers 版本保留、Version URL 与回滚范围"
+[S243]: https://developers.cloudflare.com/pages/platform/limits/#deployments "Pages 部署保留与回滚范围"
+[S244]: https://developers.cloudflare.com/changelog/post/2026-11-23-previews-profiling/ "Worker Previews 的 CPU 与 heap profiling"
+[S245]: https://developers.cloudflare.com/changelog/post/2026-11-13-spend-management/ "Workers 和 DO 的 spend limits 公告"
+[S246]: https://developers.cloudflare.com/billing/manage/spend-management/ "支出限制的阻断范围及计量排除项"
+[S248]: https://developers.cloudflare.com/changelog/post/2026-11-25-activate-pay-as-you-go-cli-mcp/ "CLI 与 MCP 可开通 Cloudflare 订阅"
+[S249]: https://developers.cloudflare.com/workers/configuration/compatibility-flags/#enable-the-temporal-api "Workers Temporal compatibility flag"

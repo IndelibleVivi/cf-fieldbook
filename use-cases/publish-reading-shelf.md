@@ -1,7 +1,7 @@
 ---
 title: 把同一个资料架公开发布
 subtitle: 从本地阅读到关机后仍可访问、更新与停用
-source_cutoff: 2026-11-06
+source_cutoff: 2026-11-26
 ---
 
 # 把同一个资料架公开发布
@@ -94,6 +94,8 @@ WRANGLER_SEND_METRICS=false npx --no-install wrangler dev --local --ip 127.0.0.1
 
 本地核对页面和下载都含新句，停止预览后，再执行第 3 节的同一部署命令，更新**同一个名称、同一个账户**。从独立客户端重新读取公开页面和原文，确认两处均已更新。页面仍旧时，依次检查本地是否生成、目标是否相同、部署输出和客户端缓存；只刷新本地文件不会改变云端副本。
 
+如需回到旧版本，先看当前账户还列出哪些版本。Workers 会保留 **30 天**内的版本，以及最近 **100** 个和当前部署。已删除版本的 Version URL 连同 alias 会失效；想长期保留资料架某次发布的证据，可留原件、构建产物与版本 ID。[S241] [S242]
+
 ## 5 / 停用与清理这次独立资源
 
 结束前先保存需要的原件、公开 URL、Worker 名称和部署结果。确认本次资源只有静态文件，没有接入其他项目；删除前再次核对目标账号与本地配置。**下面这一条会删除配置指定的 Worker**，请阅读 CLI 提示后确认，不加入自动确认参数：[S174]
@@ -106,7 +108,7 @@ npx --no-install wrangler delete --config wrangler.publish.jsonc
 
 ## 如果只想挂到一个路径前缀
 
-10 月 28 日的 Static Assets 支持 `assets.base_path`，Wrangler **4.148.0+** 可在不移动目录的情况下将静态内容挂到 `/blog` 一类前缀；cf 对应 `worker.assets.basePath`，要求 **1.0.0-beta.13+**。[S222]
+Static Assets 支持 `assets.base_path`，Wrangler **4.148.0+** 可在不移动目录的情况下将静态内容挂到 `/blog` 一类前缀；cf 对应 `worker.assets.basePath`，要求 **1.0.0-beta.13+**。11 月 11 日公告再次列出两条配置，当前示例的固定工具与根路径配置继续可读。[S222] [S252]
 
 这是另一个明确选择，当前四文件模板仍从根路径分发。改变前缀后，要重新核对页面导航、三份原文下载、未知路径和源码路径的拒绝；不能只改配置就宣布成品链接已经正确。本轮没有修改模板、安装新版工具或执行远端部署。
 
@@ -123,3 +125,7 @@ npx --no-install wrangler delete --config wrangler.publish.jsonc
 [S174]: https://developers.cloudflare.com/workers/wrangler/commands/workers/ "Wrangler 预览、部署与删除"
 
 [S222]: https://developers.cloudflare.com/changelog/post/2026-10-28-static-assets-base-path/ "Static Assets 从 URL 路径前缀分发"
+
+[S241]: https://developers.cloudflare.com/changelog/post/2026-11-19-workers-pages-version-retention/ "Workers 版本与 Pages 部署保留期公告"
+[S242]: https://developers.cloudflare.com/workers/versions-and-deployments/#version-retention "Workers 版本保留、Version URL 与回滚范围"
+[S252]: https://developers.cloudflare.com/changelog/post/2026-11-11-static-assets-base-path/ "Static Assets 路径前缀与 CLI 版本"

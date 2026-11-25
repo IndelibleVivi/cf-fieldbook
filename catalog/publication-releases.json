@@ -4,6 +4,22 @@
   "releases": [],
   "updates": [
     {
+      "date": "2026-11-26",
+      "families": [
+        "handbook",
+        "comparison"
+      ],
+      "kind": "content",
+      "topics": [
+        "public-site-search",
+        "clairic-price-change",
+        "pi-tool-parking",
+        "deployment-retention",
+        "spend-management"
+      ],
+      "summary": "手册新增公开检索、索引计量、Pi 1.6、版本保留与支出限制；专题只更新 Clairic 用途入口。当前资料上界推进至 11-26，历史报告和冻结版次按原资料日期阅读。"
+    },
+    {
       "date": "2026-11-06",
       "families": [
         "handbook",

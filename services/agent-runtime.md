@@ -1,7 +1,7 @@
 ---
 title: Agent 的工作怎样持续，工具在哪里执行
 subtitle: Harness、Durable Object 与执行环境的分工
-source_cutoff: 2026-11-06
+source_cutoff: 2026-11-26
 ---
 
 # Agent 的工作怎样持续，工具在哪里执行
@@ -43,6 +43,12 @@ Pi 1.5 会话不能由 **1.4** 读取，之前 1.4 迁移也不能由 **1.3** �
 ### Skills 现在从文件加载
 
 Agents SDK **0.32.0+**、Think **0.23.0+** 可从 Computer Workspace、R2 或代码加载 skills，Think 每轮重新列目录；`/workspace/.agents/skills/` 的文件可在下一轮使用。旧 `agents:skills`、compile、`SkillRegistry`、`skillWorkspace` 移除，`runner()` 改从 `agents/skills/runner` 接入。部分格式违规会带 warning 加载，但缺 description、缺失或不可解析的 frontmatter 等仍会跳过；写入前用 `parseSkill()` 核对；加载成功不证明严格校验或工具权限已经满足。[S210] [S211]
+
+## Pi 1.6：工具挂起与唤醒
+
+Agents SDK **0.34.0** 接入 Pi 1.6。`ToolPark` 等待信号或期限时不占 invocation，DO 可以休眠；收到 `harness.signal()` 或超时后会重新运行工具。将提问、发通知等动作绑到持久身份，醒来时先看是否已有答案或外部回执。`beforeTool` 可在执行前挂起审批，`notify` 可在子会话 settle 时唤醒父会话。[S238]
+
+`init` 可在创建 session 时送入已有 transcript；`submit(..., { onAbort: "keep" })` 可保留排队输入。已在 1.6 上跑过的会话，其工具与模型请求不能由 1.5 接续，升级后以向前修复为恢复路线。MCP 重授权收到带 `authUrl` 的 `MCPAuthorizationRequiredError`，失败 server 需要 `reconnectMcpServer(id)`。默认失败 HTTP 响应是通用 500，WebSocket upgrade 失败关闭码为 1011；按需用 `onFetchError()` 定义响应。[S238]
 
 ## Computer：重放执行记录，仍要保护外部动作
 
@@ -115,7 +121,13 @@ Browser Run 10 月 30 日默认更新 Chrome **152**，Quick Actions UA 随之�
 
 11 月 5 日起，stub 的 `fetch()`／RPC 可自动重试特定 `.retryable` 传输错误，默认首次加 4 次、不在首次开始 10 秒后启动新重试。未知接收结果沿同一请求身份去重；`retryable()` 标记则允许已到达的方法再次执行，须先保证幂等。应用错误、overload、HTTP 错误响应及不可重发的 stream／RPC 参数不适用。Wrangler **4.158.0+** 才提供新标记与 stub 配置；外层重试须计入平台次数。[S205] [S206]
 
+### 本地模拟的证据边界
+
+Artifacts 在 Wrangler、Vite 和 Vitest 本地运行时默认使用分开的 repo 模拟器；`remote = true` 连接已部署 repo，HTTPS import 会发外部请求。Browser Run Quick Actions 在 Wrangler dev 用本机 Chrome，`json` 仅返回符合 schema 的占位值，Kitesurf 尚未纳入本地模式。[S250] [S251]
+
 ## Runtime 更新时，连接能多持续多久
+
+11 月 19 日起，重启中的机器会更早离开存储组。SQLite-backed DO 可能少遇到 reset，实际收益随负载而异。连接关闭后仍需重连，并核对最后确认的状态。[S240]
 
 2026-10-12 起，Workers 例行 runtime 更新给旧进程的既有请求和连接最多 20 分钟排空，此前为最多 30 秒；新 HTTP 请求转到新 runtime。窗口属于旧进程，不能解释成每条请求都另外获得 20 分钟。[S125] [S126]
 
@@ -178,3 +190,8 @@ Browser Run 10 月 30 日默认更新 Chrome **152**，Quick Actions UA 随之�
 [S220]: https://developers.cloudflare.com/changelog/post/2026-10-30-chrome-152/ "Browser Run 更新到 Chrome 152"
 
 [S221]: https://developers.cloudflare.com/changelog/post/2026-11-03-crawl-result-diagnostics/ "Browser Run crawl 结果与 robots.txt 诊断"
+
+[S238]: https://developers.cloudflare.com/changelog/post/2026-11-20-pi-harness-pi-1-6/ "Agents SDK 0.34.0 与 Pi 1.6 挂起、信号及迁移"
+[S240]: https://developers.cloudflare.com/changelog/post/2026-11-19-durable-objects-runtime-update-reliability/ "DO runtime 更新时的存储组调整"
+[S250]: https://developers.cloudflare.com/changelog/post/2026-11-16-local-artifacts-development/ "Artifacts 本地模拟器与远端绑定"
+[S251]: https://developers.cloudflare.com/changelog/post/2026-11-13-quick-actions-local-dev/ "Browser Run Quick Actions 本地模式与占位输出"
